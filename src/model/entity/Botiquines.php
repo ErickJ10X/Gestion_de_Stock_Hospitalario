@@ -2,17 +2,17 @@
 
 namespace model\entity;
 
-class Planta
+class Botiquines
 {
     private $id;
     private $nombre;
-    private $hospital_id;
+    private $planta_id;
 
-    public function __construct($id = null, $nombre = null, $hospital_id = null)
+    public function __construct($id = null, $nombre = null, $planta_id = null)
     {
         $this->id = $id;
         $this->nombre = $nombre;
-        $this->hospital_id = $hospital_id;
+        $this->planta_id = $planta_id;
     }
 
     public function getId()
@@ -35,13 +35,13 @@ class Planta
         $this->nombre = $nombre;
     }
 
-    public function getHospitalId()
+    public function getPlantaId()
     {
-        return $this->hospital_id;
+        return $this->planta_id;
     }
 
-    public function setHospitalId($hospital_id)
+    public function setPlantaId($planta_id)
     {
-        $this->hospital_id = $hospital_id;
+        $this->planta_id = $planta_id;
     }
 }

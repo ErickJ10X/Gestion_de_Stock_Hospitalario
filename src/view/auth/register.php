@@ -1,8 +1,14 @@
 <?php
+
+use controller\AuthController;
+use util\AuthGuard;
+use model\enum\RolEnum;
+
 session_start();
 require_once(__DIR__ . '/../../controller/AuthController.php');
-require_once(__DIR__ . '/../../util/authGuard.php');
-require_once(__DIR__ . '/../../model/service/userService.php');
+require_once(__DIR__ . '/../../util/AuthGuard.php');
+require_once(__DIR__ . '/../../model/service/UsuarioService.php');
+require_once(__DIR__ . '/../../model/enum/RolEnum.php');
 
 $authGuard = new AuthGuard();
 $authGuard->requireNoAuth();
@@ -12,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $authController->register();
 }
 
-$userService = new model\service\UserService();
+$userService = new model\service\UsuarioService();
 $rolOptions = $userService->getRolOptions();
 
 include('../templates/header.php');
@@ -21,7 +27,7 @@ include('../templates/header.php');
     <div>
         <div>
             <div>
-                <h2">Registro de Usuario</h2>
+                <h2>Registro de Usuario</h2>
 
                 <?php if (isset($_GET['error'])): ?>
                     <div>
@@ -55,7 +61,7 @@ include('../templates/header.php');
                         <input type="password" name="confirmar_contrasena" required>
                     </div>
                     
-                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador'): ?>
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === RolEnum::ADMINISTRADOR): ?>
                     <div>
                         <label for="rol">Rol:</label>
                         <select name="rol">

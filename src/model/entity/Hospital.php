@@ -4,8 +4,8 @@ namespace model\entity;
 
 class Hospital
 {
-    private $id;
-    private $nombre;
+    public int $id;
+    public string $nombre;
 
     public function __construct($id, $nombre)
     {
@@ -13,24 +13,25 @@ class Hospital
         $this->nombre = $nombre;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function getNombre()
+    public function getNombre(): string
     {
         return $this->nombre;
     }
 
-    public function setNombre($nombre): void
+    public function setNombre(string $nombre): void
     {
         $this->nombre = $nombre;
     }
+
 
 }

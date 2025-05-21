@@ -1,23 +1,24 @@
 <?php
 
 namespace model\service;
-require_once(__DIR__ . '/../../config/database.php');
-require_once(__DIR__ . '/../repository/usuarioRepository.php');
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../repository/UsuarioRepository.php');
 require_once(__DIR__ . '/../entity/Usuario.php');
 require_once(__DIR__ . '/../enum/RolEnum.php');
 
 use model\entity\Usuario;
-use App\model\enum\RolEnum;
-use \PDOException;
-use \Exception;
+use model\enum\RolEnum;
+use model\repository\UsuarioRepository;
+use PDOException;
+use Exception;
 
-class UserService
+class UsuarioService
 {
-    private \model\repository\UsuarioRepository $usuarioRepository;
+    private UsuarioRepository $usuarioRepository;
 
     public function __construct()
     {
-        $this->usuarioRepository = new \model\repository\UsuarioRepository();
+        $this->usuarioRepository = new UsuarioRepository();
     }
 
     public function getAllUsuarios(): array
@@ -87,7 +88,7 @@ class UserService
                     'id' => $usuario->getId(),
                     'nombre' => $usuario->getNombre(),
                     'email' => $usuario->getEmail(),
-                    'rol' => $usuario->getRolValue()
+                    'rol' => $usuario->getRol()
                 ];
             }
             return false;
@@ -117,5 +118,13 @@ class UserService
     public function getRolOptions(): array
     {
         return RolEnum::getValues();
+    }
+
+    public function getUsuarioById($id) {
+        try {
+            return $this->usuarioRepository->findById($id);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener usuario: " . $e->getMessage());
+        }
     }
 }

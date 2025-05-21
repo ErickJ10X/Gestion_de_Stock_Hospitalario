@@ -1,4 +1,5 @@
 <?php
+namespace util;
 class Redirect {
     public static function to(string $path, array $params = []): void {
         $url = $path;

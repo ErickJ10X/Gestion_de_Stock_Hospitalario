@@ -1,14 +1,14 @@
 <?php
 
 namespace model\service;
-require_once(__DIR__ . '/../../config/database.php');
+require_once(__DIR__ . '/../../../config/database.php');
 require_once(__DIR__ . '/../repository/HospitalesRepository.php');
 require_once(__DIR__ . '/../entity/Hospital.php');
 
 use model\entity\Hospital;
 use model\repository\HospitalesRepository;
-use \PDOException;
-use \Exception;
+use PDOException;
+use Exception;
 
 class HospitalService
 {

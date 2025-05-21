@@ -1,22 +1,24 @@
 <?php
+namespace controller;
 
-use model\service\UserService;
-use model\entity\Usuario;
-use App\model\enum\RolEnum;
+use model\service\UsuarioService;
+use model\enum\RolEnum;
+use util\Session;
+use Exception;
 
-require_once(__DIR__ . '/../model/service/userService.php');
+require_once(__DIR__ . '/../model/service/UsuarioService.php');
 require_once(__DIR__ . '/../model/entity/Usuario.php');
 require_once(__DIR__ . '/../model/enum/RolEnum.php');
-include_once(__DIR__ . '/../util/session.php');
+include_once(__DIR__ . '/../util/Session.php');
 
 class UsuarioController
 {
-    private UserService $userService;
+    private UsuarioService $userService;
     private Session $session;
 
     public function __construct()
     {
-        $this->userService = new UserService();
+        $this->userService = new UsuarioService();
         $this->session = new Session();
     }
 
@@ -48,7 +50,7 @@ class UsuarioController
         return $user;
     }
 
-    public function register($nombre, $email, $password, $rol = RolEnum::USUARIO_BOTIQUIN->value): void
+    public function register($nombre, $email, $password, $rol = RolEnum::USUARIO_BOTIQUIN): void
     {
         if (empty($nombre) || empty($email) || empty($password)) {
             throw new Exception("El nombre, email y contraseña son obligatorios");
@@ -190,5 +192,13 @@ class UsuarioController
             return $_SERVER['REMOTE_ADDR'];
         }
         return 'unknown';
+    }
+
+    public function getUserById($id) {
+        try {
+            return $this->userService->getUsuarioById($id);
+        } catch (Exception $e) {
+            throw new Exception("Error al obtener el usuario: " . $e->getMessage());
+        }
     }
 }

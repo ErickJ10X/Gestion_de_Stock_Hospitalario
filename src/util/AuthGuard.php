@@ -1,9 +1,12 @@
 <?php
-include_once(__DIR__ . '/session.php');
-include_once(__DIR__ . '/redirect.php');
+
+namespace util;
+include_once(__DIR__ . '/Session.php');
+include_once(__DIR__ . '/Redirect.php');
 require_once(__DIR__ . '/../model/enum/RolEnum.php');
 
-use App\model\enum\RolEnum;
+use model\enum\RolEnum;
+
 
 class AuthGuard {
     private Session $session;
@@ -27,7 +30,7 @@ class AuthGuard {
     public function requireAdmin(): void {
         $this->requireAuth();
 
-        if ($this->session->get('rol') !== RolEnum::ADMINISTRADOR->value) {
+        if ($this->session->get('rol') !== RolEnum::ADMINISTRADOR) {
             Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php', 'No tienes permisos para acceder a esta página');
         }
     }
@@ -47,9 +50,9 @@ class AuthGuard {
         $this->requireAuth();
         
         $allowedRoles = [
-            RolEnum::ADMINISTRADOR->value, 
-            RolEnum::GESTOR_GENERAL->value, 
-            RolEnum::GESTOR_HOSPITAL->value
+            RolEnum::ADMINISTRADOR, 
+            RolEnum::GESTOR_GENERAL, 
+            RolEnum::GESTOR_HOSPITAL
         ];
         
         $userRole = $this->session->get('rol');
@@ -64,9 +67,9 @@ class AuthGuard {
         $this->requireAuth();
         
         $allowedRoles = [
-            RolEnum::ADMINISTRADOR->value, 
-            RolEnum::GESTOR_GENERAL->value,
-            RolEnum::GESTOR_HOSPITAL->value
+            RolEnum::ADMINISTRADOR, 
+            RolEnum::GESTOR_GENERAL,
+            RolEnum::GESTOR_HOSPITAL
         ];
         
         $userRole = $this->session->get('rol');
@@ -75,5 +78,10 @@ class AuthGuard {
             $this->session->setMessage("error", "No tienes permisos para gestionar plantas");
             Redirect::toHome();
         }
+    }
+    
+    // Método necesario para verificación de sesión en los controladores
+    public function checkSession(): void {
+        $this->requireAuth();
     }
 }

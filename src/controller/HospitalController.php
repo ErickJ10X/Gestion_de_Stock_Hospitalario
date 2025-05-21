@@ -1,11 +1,14 @@
 <?php
+namespace controller;
 
 require_once(__DIR__ . '/../model/service/HospitalService.php');
 require_once(__DIR__ . '/../model/entity/Hospital.php');
-include_once(__DIR__ . '/../util/session.php');
+include_once(__DIR__ . '/../util/Session.php');
 
 use model\service\HospitalService;
 use model\entity\Hospital;
+use util\Session;
+use Exception;
 
 class HospitalController
 {

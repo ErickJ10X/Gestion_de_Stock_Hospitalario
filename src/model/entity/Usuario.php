@@ -2,108 +2,72 @@
 
 namespace model\entity;
 
-require_once(__DIR__ . '/../enum/RolEnum.php');
-use App\model\enum\RolEnum;
-
 class Usuario
 {
-    private int $id;
-    private string $nombre;
-    private string $email;
-    private string $contrasena;
-    private RolEnum $rol;
+    private $id;
+    private $nombre;
+    private $email;
+    private $contrasena;
+    private $rol;
 
-    public function __construct(int $id, string $nombre, string $email, string $contrasena, string|RolEnum $rol)
+    public function __construct($id = null, $nombre = null, $email = null, $contrasena = null, $rol = null)
     {
         $this->id = $id;
         $this->nombre = $nombre;
         $this->email = $email;
-        
-        if (strpos($contrasena, '$2y$') === 0) {
-            $this->contrasena = $contrasena;
-        } else {
-            $this->contrasena = password_hash($contrasena, PASSWORD_BCRYPT);
-        }
-        
-        if ($rol instanceof RolEnum) {
-            $this->rol = $rol;
-        } else {
-            if (RolEnum::isValid($rol)) {
-                foreach (RolEnum::cases() as $case) {
-                    if ($case->value === $rol) {
-                        $this->rol = $case;
-                        break;
-                    }
-                }
-            } else {
-                $this->rol = RolEnum::USUARIO_BOTIQUIN;
-            }
-        }
+        $this->contrasena = $contrasena;
+        $this->rol = $rol;
     }
 
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getNombre(): string
+    public function getNombre()
     {
         return $this->nombre;
     }
 
-    public function getEmail(): string
+    public function getEmail()
     {
         return $this->email;
     }
 
-    public function getContrasena(): string
-    {
-        return $this->contrasena;
-    }
-
-    public function getRol(): RolEnum
+    public function getRol()
     {
         return $this->rol;
     }
 
-    public function getRolValue(): string
+    public function setId($id)
     {
-        return $this->rol->value;
+        $this->id = $id;
     }
 
-    public function setNombre(string $nombre): void
+    public function setNombre($nombre)
     {
         $this->nombre = $nombre;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail($email)
     {
         $this->email = $email;
     }
 
-    public function setContrasena(string $contrasena): void
+    public function setContrasena($contrasena)
     {
         $this->contrasena = $contrasena;
     }
 
-    public function setRol(string|RolEnum $rol): void
+    public function setRol($rol)
     {
-        if ($rol instanceof RolEnum) {
-            $this->rol = $rol;
-        } else {
-            if (RolEnum::isValid($rol)) {
-                foreach (RolEnum::cases() as $case) {
-                    if ($case->value === $rol) {
-                        $this->rol = $case;
-                        break;
-                    }
-                }
-            }
-        }
+        $this->rol = $rol;
     }
 
-    public function verificarContrasena(string $contrasena): bool
+    public function verificarContrasena($contrasena)
     {
         return password_verify($contrasena, $this->contrasena);
     }
+
+
 }

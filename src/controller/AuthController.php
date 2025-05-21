@@ -1,7 +1,15 @@
 <?php
-include_once(__DIR__ . '/../util/session.php');
-include_once(__DIR__ . '/../util/redirect.php');
-include_once(__DIR__ . '/../util/authGuard.php');
+
+namespace controller;
+
+use util\Redirect;
+use util\Session;
+use util\AuthGuard;
+use Exception;
+
+include_once(__DIR__ . '/../util/Session.php');
+include_once(__DIR__ . '/../util/Redirect.php');
+include_once(__DIR__ . '/../util/AuthGuard.php');
 require_once(__DIR__ . '/UsuarioController.php');
 
 class AuthController {

@@ -1,14 +1,15 @@
 <?php
 
 namespace model\repository;
-require_once(__DIR__ . '/../../config/database.php');
+require_once(__DIR__ . '/../../../config/database.php');
 require_once(__DIR__ . '/../entity/Planta.php');
 
 use model\entity\Planta;
+use PDO;
 
 class PlantasRepository
 {
-    private $pdo;
+    private ?PDO $pdo;
 
     public function __construct()
     {
@@ -37,7 +38,7 @@ class PlantasRepository
     {
         $sql = "SELECT * FROM plantas";
         $stmt = $this->pdo->query($sql);
-        return $this->mapToPlantaArray($stmt->fetchAll(\PDO::FETCH_ASSOC));
+        return $this->mapToPlantaArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findById($id): ?Planta
@@ -45,7 +46,7 @@ class PlantasRepository
         $sql = "SELECT * FROM plantas WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? $this->mapToPlanta($row) : null;
     }
 
@@ -54,7 +55,7 @@ class PlantasRepository
         $sql = "SELECT * FROM plantas WHERE hospital_id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$hospitalId]);
-        return $this->mapToPlantaArray($stmt->fetchAll(\PDO::FETCH_ASSOC));
+        return $this->mapToPlantaArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function save(Planta $planta): bool

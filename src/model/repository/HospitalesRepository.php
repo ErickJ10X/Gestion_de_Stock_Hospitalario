@@ -1,14 +1,15 @@
 <?php
 
 namespace model\repository;
-require_once(__DIR__ . '/../../config/database.php');
+require_once(__DIR__ . '/../../../config/database.php');
 require_once(__DIR__ . '/../entity/Hospital.php');
 
 use model\entity\Hospital;
+use PDO;
 
 class HospitalesRepository
 {
-    private ?\PDO $pdo;
+    private ?PDO $pdo;
     
     public function __construct()
     {
@@ -36,7 +37,7 @@ class HospitalesRepository
     {
         $sql = "SELECT id, nombre FROM hospitales";
         $stmt = $this->pdo->query($sql);
-        return $this->mapToHospitalArray($stmt->fetchAll(\PDO::FETCH_ASSOC));
+        return $this->mapToHospitalArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findById($id): ?Hospital
@@ -44,7 +45,7 @@ class HospitalesRepository
         $sql = "SELECT id, nombre FROM hospitales WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? $this->mapToHospital($row) : null;
     }
 
@@ -52,7 +53,7 @@ class HospitalesRepository
     {
         $sql = "INSERT INTO hospitales (nombre) VALUES (?)";
         return $this->pdo->prepare($sql)->execute([
-            $hospital->getNombre()
+            $hospital->nombre
         ]);
     }
 
@@ -60,8 +61,8 @@ class HospitalesRepository
     {
         $sql = "UPDATE hospitales SET nombre = ? WHERE id = ?";
         return $this->pdo->prepare($sql)->execute([
-            $hospital->getNombre(),
-            $hospital->getId()
+            $hospital->nombre,
+            $hospital->id
         ]);
     }
     
