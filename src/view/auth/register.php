@@ -1,14 +1,21 @@
 <?php
 session_start();
-require_once(__DIR__ . '/../../controller/authController.php');
+require_once(__DIR__ . '/../../controller/AuthController.php');
 require_once(__DIR__ . '/../../util/authGuard.php');
+require_once(__DIR__ . '/../../model/service/userService.php');
 
 $authGuard = new AuthGuard();
 $authGuard->requireNoAuth();
+$authController = new AuthController();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $authController->register();
+}
+
+$userService = new model\service\UserService();
+$rolOptions = $userService->getRolOptions();
 
 include('../templates/header.php');
-$authController = new AuthController();
-$authController->register();
 ?>
 
     <div>
@@ -22,7 +29,7 @@ $authController->register();
                         if (isset($_GET['message'])) {
                             echo htmlspecialchars(urldecode($_GET['message']));
                         } elseif ($_GET['error'] == 'usuario_existente') {
-                            echo "El nombre de usuario ya está en uso.";
+                            echo "El email ya está en uso.";
                         } else {
                             echo "Error en el registro.";
                         }
@@ -47,6 +54,19 @@ $authController->register();
                         <label for="confirmar_contrasena">Confirmar Contraseña:</label>
                         <input type="password" name="confirmar_contrasena" required>
                     </div>
+                    
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador'): ?>
+                    <div>
+                        <label for="rol">Rol:</label>
+                        <select name="rol">
+                            <?php foreach ($rolOptions as $rol): ?>
+                                <option value="<?php echo htmlspecialchars($rol); ?>">
+                                    <?php echo htmlspecialchars($rol); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
 
                     <button type="submit">Registrarse</button>
                 </form>
