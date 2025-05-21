@@ -20,10 +20,24 @@ class Session {
     }
 
     public function isAuthenticated(): bool {
-        return isset($_SESSION['id']) && !empty($_SESSION['id']);
+        return !empty($_SESSION['id']);
     }
 
     public function isAdmin(): bool {
         return $this->isAuthenticated() && $this->get('rol') === 'admin';
+    }
+    
+    public function setMessage(string $type, string $message): void {
+        $_SESSION['messages'][$type] = $message;
+    }
+    
+    public function getMessage(string $type): ?string {
+        $message = $_SESSION['messages'][$type] ?? null;
+        unset($_SESSION['messages'][$type]);
+        return $message;
+    }
+    
+    public function hasMessage(string $type): bool {
+        return isset($_SESSION['messages'][$type]);
     }
 }
