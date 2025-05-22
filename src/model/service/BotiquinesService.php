@@ -9,6 +9,7 @@ use Exception;
 
 require_once(__DIR__ . '/../repository/BotiquinesRepository.php');
 require_once(__DIR__ . '/../entity/Botiquines.php');
+require_once(__DIR__ . '/../../../config/database.php');
 
 class BotiquinesService
 {
