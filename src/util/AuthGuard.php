@@ -1,87 +1,123 @@
 <?php
 
 namespace util;
-include_once(__DIR__ . '/Session.php');
-include_once(__DIR__ . '/Redirect.php');
-require_once(__DIR__ . '/../model/enum/RolEnum.php');
+
+require_once __DIR__ . '/../model/enum/RolEnum.php';
+require_once __DIR__ . '/Redirect.php';
+require_once __DIR__ . '/Session.php';
 
 use model\enum\RolEnum;
 
-
-class AuthGuard {
+class AuthGuard
+{
     private Session $session;
+    private RolEnum $rolEnum;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->session = new Session();
+        $this->rolEnum = new RolEnum();
     }
 
-    public function requireAuth(): void {
-        if (!$this->session->isAuthenticated()) {
-            Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php', 'Debes iniciar sesión para acceder a esta página');
+
+    public function requireAuth()
+    {
+        if (!$this->session->isLoggedIn()) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php');
+            exit;
         }
+        return true;
     }
 
-    public function requireNoAuth(): void {
-        if ($this->session->isAuthenticated()) {
+    public function requireNoAuth()
+    {
+        if ($this->session->isLoggedIn()) {
             Redirect::toHome();
+            exit;
         }
+        return true;
     }
 
-    public function requireAdmin(): void {
-        $this->requireAuth();
 
-        if ($this->session->get('rol') !== RolEnum::ADMINISTRADOR) {
-            Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php', 'No tienes permisos para acceder a esta página');
-        }
-    }
 
-    public function requireRole(array $allowedRoles): void {
+    public function requireUsuarioBotiquin()
+    {
         $this->requireAuth();
-        
-        $userRole = $this->session->get('rol');
-        
-        if (!in_array($userRole, $allowedRoles)) {
-            $this->session->setMessage("error", "No tienes permisos para acceder a esta sección");
-            Redirect::toHome();
-        }
-    }
-
-    public function requireHospitalGestor(): void {
-        $this->requireAuth();
-        
-        $allowedRoles = [
-            RolEnum::ADMINISTRADOR, 
-            RolEnum::GESTOR_GENERAL, 
-            RolEnum::GESTOR_HOSPITAL
+        $userRole = $this->session->getUserData('rol');
+        $rolAllowed = [
+            $this->rolEnum::USUARIO_BOTIQUIN,
+            $this->rolEnum::ADMINISTRADOR,
+            $this->rolEnum::GESTOR_HOSPITAL,
+            $this->rolEnum::GESTOR_PLANTA,
+            $this->rolEnum::GESTOR_GENERAL
         ];
-        
-        $userRole = $this->session->get('rol');
-        
-        if (!in_array($userRole, $allowedRoles)) {
-            $this->session->setMessage("error", "No tienes permisos para gestionar hospitales");
-            Redirect::toHome();
+        if (!in_array($userRole, $rolAllowed)) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
+            exit;
         }
+        return true;
     }
 
-    public function requirePlantaGestor(): void {
+    public function requirePlantaGestor()
+    {
         $this->requireAuth();
-        
-        $allowedRoles = [
-            RolEnum::ADMINISTRADOR, 
-            RolEnum::GESTOR_GENERAL,
-            RolEnum::GESTOR_HOSPITAL
+        $userRole = $this->session->getUserData('rol');
+        $rolAllowed = [
+            $this->rolEnum::GESTOR_PLANTA,
+            $this->rolEnum::ADMINISTRADOR,
+            $this->rolEnum::GESTOR_HOSPITAL,
+            $this->rolEnum::GESTOR_GENERAL
         ];
-        
-        $userRole = $this->session->get('rol');
-        
-        if (!in_array($userRole, $allowedRoles)) {
-            $this->session->setMessage("error", "No tienes permisos para gestionar plantas");
-            Redirect::toHome();
+        if (!in_array($userRole, $rolAllowed)) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
+            exit;
         }
+        return true;
     }
-    
-    // Método necesario para verificación de sesión en los controladores
-    public function checkSession(): void {
+
+    public function requireHospitalGestor()
+    {
         $this->requireAuth();
+        $userRole = $this->session->getUserData('rol');
+        $rolAllowed = [
+            $this->rolEnum::GESTOR_HOSPITAL,
+            $this->rolEnum::ADMINISTRADOR,
+            $this->rolEnum::GESTOR_GENERAL
+        ];
+        if (!in_array($userRole, $rolAllowed)) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
+            exit;
+        }
+
+        return true;
+    }
+
+
+
+    public function requireGeneralGestor()
+    {
+        $this->requireAuth();
+        $userRole = $this->session->getUserData('rol');
+        $rolAllowed = [
+            $this->rolEnum::GESTOR_GENERAL,
+            $this->rolEnum::ADMINISTRADOR
+        ];
+        if (!in_array($userRole, $rolAllowed)) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
+            exit;
+        }
+        return true;
+    }
+
+    public function requireAdministrador()
+    {
+        $this->requireAuth();
+        $userRole = $this->session->getUserData('rol');
+
+        if ($userRole !==  $this->rolEnum::ADMINISTRADOR) {
+            Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
+            exit;
+        }
+        return true;
     }
 }

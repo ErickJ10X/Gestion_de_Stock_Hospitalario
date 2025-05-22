@@ -1,73 +1,96 @@
 <?php
+
 namespace util;
-class Session {
-    public function __construct() {
+
+class Session
+{
+    public function __construct()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
-    public function set(string $key, $value): void {
+    public function set($key, $value)
+    {
         $_SESSION[$key] = $value;
     }
 
-    public function get(string $key) {
-        return $_SESSION[$key] ?? null;
+    public function get($key, $default = null)
+    {
+        return isset($_SESSION[$key]) ? $_SESSION[$key] : $default;
     }
 
-    public function destroy(): void {
+    public function remove($key)
+    {
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+    public function destroy()
+    {
         session_unset();
         session_destroy();
     }
 
-    public function isAuthenticated(): bool {
+    public function isLoggedIn(): bool
+    {
         return !empty($_SESSION['id']);
     }
 
-    public function isAdmin(): bool {
-        return $this->isAuthenticated() && $this->get('rol') === 'admin';
+    public function setUserData($user)
+    {
+        $_SESSION['id'] = $user->getId();
+        $_SESSION['nombre'] = $user->getNombre();
+        $_SESSION['email'] = $user->getEmail();
+        $_SESSION['rol'] = $user->getRol();
     }
-    
-    public function setMessage(string $type, string $message): void {
-        $_SESSION['messages'][$type] = $message;
+
+    public function getUserData($key, $default = null)
+    {
+        return $_SESSION[$key] ?? $default;
     }
-    
-    public function getMessage(string $type = null): ?string {
+
+    public function setMessage($type, $message)
+    {
+        $_SESSION['flash_message'] = $message;
+        $_SESSION['flash_message_type'] = $type;
+    }
+
+    public function hasMessage($type = null)
+    {
         if ($type === null) {
-            foreach ($_SESSION['messages'] ?? [] as $type => $message) {
-                $msg = $message;
-                unset($_SESSION['messages'][$type]);
-                return $msg;
-            }
+            return isset($_SESSION['flash_message']);
+        }
+        return isset($_SESSION['flash_message']) && isset($_SESSION['flash_message_type']) && $_SESSION['flash_message_type'] === $type;
+    }
+
+    public function getMessage($type = null)
+    {
+        if (!$this->hasMessage($type)) {
             return null;
         }
-        
-        $message = $_SESSION['messages'][$type] ?? null;
-        unset($_SESSION['messages'][$type]);
-        return $message;
-    }
-    
-    public function getMessageType(): ?string {
-        if (!isset($_SESSION['messages']) || empty($_SESSION['messages'])) {
-            return null;
+
+        $message = $_SESSION['flash_message'];
+        $messageType = $_SESSION['flash_message_type'];
+
+        // Si el tipo coincide o no se especificó un tipo
+        if ($type === null || $messageType === $type) {
+            // Eliminar el mensaje para que no se muestre de nuevo
+            unset($_SESSION['flash_message']);
+            unset($_SESSION['flash_message_type']);
+            return $message;
         }
-        
-        reset($_SESSION['messages']);
-        return key($_SESSION['messages']);
+
+        return null;
     }
-    
-    public function hasMessage(string $type = null): bool {
-        if ($type === null) {
-            return !empty($_SESSION['messages']);
+
+    public function getMessageType()
+    {
+        if (isset($_SESSION['flash_message_type'])) {
+            return $_SESSION['flash_message_type'];
         }
-        return isset($_SESSION['messages'][$type]);
-    }
-    
-    public function clearMessage(string $type = null): void {
-        if ($type === null) {
-            unset($_SESSION['messages']);
-        } else {
-            unset($_SESSION['messages'][$type]);
-        }
+        return null;
     }
 }
