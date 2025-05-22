@@ -1,0 +1,584 @@
+/* Estilos para las tarjetas flotantes usando metodología BEM */
+
+/* Bloque: hospital-card */
+.hospital-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    max-width: 90vw;
+    z-index: 1000;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+/* Elemento: hospital-card__header */
+.hospital-card__header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Modificador: hospital-card__header--create */
+.hospital-card__header--create {
+    background-color: #198754;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Modificador: hospital-card__header--edit */
+.hospital-card__header--edit {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Modificador: hospital-card__header--delete */
+.hospital-card__header--delete {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Elemento: hospital-card__title */
+.hospital-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Elemento: hospital-card__close */
+.hospital-card__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+/* Elemento: hospital-card__body */
+.hospital-card__body {
+    padding: 1rem;
+}
+
+/* Elemento: hospital-card__footer */
+.hospital-card__footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Bloque: hospital-overlay */
+.hospital-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+/* Clase cuando el elemento está activo */
+.hospital-card--active,
+.hospital-overlay--active {
+    display: block;
+}
+
+/* Elementos del formulario dentro de la tarjeta */
+.hospital-form__group {
+    margin-bottom: 1rem;
+}
+
+.hospital-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.hospital-form__input {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.hospital-form__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.hospital-form__button--primary {
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: white;
+}
+
+.hospital-form__button--secondary {
+    background-color: #6c757d;
+    border: 1px solid #6c757d;
+    color: white;
+}
+
+.hospital-form__button--danger {
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
+    color: white;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.hospital-card--animate {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Bloque: almacen-card y estilos específicos de almacenes */
+.almacen-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    max-width: 90vw;
+    z-index: 1000;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.almacen-card__header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.almacen-card__header--create {
+    background-color: #198754;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.almacen-card__header--edit {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 8px 8px 0 0;
+}
+
+.almacen-card__header--delete {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.almacen-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.almacen-card__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.almacen-card__body {
+    padding: 1rem;
+}
+
+.almacen-card__footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.almacen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.almacen-card--active,
+.almacen-overlay--active {
+    display: block;
+}
+
+.almacen-form__group {
+    margin-bottom: 1rem;
+}
+
+.almacen-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.almacen-form__select {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.almacen-form__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.almacen-form__button--primary {
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: white;
+}
+
+.almacen-form__button--secondary {
+    background-color: #6c757d;
+    border: 1px solid #6c757d;
+    color: white;
+}
+
+.almacen-form__button--danger {
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
+    color: white;
+}
+
+.almacen-card--animate {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Bloque: botiquin-card y estilos específicos de botiquines */
+.botiquin-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    max-width: 90vw;
+    z-index: 1000;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.botiquin-card__header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.botiquin-card__header--create {
+    background-color: #198754;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.botiquin-card__header--edit {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 8px 8px 0 0;
+}
+
+.botiquin-card__header--delete {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.botiquin-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.botiquin-card__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.botiquin-card__body {
+    padding: 1rem;
+}
+
+.botiquin-card__footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.botiquin-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.botiquin-card--active,
+.botiquin-overlay--active {
+    display: block;
+}
+
+.botiquin-form__group {
+    margin-bottom: 1rem;
+}
+
+.botiquin-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.botiquin-form__input {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.botiquin-form__select {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.botiquin-form__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.botiquin-form__button--primary {
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: white;
+}
+
+.botiquin-form__button--secondary {
+    background-color: #6c757d;
+    border: 1px solid #6c757d;
+    color: white;
+}
+
+.botiquin-form__button--danger {
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
+    color: white;
+}
+
+.botiquin-card--animate {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Bloque: planta-card y estilos específicos de plantas */
+.planta-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    max-width: 90vw;
+    z-index: 1000;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.planta-card__header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.planta-card__header--create {
+    background-color: #198754;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.planta-card__header--edit {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 8px 8px 0 0;
+}
+
+.planta-card__header--delete {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.planta-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.planta-card__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.planta-card__body {
+    padding: 1rem;
+}
+
+.planta-card__footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.planta-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.planta-card--active,
+.planta-overlay--active {
+    display: block;
+}
+
+.planta-form__group {
+    margin-bottom: 1rem;
+}
+
+.planta-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.planta-form__input {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.planta-form__select {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.planta-form__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.planta-form__button--primary {
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: white;
+}
+
+.planta-form__button--secondary {
+    background-color: #6c757d;
+    border: 1px solid #6c757d;
+    color: white;
+}
+
+.planta-form__button--danger {
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
+    color: white;
+}
+
+.planta-card--animate {
+    animation: fadeIn 0.3s ease;
+}
