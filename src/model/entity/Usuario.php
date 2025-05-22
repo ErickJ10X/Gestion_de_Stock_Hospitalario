@@ -43,6 +43,10 @@ class Usuario
     {
         $this->id = $id;
     }
+    public function  getContrasena()
+    {
+        return $this->contrasena;
+    }
 
     public function setNombre($nombre)
     {

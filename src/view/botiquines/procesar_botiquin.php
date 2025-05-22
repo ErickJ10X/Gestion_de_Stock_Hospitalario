@@ -9,12 +9,10 @@ use controller\BotiquinesController;
 use util\AuthGuard;
 
 $authGuard = new AuthGuard();
-$authGuard->checkSession();
+$authGuard->requireAuth();
 
 $controller = new BotiquinesController();
 
-// Procesa el formulario
 $controller->processForm();
 
-// Si llegamos aquí, algo falló en el procesamiento
 Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquines/tabla_botiquines.php');

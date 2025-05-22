@@ -15,10 +15,8 @@ $plantaController = new PlantaController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-// Verificar si el usuario está autorizado
 $authGuard->requirePlantaGestor();
 
-// Verificar el método y la acción
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['action'])) {
     $session->setMessage('error', 'Solicitud inválida');
     Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
@@ -28,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['action'])) {
 $action = $_POST['action'];
 
 try {
-    // Crear una nueva planta
     if ($action === 'create') {
         if (!isset($_POST['nombre']) || !isset($_POST['hospital_id'])) {
             $session->setMessage('error', 'Faltan datos obligatorios');
@@ -51,7 +48,6 @@ try {
             $session->setMessage('error', 'Error al crear la planta');
         }
     }
-    // Actualizar una planta existente
     elseif ($action === 'update') {
         if (!isset($_POST['id']) || !isset($_POST['nombre']) || !isset($_POST['hospital_id'])) {
             $session->setMessage('error', 'Faltan datos obligatorios');
@@ -75,7 +71,6 @@ try {
             $session->setMessage('error', 'Error al actualizar la planta');
         }
     }
-    // Eliminar una planta
     elseif ($action === 'delete') {
         if (!isset($_POST['id'])) {
             $session->setMessage('error', 'ID de planta no proporcionado');
@@ -104,6 +99,5 @@ try {
     $session->setMessage('error', 'Error: ' . $e->getMessage());
 }
 
-// Redireccionar a la lista de plantas
 Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
 exit;

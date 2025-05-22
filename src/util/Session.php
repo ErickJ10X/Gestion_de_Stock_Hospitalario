@@ -75,9 +75,7 @@ class Session
         $message = $_SESSION['flash_message'];
         $messageType = $_SESSION['flash_message_type'];
 
-        // Si el tipo coincide o no se especificó un tipo
         if ($type === null || $messageType === $type) {
-            // Eliminar el mensaje para que no se muestre de nuevo
             unset($_SESSION['flash_message']);
             unset($_SESSION['flash_message_type']);
             return $message;

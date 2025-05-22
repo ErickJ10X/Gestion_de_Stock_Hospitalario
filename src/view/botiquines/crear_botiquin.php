@@ -9,7 +9,7 @@ use util\Session;
 use util\AuthGuard;
 
 $authGuard = new AuthGuard();
-$authGuard->checkSession();
+$authGuard->requireAuth();
 
 $botiquinesController = new BotiquinesController();
 $plantas = $botiquinesController->getPlantas();

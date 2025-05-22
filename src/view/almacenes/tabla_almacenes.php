@@ -109,10 +109,8 @@ $session = new Session();
         </div>
     </div>
 
-    <!-- Overlay para el fondo oscurecido -->
     <div class="almacen-overlay"></div>
 
-    <!-- Tarjeta flotante para crear un nuevo almacén -->
     <div id="almacen-card-create" class="almacen-card">
         <div class="almacen-card__header almacen-card__header--create">
             <h3 class="almacen-card__title">Nuevo Almacén</h3>
@@ -140,7 +138,6 @@ $session = new Session();
         </div>
     </div>
 
-    <!-- Tarjetas flotantes para editar almacenes -->
     <?php if (!empty($almacenesWithPlantas)): ?>
         <?php foreach ($almacenesWithPlantas as $item): ?>
             <div id="almacen-card-edit-<?php echo $item['almacen']->getId(); ?>" class="almacen-card">
@@ -171,7 +168,6 @@ $session = new Session();
                 </div>
             </div>
 
-            <!-- Tarjetas flotantes para eliminar almacenes -->
             <div id="almacen-card-delete-<?php echo $item['almacen']->getId(); ?>" class="almacen-card">
                 <div class="almacen-card__header almacen-card__header--delete">
                     <h3 class="almacen-card__title">Eliminar Almacén</h3>

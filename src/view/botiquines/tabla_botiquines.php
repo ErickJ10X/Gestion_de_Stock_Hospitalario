@@ -18,11 +18,9 @@ $plantas = $botiquinesController->getPlantas();
 
 $session = new Session();
 
-// Incluir header después de inicializar variables para evitar problemas
 include(__DIR__ . '/../templates/header.php');
 ?>
 
-<!-- Incluir el archivo CSS para las tarjetas -->
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
 
 <div class="container mt-4">
@@ -95,10 +93,8 @@ include(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-<!-- Overlay para el fondo oscurecido -->
 <div class="botiquin-overlay"></div>
 
-<!-- Tarjeta flotante para crear un nuevo botiquín -->
 <div id="botiquin-card-create" class="botiquin-card">
     <div class="botiquin-card__header botiquin-card__header--create">
         <h3 class="botiquin-card__title">Nuevo Botiquín</h3>
@@ -130,7 +126,6 @@ include(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-<!-- Tarjetas flotantes para editar y eliminar botiquines -->
 <?php if (!empty($botiquinesWithPlantas)): ?>
     <?php foreach ($botiquinesWithPlantas as $item): ?>
         <div id="botiquin-card-edit-<?php echo $item['botiquin']->getId(); ?>" class="botiquin-card">
@@ -188,5 +183,4 @@ include(__DIR__ . '/../templates/header.php');
 
 <?php include(__DIR__ . '/../templates/footer.php'); ?>
     
-<!-- Scripts después del footer -->
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/botiquin-cards.js"></script>

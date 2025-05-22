@@ -20,7 +20,6 @@ $pageTitle = "Lista de Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
-<!-- Incluir el archivo CSS para las tarjetas -->
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
 
 <div class="container mt-5">
@@ -74,10 +73,8 @@ include_once(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-<!-- Overlay para el fondo oscurecido -->
 <div class="hospital-overlay"></div>
 
-<!-- Tarjeta flotante para crear un nuevo hospital -->
 <div id="hospital-card-create" class="hospital-card">
     <div class="hospital-card__header hospital-card__header--create">
         <h3 class="hospital-card__title">Nuevo Hospital</h3>
@@ -97,7 +94,6 @@ include_once(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-<!-- Tarjetas flotantes para editar hospitales -->
 <?php if (!empty($hospitales)): ?>
     <?php foreach ($hospitales as $hospital): ?>
         <div id="hospital-card-edit-<?= $hospital->id ?>" class="hospital-card">
@@ -119,7 +115,6 @@ include_once(__DIR__ . '/../templates/header.php');
             </div>
         </div>
 
-        <!-- Tarjetas flotantes para eliminar hospitales -->
         <div id="hospital-card-delete-<?= $hospital->id ?>" class="hospital-card">
             <div class="hospital-card__header hospital-card__header--delete">
                 <h3 class="hospital-card__title">Eliminar Hospital</h3>
@@ -140,7 +135,6 @@ include_once(__DIR__ . '/../templates/header.php');
     <?php endforeach; ?>
 <?php endif; ?>
 
-<!-- Incluir el script JS para las tarjetas -->
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>

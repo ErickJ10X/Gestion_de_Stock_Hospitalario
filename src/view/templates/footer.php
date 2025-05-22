@@ -10,7 +10,6 @@
 </footer>
 
 <script>
-// Script para manejar el menú responsive
 document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.getElementById('navToggle');
     const mainNav = document.getElementById('mainNav');
@@ -21,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Manejo de botones de cierre de alertas
     const closeButtons = document.querySelectorAll('.alert__close');
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {

@@ -11,12 +11,11 @@ use util\AuthGuard;
 use util\Redirect;
 
 $authGuard = new AuthGuard();
-$authGuard->checkSession();
+$authGuard->requireAuth();
 
 $session = new Session();
 $almacenesController = new AlmacenesController();
 
-// Validar que se ha proporcionado un ID
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $session->setMessage('error', 'ID de almacén no proporcionado');
     Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/tabla_almacenes.php');

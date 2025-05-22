@@ -124,7 +124,6 @@ class PlantasRepository
     public function delete($id)
     {
         try {
-            // Comprobar primero si la planta tiene almacenes o botiquines asociados
             $checkBotiquines = "SELECT COUNT(*) FROM botiquines WHERE planta_id = :id";
             $checkAlmacenes = "SELECT COUNT(*) FROM almacenes WHERE planta_id = :id";
             
@@ -146,7 +145,6 @@ class PlantasRepository
                 throw new Exception("No se puede eliminar la planta porque tiene almacenes asociados.");
             }
             
-            // Si no hay dependencias, eliminar la planta
             $query = "DELETE FROM plantas WHERE id = :id";
             $statement = $this->db->prepare($query);
             $statement->bindParam(':id', $id, PDO::PARAM_INT);

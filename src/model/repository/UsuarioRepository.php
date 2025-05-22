@@ -76,10 +76,10 @@ class UsuarioRepository
     {
         $sql = "INSERT INTO usuarios (nombre, email, contrasena, rol) VALUES (?, ?, ?, ?)";
         return $this->pdo->prepare($sql)->execute([
-            $usuario->nombre,
-            $usuario->email,
-            $usuario->contrasena,
-            $usuario->getRolValue()
+            $usuario->getNombre(),
+            $usuario->getEmail(),
+            $usuario->getContrasena(),
+            $usuario->getRol()
         ]);
     }
     
@@ -92,11 +92,11 @@ class UsuarioRepository
     {
         $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, rol = ? WHERE id = ?";
         return $this->pdo->prepare($sql)->execute([
-            $usuario->nombre,
-            $usuario->email,
-            $usuario->contrasena,
-            $usuario->getRolValue(),
-            $usuario->id
+            $usuario->getNombre(),
+            $usuario->getEmail(),
+            $usuario->getContrasena(),
+            $usuario->getRol(),
+            $usuario->getId()
         ]);
     }
 }

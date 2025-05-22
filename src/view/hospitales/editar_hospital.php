@@ -12,10 +12,8 @@ $hospitalController = new HospitalController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-// Verificar permisos
 $authGuard->requireHospitalGestor();
 
-// Verificar si se proporcionó un ID válido
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $session->setMessage('error', 'ID de hospital no válido');
     header('Location: lista_hospitales.php');
@@ -25,14 +23,12 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $id = $_GET['id'];
 $hospital = $hospitalController->getHospitalById($id);
 
-// Verificar si el hospital existe
 if (!$hospital) {
     $session->setMessage('error', 'Hospital no encontrado');
     header('Location: lista_hospitales.php');
     exit;
 }
 
-// Procesar el formulario de edición
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     $nombre = trim($_POST['nombre']);
     

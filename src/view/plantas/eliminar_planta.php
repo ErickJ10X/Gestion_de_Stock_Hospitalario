@@ -10,7 +10,6 @@ $authGuard = new \util\AuthGuard();
 
 $authGuard->requirePlantaGestor();
 
-// Verificar que es una petición POST y que hay un ID
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id']) || empty($_POST['id'])) {
     $session->setMessage('error', 'Solicitud inválida');
     header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
@@ -19,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id']) || empty($_POS
 
 $id = $_POST['id'];
 
-// Intentar eliminar la planta
 if ($plantaController->deletePlanta($id)) {
     $session->setMessage('success', 'Planta eliminada correctamente');
 } else {

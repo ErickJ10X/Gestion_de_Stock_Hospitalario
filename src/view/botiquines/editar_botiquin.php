@@ -11,7 +11,7 @@ use util\AuthGuard;
 use util\Redirect;
 
 $authGuard = new AuthGuard();
-$authGuard->checkSession();
+$authGuard->requireAuth();
 
 $session = new Session();
 $botiquinesController = new BotiquinesController();

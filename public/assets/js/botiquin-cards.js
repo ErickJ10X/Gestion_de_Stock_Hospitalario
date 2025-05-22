@@ -1,8 +1,4 @@
-/**
- * Script para manejar las tarjetas flotantes de botiquines
- */
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener referencias a elementos del DOM
     const overlay = document.querySelector('.botiquin-overlay');
     const addButton = document.getElementById('btn-add-botiquin');
     const createCard = document.getElementById('botiquin-card-create');
@@ -11,17 +7,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeButtons = document.querySelectorAll('.botiquin-card__close');
     const cancelButtons = document.querySelectorAll('.botiquin-form__button--cancel');
     
-    // Función para mostrar una tarjeta específica
     function showCard(card) {
         if (overlay) {
             overlay.classList.add('botiquin-overlay--active');
         }
         card.classList.add('botiquin-card--active');
         card.classList.add('botiquin-card--animate');
-        document.body.style.overflow = 'hidden'; // Evita el desplazamiento de fondo
+        document.body.style.overflow = 'hidden';
     }
     
-    // Función para ocultar todas las tarjetas
     function hideCards() {
         const activeCards = document.querySelectorAll('.botiquin-card--active');
         if (overlay) {
@@ -30,10 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
         activeCards.forEach(card => {
             card.classList.remove('botiquin-card--active');
         });
-        document.body.style.overflow = ''; // Restaura el desplazamiento
+        document.body.style.overflow = '';
     }
     
-    // Event listener para el botón de nuevo botiquín
     if (addButton) {
         addButton.addEventListener('click', function(e) {
             e.preventDefault();
@@ -41,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Event listeners para los botones de editar
     editButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -53,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Event listeners para los botones de eliminar
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -65,12 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Event listeners para los botones de cerrar
     closeButtons.forEach(button => {
         button.addEventListener('click', hideCards);
     });
     
-    // Event listeners para los botones de cancelar
     cancelButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -78,12 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Cerrar la tarjeta al hacer clic en el overlay
     if (overlay) {
         overlay.addEventListener('click', hideCards);
     }
     
-    // Cerrar la tarjeta al presionar ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             hideCards();
