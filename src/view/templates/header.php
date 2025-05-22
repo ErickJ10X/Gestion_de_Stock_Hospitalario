@@ -10,14 +10,14 @@ use model\enum\RolEnum;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion de Stock Hospitalario</title>
+    <title>Gestor Hospitalario</title>
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/header.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
 <header class="header">
     <div class="container header__container">
-        <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Gestor de Stock Hospitalario</a>
+        <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Gestor Hospitalario</a>
         <button class="header__toggle" id="navToggle">
             <i class="bi bi-list"></i>
         </button>
@@ -44,6 +44,10 @@ use model\enum\RolEnum;
                         
                         <li class="nav__item">
                             <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquines/tabla_botiquines.php">Botiquines</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/productos/lista_productos.php">Productos</a>
                         </li>
                     <?php endif; ?>
 

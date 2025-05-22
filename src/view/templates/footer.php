@@ -1,7 +1,7 @@
 </main>
 <footer class="footer">
     <div class="container footer__container">
-        <p class="footer__copyright">&copy; <?php echo date('Y'); ?> Pegasus Medical - Gestión de Stock Hospitalario.</p>
+        <p class="footer__copyright">&copy; <?php echo date('Y'); ?> Pegasus Medical - Gestión Hospitalario.</p>
         <?php if (isset($_SESSION['id'])): ?>
             <small class="footer__user-info">Conectado como: <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong> 
             (<?php echo htmlspecialchars($_SESSION['rol']); ?>)</small>
