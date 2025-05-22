@@ -1,14 +1,20 @@
 <?php
+
+use controller\HospitalController;
+use controller\PlantaController;
+use util\AuthGuard;
+use util\Session;
+
 session_start();
 require_once(__DIR__ . '/../../controller/PlantaController.php');
 require_once(__DIR__ . '/../../controller/HospitalController.php');
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
 
-$plantaController = new \controller\PlantaController();
-$hospitalController = new \controller\HospitalController();
-$session = new \util\Session();
-$authGuard = new \util\AuthGuard();
+$plantaController = new PlantaController();
+$hospitalController = new HospitalController();
+$session = new Session();
+$authGuard = new AuthGuard();
 
 $authGuard->checkSession();
 

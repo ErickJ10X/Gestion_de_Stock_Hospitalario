@@ -1,142 +1,90 @@
 <?php
+
 namespace controller;
 
-require_once(__DIR__ . '/../model/service/PlantaService.php');
-require_once(__DIR__ . '/../model/entity/Planta.php');
-include_once(__DIR__ . '/../util/Session.php');
+require_once __DIR__ . '/../model/entity/Planta.php';
+require_once __DIR__ . '/../model/service/PlantaService.php';
+require_once __DIR__ . '/../model/repository/PlantasRepository.php';
 
-use model\service\PlantaService;
+use Exception;
 use model\entity\Planta;
-use util\Session;
+use model\service\PlantaService;
 
 class PlantaController
 {
-    private PlantaService $plantaService;
-    private Session $session;
+    private $plantaService;
 
     public function __construct()
     {
         $this->plantaService = new PlantaService();
-        $this->session = new Session();
     }
 
-    public function getAllPlantas(): array
+    public function getAllPlantas()
     {
         try {
             return $this->plantaService->getAllPlantas();
         } catch (Exception $e) {
-            $this->handleError("Error al obtener plantas", $e->getMessage());
-            return [];
+            error_log("Error en PlantaController::getAllPlantas: " . $e->getMessage());
+            throw new Exception("Error al obtener las plantas: " . $e->getMessage());
         }
     }
 
-    public function getPlantaById($id): ?Planta
+    public function getPlantaById($id)
     {
         try {
-            if (empty($id)) {
-                throw new Exception("El ID de la planta es requerido");
-            }
-            
-            $planta = $this->plantaService->getPlantaById($id);
-            
-            if (!$planta) {
-                throw new Exception("Planta no encontrada");
-            }
-            
-            return $planta;
+            return $this->plantaService->getPlantaById($id);
         } catch (Exception $e) {
-            $this->handleError("Error al obtener planta", $e->getMessage());
+            error_log("Error en PlantaController::getPlantaById: " . $e->getMessage());
             return null;
         }
     }
 
-    public function getPlantasByHospitalId($hospitalId): array
+    public function getPlantasByHospitalId($hospitalId)
     {
         try {
-            if (empty($hospitalId)) {
-                throw new Exception("El ID del hospital es requerido");
-            }
-            
             return $this->plantaService->getPlantasByHospitalId($hospitalId);
         } catch (Exception $e) {
-            $this->handleError("Error al obtener plantas del hospital", $e->getMessage());
+            error_log("Error en PlantaController::getPlantasByHospitalId: " . $e->getMessage());
             return [];
         }
     }
 
-    public function createPlanta($nombre, $hospitalId): bool
+    public function createPlanta($nombre, $hospitalId)
     {
         try {
-            if (empty($nombre)) {
-                throw new Exception("El nombre de la planta es requerido");
-            }
-            
-            if (empty($hospitalId)) {
-                throw new Exception("El ID del hospital es requerido");
-            }
-            
-            if (!$this->plantaService->createPlanta($nombre, $hospitalId)) {
-                throw new Exception("No se pudo crear la planta");
-            }
-            
-            $this->session->setMessage("success", "Planta creada correctamente");
-            return true;
+            $planta = new Planta();
+            $planta->setNombre($nombre);
+            $planta->setHospitalId($hospitalId);
+            return $this->plantaService->savePlanta($planta);
         } catch (Exception $e) {
-            $this->handleError("Error al crear planta", $e->getMessage());
+            error_log("Error en PlantaController::createPlanta: " . $e->getMessage());
             return false;
         }
     }
 
-    public function updatePlanta($id, $nombre, $hospitalId): bool
+    public function updatePlanta($id, $nombre, $hospitalId)
     {
         try {
-            if (empty($id) || empty($nombre) || empty($hospitalId)) {
-                throw new Exception("El ID, nombre y hospital de la planta son requeridos");
-            }
-            
             $planta = $this->plantaService->getPlantaById($id);
-            if (!$planta) {
-                throw new Exception("Planta no encontrada");
+            if ($planta) {
+                $planta->setNombre($nombre);
+                $planta->setHospitalId($hospitalId);
+                return $this->plantaService->updatePlanta($planta);
             }
-            
-            if (!$this->plantaService->updatePlanta($id, $nombre, $hospitalId)) {
-                throw new Exception("No se pudo actualizar la planta");
-            }
-            
-            $this->session->setMessage("success", "Planta actualizada correctamente");
-            return true;
+            return false;
         } catch (Exception $e) {
-            $this->handleError("Error al actualizar planta", $e->getMessage());
+            error_log("Error en PlantaController::updatePlanta: " . $e->getMessage());
             return false;
         }
     }
 
-    public function deletePlanta($id): bool
+    public function deletePlanta($id)
     {
         try {
-            if (empty($id)) {
-                throw new Exception("El ID de la planta es requerido");
-            }
-            
-            $planta = $this->plantaService->getPlantaById($id);
-            if (!$planta) {
-                throw new Exception("Planta no encontrada");
-            }
-            
-            if (!$this->plantaService->deletePlanta($id)) {
-                throw new Exception("No se pudo eliminar la planta");
-            }
-            
-            $this->session->setMessage("success", "Planta eliminada correctamente");
-            return true;
+            return $this->plantaService->deletePlanta($id);
         } catch (Exception $e) {
-            $this->handleError("Error al eliminar planta", $e->getMessage());
+            error_log("Error en PlantaController::deletePlanta: " . $e->getMessage());
             return false;
         }
-    }
-
-    private function handleError($title, $message): void
-    {
-        $this->session->setMessage("error", $title . ": " . $message);
     }
 }
