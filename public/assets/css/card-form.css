@@ -564,3 +564,159 @@
 .planta-card--animate {
     animation: fadeIn 0.3s ease;
 }
+
+/* Estilos para las tarjetas de productos */
+.producto-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.producto-overlay--active {
+    display: block;
+}
+
+.producto-card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1001;
+}
+
+.producto-card--active {
+    display: block;
+}
+
+.producto-card--animate {
+    animation: fadeIn 0.3s ease;
+}
+
+.producto-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    background-color: inherit;
+    z-index: 10;
+}
+
+.producto-card__header--create {
+    background-color: #28a745;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.producto-card__header--edit {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 8px 8px 0 0;
+}
+
+.producto-card__header--delete {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.producto-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.producto-card__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+}
+
+.producto-card__body {
+    padding: 1rem;
+}
+
+.producto-form__group {
+    margin-bottom: 1rem;
+}
+
+.producto-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.producto-form__input,
+.producto-form__select {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.producto-form__input:focus,
+.producto-form__select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.producto-card__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.producto-form__button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.producto-form__button--primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.producto-form__button--secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.producto-form__button--danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Animación de fade in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
