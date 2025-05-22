@@ -32,7 +32,7 @@ class BotiquinesController
 
     public function getBotiquines()
     {
-        $this->authGuard->checkSession();
+        $this->authGuard->requireAuth();
         try {
             return $this->botiquinesService->getAllBotiquines();
         } catch (Exception $e) {
@@ -43,7 +43,7 @@ class BotiquinesController
 
     public function getBotiquinesWithPlantas()
     {
-        $this->authGuard->checkSession();
+        $this->authGuard->requireAuth();
         try {
             $botiquines = $this->botiquinesService->getAllBotiquines();
             $result = [];
@@ -65,7 +65,7 @@ class BotiquinesController
 
     public function getPlantas()
     {
-        $this->authGuard->checkSession();
+        $this->authGuard->requireAuth();
         try {
             return $this->plantaService->getAllPlantas();
         } catch (Exception $e) {
@@ -76,7 +76,7 @@ class BotiquinesController
 
     public function getBotiquinById($id)
     {
-        $this->authGuard->checkSession();
+        $this->authGuard->requireNoAuth();
         try {
             return $this->botiquinesService->getBotiquinById($id);
         } catch (Exception $e) {
@@ -87,7 +87,7 @@ class BotiquinesController
 
     public function processForm()
     {
-        $this->authGuard->checkSession();
+        $this->authGuard->requireAuth();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $action = $_POST['action'] ?? '';
