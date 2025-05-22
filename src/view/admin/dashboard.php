@@ -9,7 +9,7 @@ require_once(__DIR__ . '/../../controller/UsuarioController.php');
 require_once(__DIR__ . '/../../util/AuthGuard.php');
 
 $authGuard = new AuthGuard();
-$authGuard->requireAdmin();
+$authGuard->requireAdministrador();
 
 $usuarioController = new UsuarioController();
 $usuarios = $usuarioController->getAllUsers();
