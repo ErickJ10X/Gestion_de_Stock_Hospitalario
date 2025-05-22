@@ -33,94 +33,87 @@ include_once(__DIR__ . '/../templates/header.php');
 
 <!-- Incluir el archivo CSS para las tarjetas -->
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
 
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col">
-            <h2>Gestión de Plantas</h2>
-        </div>
-        <div class="col text-end">
-            <button id="btn-add-planta" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Nueva Planta
+<div class="list-container">
+    <div class="list-header">
+        <h2 class="list-header__title">Gestión de Plantas</h2>
+        <div class="list-header__actions">
+            <button id="btn-add-planta" class="list-button list-button--primary">
+                <i class="bi bi-plus-circle list-button__icon"></i> Nueva Planta
             </button>
         </div>
     </div>
-
+    
     <?php if ($session->hasMessage('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?php echo $session->getMessage('success'); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="list-alert list-alert--success">
+            <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
+            <button type="button" class="list-alert__close">&times;</button>
         </div>
     <?php endif; ?>
 
     <?php if ($session->hasMessage('error')): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo $session->getMessage('error'); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="list-alert list-alert--error">
+            <p class="list-alert__message"><?= $session->getMessage('error') ?></p>
+            <button type="button" class="list-alert__close">&times;</button>
         </div>
     <?php endif; ?>
 
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0">Listado de Plantas</h3>
+    <div class="list-card">
+        <div class="list-card__header">
+            <h3 class="list-card__title">Listado de Plantas</h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
+        <div class="list-card__body">
+            <table class="list-table">
+                <thead class="list-table__head">
+                    <tr>
+                        <th class="list-table__header">ID</th>
+                        <th class="list-table__header">Nombre</th>
+                        <th class="list-table__header">Hospital</th>
+                        <th class="list-table__header">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($plantas)): ?>
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Hospital</th>
-                            <th>Acciones</th>
+                            <td colspan="4" class="list-table__empty">No hay plantas registradas</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($plantas)): ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No hay plantas registradas</td>
+                    <?php else: ?>
+                        <?php foreach ($plantas as $planta): ?>
+                            <tr class="list-table__body-row">
+                                <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($planta->getId()) ?></td>
+                                <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($planta->getNombre()) ?></td>
+                                <td class="list-table__body-cell" data-label="Hospital">
+                                    <?= isset($hospitalesMap[$planta->getHospitalId()]) ? htmlspecialchars($hospitalesMap[$planta->getHospitalId()]) : 'N/A' ?>
+                                </td>
+                                <td class="list-table__body-cell" data-label="Acciones">
+                                    <div class="list-table__actions">
+                                        <button class="list-table__button list-table__button--edit btn-edit-planta" data-id="<?= $planta->getId() ?>">
+                                            <i class="bi bi-pencil-square list-table__button-icon"></i> Modificar
+                                        </button>
+                                        <button class="list-table__button list-table__button--delete btn-delete-planta" data-id="<?= $planta->getId() ?>">
+                                            <i class="bi bi-trash list-table__button-icon"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($plantas as $planta): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($planta->getId()); ?></td>
-                                    <td><?php echo htmlspecialchars($planta->getNombre()); ?></td>
-                                    <td>
-                                        <?php 
-                                        $hospitalId = $planta->getHospitalId();
-                                        echo isset($hospitalesMap[$hospitalId]) ? htmlspecialchars($hospitalesMap[$hospitalId]) : 'Desconocido';
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm btn-edit-planta" data-id="<?php echo $planta->getId(); ?>">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
-                                        <button class="btn btn-danger btn-sm btn-delete-planta" data-id="<?php echo $planta->getId(); ?>">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<!-- Overlay para el fondo oscurecido -->
 <div class="planta-overlay"></div>
 
-<!-- Tarjeta flotante para crear una nueva planta -->
 <div id="planta-card-create" class="planta-card">
     <div class="planta-card__header planta-card__header--create">
         <h3 class="planta-card__title">Nueva Planta</h3>
         <button type="button" class="planta-card__close">&times;</button>
     </div>
     <div class="planta-card__body">
-        <form id="create-planta-form" method="POST" action="procesar_planta.php">
-            <input type="hidden" name="action" value="create">
+        <form id="create-planta-form" method="POST" action="registrar_planta.php">
             <div class="planta-form__group">
                 <label for="nombre-create" class="planta-form__label">Nombre de la Planta</label>
                 <input type="text" class="planta-form__input" id="nombre-create" name="nombre" required>
@@ -130,9 +123,7 @@ include_once(__DIR__ . '/../templates/header.php');
                 <select class="planta-form__select" id="hospital_id-create" name="hospital_id" required>
                     <option value="">Seleccionar hospital</option>
                     <?php foreach ($hospitales as $hospital): ?>
-                        <option value="<?php echo $hospital->getId(); ?>">
-                            <?php echo htmlspecialchars($hospital->getNombre()); ?>
-                        </option>
+                        <option value="<?= $hospital->getId() ?>"><?= htmlspecialchars($hospital->getNombre()) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -144,29 +135,27 @@ include_once(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-<!-- Tarjetas flotantes para editar y eliminar plantas -->
 <?php if (!empty($plantas)): ?>
     <?php foreach ($plantas as $planta): ?>
-        <div id="planta-card-edit-<?php echo $planta->getId(); ?>" class="planta-card">
+        <div id="planta-card-edit-<?= $planta->getId() ?>" class="planta-card">
             <div class="planta-card__header planta-card__header--edit">
                 <h3 class="planta-card__title">Editar Planta</h3>
                 <button type="button" class="planta-card__close">&times;</button>
             </div>
             <div class="planta-card__body">
-                <form id="edit-planta-form-<?php echo $planta->getId(); ?>" method="POST" action="procesar_planta.php">
-                    <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="id" value="<?php echo $planta->getId(); ?>">
+                <form id="edit-planta-form-<?= $planta->getId() ?>" method="POST" action="editar_planta.php">
+                    <input type="hidden" name="id" value="<?= $planta->getId() ?>">
                     <div class="planta-form__group">
-                        <label for="nombre-edit-<?php echo $planta->getId(); ?>" class="planta-form__label">Nombre de la Planta</label>
-                        <input type="text" class="planta-form__input" id="nombre-edit-<?php echo $planta->getId(); ?>" name="nombre" value="<?php echo htmlspecialchars($planta->getNombre()); ?>" required>
+                        <label for="nombre-edit-<?= $planta->getId() ?>" class="planta-form__label">Nombre de la Planta</label>
+                        <input type="text" class="planta-form__input" id="nombre-edit-<?= $planta->getId() ?>" name="nombre" value="<?= htmlspecialchars($planta->getNombre()) ?>" required>
                     </div>
                     <div class="planta-form__group">
-                        <label for="hospital_id-edit-<?php echo $planta->getId(); ?>" class="planta-form__label">Hospital</label>
-                        <select class="planta-form__select" id="hospital_id-edit-<?php echo $planta->getId(); ?>" name="hospital_id" required>
+                        <label for="hospital_id-edit-<?= $planta->getId() ?>" class="planta-form__label">Hospital</label>
+                        <select class="planta-form__select" id="hospital_id-edit-<?= $planta->getId() ?>" name="hospital_id" required>
                             <option value="">Seleccionar hospital</option>
                             <?php foreach ($hospitales as $hospital): ?>
-                                <option value="<?php echo $hospital->getId(); ?>" <?php echo ($planta->getHospitalId() == $hospital->getId()) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($hospital->getNombre()); ?>
+                                <option value="<?= $hospital->getId() ?>" <?= $planta->getHospitalId() == $hospital->getId() ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($hospital->getNombre()) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -179,17 +168,17 @@ include_once(__DIR__ . '/../templates/header.php');
             </div>
         </div>
 
-        <div id="planta-card-delete-<?php echo $planta->getId(); ?>" class="planta-card">
+        <div id="planta-card-delete-<?= $planta->getId() ?>" class="planta-card">
             <div class="planta-card__header planta-card__header--delete">
                 <h3 class="planta-card__title">Eliminar Planta</h3>
                 <button type="button" class="planta-card__close">&times;</button>
             </div>
             <div class="planta-card__body">
-                <h4>¿Estás seguro de que deseas eliminar la planta "<?php echo htmlspecialchars($planta->getNombre()); ?>"?</h4>
+                <h4>¿Estás seguro de que deseas eliminar la planta "<?= htmlspecialchars($planta->getNombre()) ?>"?</h4>
                 <p class="text-danger">Esta acción no se puede deshacer.</p>
-                <form id="delete-planta-form-<?php echo $planta->getId(); ?>" method="POST" action="procesar_planta.php">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="id" value="<?php echo $planta->getId(); ?>">
+                <form id="delete-planta-form-<?= $planta->getId() ?>" method="POST" action="eliminar_planta.php">
+                    <input type="hidden" name="id" value="<?= $planta->getId() ?>">
+                    <input type="hidden" name="confirmar" value="1">
                     <div class="planta-card__footer">
                         <button type="button" class="planta-form__button planta-form__button--secondary planta-form__button--cancel">Cancelar</button>
                         <button type="submit" class="planta-form__button planta-form__button--danger">Confirmar Eliminación</button>
@@ -200,7 +189,63 @@ include_once(__DIR__ . '/../templates/header.php');
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php include(__DIR__ . '/../templates/footer.php'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cerrar alertas
+    const alertCloseButtons = document.querySelectorAll('.list-alert__close');
+    alertCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const alert = this.closest('.list-alert');
+            alert.style.display = 'none';
+        });
+    });
+    
+    // Botón para agregar planta
+    const btnAddPlanta = document.getElementById('btn-add-planta');
+    const plantaOverlay = document.querySelector('.planta-overlay');
+    const plantaCardCreate = document.getElementById('planta-card-create');
+    const plantaCloseButtons = document.querySelectorAll('.planta-card__close, .planta-form__button--cancel');
+    
+    // Botones para editar plantas
+    const btnEditPlantas = document.querySelectorAll('.btn-edit-planta');
+    
+    // Botones para eliminar plantas
+    const btnDeletePlantas = document.querySelectorAll('.btn-delete-planta');
+    
+    // Abrir modal de creación
+    btnAddPlanta.addEventListener('click', function() {
+        plantaOverlay.style.display = 'block';
+        plantaCardCreate.style.display = 'block';
+    });
+    
+    // Cerrar modales
+    plantaCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            plantaOverlay.style.display = 'none';
+            document.querySelectorAll('.planta-card').forEach(card => {
+                card.style.display = 'none';
+            });
+        });
+    });
+    
+    // Abrir modal de edición
+    btnEditPlantas.forEach(button => {
+        button.addEventListener('click', function() {
+            const plantaId = this.getAttribute('data-id');
+            plantaOverlay.style.display = 'block';
+            document.getElementById(`planta-card-edit-${plantaId}`).style.display = 'block';
+        });
+    });
+    
+    // Abrir modal de eliminación
+    btnDeletePlantas.forEach(button => {
+        button.addEventListener('click', function() {
+            const plantaId = this.getAttribute('data-id');
+            plantaOverlay.style.display = 'block';
+            document.getElementById(`planta-card-delete-${plantaId}`).style.display = 'block';
+        });
+    });
+});
+</script>
 
-<!-- Scripts después del footer -->
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/planta-cards.js"></script>
+<?php include_once(__DIR__ . '/../templates/footer.php'); ?>

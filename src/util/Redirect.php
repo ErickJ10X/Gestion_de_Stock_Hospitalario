@@ -12,7 +12,7 @@ class Redirect
 
     public static function toHome()
     {
-        self::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/index.php');
+        self::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php');
     }
 
     public static function toLogin()

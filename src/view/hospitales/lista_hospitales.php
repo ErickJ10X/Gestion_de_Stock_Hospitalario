@@ -21,54 +21,70 @@ include_once(__DIR__ . '/../templates/header.php');
 ?>
 
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
 
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2>Lista de Hospitales</h2>
-            <button id="btn-add-hospital" class="btn btn-success">Nuevo Hospital</button>
+<div class="list-container">
+    <div class="list-header">
+        <h2 class="list-header__title">Lista de Hospitales</h2>
+        <div class="list-header__actions">
+            <button id="btn-add-hospital" class="list-button list-button--success">
+                <i class="bi bi-plus-circle list-button__icon"></i> Nuevo Hospital
+            </button>
         </div>
-        <div class="card-body">
-            <?php if ($session->hasMessage()): ?>
-                <div class="alert alert-<?= $session->getMessageType() ?> alert-dismissible fade show" role="alert">
-                    <?= $session->getMessage() ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
+    </div>
+    
+    <?php if ($session->hasMessage('success')): ?>
+        <div class="list-alert list-alert--success">
+            <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
+            <button type="button" class="list-alert__close">&times;</button>
+        </div>
+    <?php endif; ?>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
+    <?php if ($session->hasMessage('error')): ?>
+        <div class="list-alert list-alert--error">
+            <p class="list-alert__message"><?= $session->getMessage('error') ?></p>
+            <button type="button" class="list-alert__close">&times;</button>
+        </div>
+    <?php endif; ?>
+
+    <div class="list-card">
+        <div class="list-card__header">
+            <h3 class="list-card__title">Listado de Hospitales</h3>
+        </div>
+        <div class="list-card__body">
+            <table class="list-table">
+                <thead class="list-table__head">
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th class="list-table__header">ID</th>
+                        <th class="list-table__header">Nombre</th>
+                        <th class="list-table__header">Acciones</th>
                     </tr>
-                    </thead>
-                    <tbody>
+                </thead>
+                <tbody>
                     <?php if (empty($hospitales)): ?>
                         <tr>
-                            <td colspan="3" class="text-center">No hay hospitales registrados</td>
+                            <td colspan="3" class="list-table__empty">No hay hospitales registrados</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($hospitales as $hospital): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($hospital->id) ?></td>
-                                <td><?= htmlspecialchars($hospital->nombre) ?></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit-hospital" data-id="<?= $hospital->id ?>">
-                                        <i class="bi bi-pencil-square"></i> Modificar
-                                    </button>
-                                    <button class="btn btn-danger btn-sm btn-delete-hospital" data-id="<?= $hospital->id ?>">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
+                            <tr class="list-table__body-row">
+                                <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($hospital->id) ?></td>
+                                <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($hospital->nombre) ?></td>
+                                <td class="list-table__body-cell" data-label="Acciones">
+                                    <div class="list-table__actions">
+                                        <button class="list-table__button list-table__button--edit btn-edit-hospital" data-id="<?= $hospital->id ?>">
+                                            <i class="bi bi-pencil-square list-table__button-icon"></i> Modificar
+                                        </button>
+                                        <button class="list-table__button list-table__button--delete btn-delete-hospital" data-id="<?= $hospital->id ?>">
+                                            <i class="bi bi-trash list-table__button-icon"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -134,6 +150,19 @@ include_once(__DIR__ . '/../templates/header.php');
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cerrar alertas
+    const alertCloseButtons = document.querySelectorAll('.list-alert__close');
+    alertCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const alert = this.closest('.list-alert');
+            alert.style.display = 'none';
+        });
+    });
+});
+</script>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>
 
