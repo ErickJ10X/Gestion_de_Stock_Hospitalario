@@ -35,14 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre']) && isset($_
         $session->setMessage('error', 'Debe seleccionar un hospital');
     } else {
         if ($plantaController->createPlanta($nombre, $hospitalId)) {
-            $session->setMessage('success', 'Planta registrada correctamente');
+            $session->setMessage('success', 'Plantas registrada correctamente');
             header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
             exit;
         }
     }
 }
 
-$pageTitle = "Registrar Planta";
+$pageTitle = "Registrar Plantas";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

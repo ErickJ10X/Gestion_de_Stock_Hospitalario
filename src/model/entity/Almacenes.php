@@ -4,32 +4,58 @@ namespace model\entity;
 
 class Almacenes
 {
-    private $id;
-    private $planta_id;
+    private $id_almacen;
+    private $id_planta;
+    private $tipo;
+    private $id_hospital;
 
-    public function __construct($id = null, $planta_id = null)
+    public function __construct($id_almacen, $id_planta, $tipo, $id_hospital)
     {
-        $this->id = $id;
-        $this->planta_id = $planta_id;
+        $this->id_almacen = $id_almacen;
+        $this->id_planta = $id_planta;
+        $this->tipo = $tipo;
+        $this->id_hospital = $id_hospital;
     }
 
-    public function getId()
+    public function getIdAlmacen()
     {
-        return $this->id;
+        return $this->id_almacen;
     }
 
-    public function setId($id)
+    public function setIdAlmacen($id_almacen): void
     {
-        $this->id = $id;
+        $this->id_almacen = $id_almacen;
     }
 
-    public function getPlantaId()
+    public function getIdPlanta()
     {
-        return $this->planta_id;
+        return $this->id_planta;
     }
 
-    public function setPlantaId($planta_id)
+    public function setIdPlanta($id_planta): void
     {
-        $this->planta_id = $planta_id;
+        $this->id_planta = $id_planta;
     }
+
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+
+    public function setTipo($tipo): void
+    {
+        $this->tipo = $tipo;
+    }
+
+    public function getIdHospital()
+    {
+        return $this->id_hospital;
+    }
+
+    public function setIdHospital($id_hospital): void
+    {
+        $this->id_hospital = $id_hospital;
+    }
+
+
 }

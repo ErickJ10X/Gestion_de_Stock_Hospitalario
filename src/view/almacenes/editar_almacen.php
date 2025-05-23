@@ -72,14 +72,14 @@ $plantas = $almacenesController->getPlantas();
             <div class="card-body">
                 <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/procesar_almacen.php" method="post">
                     <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="id" value="<?php echo $almacen->getId(); ?>">
+                    <input type="hidden" name="id" value="<?php echo $almacen->getIdAlmacen(); ?>">
                     
                     <div class="mb-3">
                         <label for="planta_id" class="form-label">Planta</label>
                         <select class="form-select" id="planta_id" name="planta_id" required>
                             <option value="">Seleccionar planta</option>
                             <?php foreach ($plantas as $planta): ?>
-                                <option value="<?php echo $planta->getId(); ?>" <?php echo ($planta->getId() == $almacen->getPlantaId()) ? 'selected' : ''; ?>>
+                                <option value="<?php echo $planta->getId(); ?>" <?php echo ($planta->getId() == $almacen->getIdPlanta()) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($planta->getNombre()); ?>
                                 </option>
                             <?php endforeach; ?>

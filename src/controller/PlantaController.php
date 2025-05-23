@@ -2,12 +2,12 @@
 
 namespace controller;
 
-require_once __DIR__ . '/../model/entity/Planta.php';
+require_once __DIR__ . '/../model/entity/Plantas.php';
 require_once __DIR__ . '/../model/service/PlantaService.php';
 require_once __DIR__ . '/../model/repository/PlantasRepository.php';
 
 use Exception;
-use model\entity\Planta;
+use model\entity\Plantas;
 use model\service\PlantaService;
 
 class PlantaController
@@ -52,9 +52,9 @@ class PlantaController
     public function createPlanta($nombre, $hospitalId)
     {
         try {
-            $planta = new Planta();
+            $planta = new Plantas();
             $planta->setNombre($nombre);
-            $planta->setHospitalId($hospitalId);
+            $planta->setIdHospital($hospitalId);
             return $this->plantaService->savePlanta($planta);
         } catch (Exception $e) {
             error_log("Error en PlantaController::createPlanta: " . $e->getMessage());
@@ -68,7 +68,7 @@ class PlantaController
             $planta = $this->plantaService->getPlantaById($id);
             if ($planta) {
                 $planta->setNombre($nombre);
-                $planta->setHospitalId($hospitalId);
+                $planta->setIdHospital($hospitalId);
                 return $this->plantaService->updatePlanta($planta);
             }
             return false;

@@ -22,7 +22,7 @@ $id = $_GET['id'];
 $planta = $plantaController->getPlantaById($id);
 
 if (!$planta) {
-    $session->setMessage('error', 'Planta no encontrada');
+    $session->setMessage('error', 'Plantas no encontrada');
     header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
     exit;
 }
@@ -44,14 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre']) && isset($_
         $session->setMessage('error', 'Debe seleccionar un hospital');
     } else {
         if ($plantaController->updatePlanta($id, $nombre, $hospitalId)) {
-            $session->setMessage('success', 'Planta actualizada correctamente');
+            $session->setMessage('success', 'Plantas actualizada correctamente');
             header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php');
             exit;
         }
     }
 }
 
-$pageTitle = "Editar Planta";
+$pageTitle = "Editar Plantas";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
@@ -90,7 +90,7 @@ include_once(__DIR__ . '/../templates/header.php');
                     <select class="form-select" id="hospital_id" name="hospital_id" required>
                         <option value="">Seleccionar hospital</option>
                         <?php foreach ($hospitales as $hospital): ?>
-                            <option value="<?php echo $hospital->getId(); ?>" <?php echo ($hospital->getId() == $planta->getHospitalId()) ? 'selected' : ''; ?>>
+                            <option value="<?php echo $hospital->getId(); ?>" <?php echo ($hospital->getId() == $planta->getIdHospital()) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($hospital->getNombre()); ?>
                             </option>
                         <?php endforeach; ?>

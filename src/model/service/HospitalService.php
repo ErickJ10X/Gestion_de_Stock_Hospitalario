@@ -3,9 +3,9 @@
 namespace model\service;
 require_once(__DIR__ . '/../../../config/database.php');
 require_once(__DIR__ . '/../repository/HospitalesRepository.php');
-require_once(__DIR__ . '/../entity/Hospital.php');
+require_once(__DIR__ . '/../entity/Hospitales.php');
 
-use model\entity\Hospital;
+use model\entity\Hospitales;
 use model\repository\HospitalesRepository;
 use PDOException;
 use Exception;
@@ -28,7 +28,7 @@ class HospitalService
         }
     }
 
-    public function getHospitalById($id): ?Hospital
+    public function getHospitalById($id): ?Hospitales
     {
         try {
             return $this->hospitalRepository->findById($id);
@@ -44,7 +44,7 @@ class HospitalService
                 throw new Exception("El nombre del hospital es obligatorio");
             }
             
-            $hospital = new Hospital(0, $nombre);
+            $hospital = new Hospitales(0, $nombre);
             return $this->hospitalRepository->save($hospital);
         } catch (PDOException $e) {
             throw new Exception("Error al crear el hospital: " . $e->getMessage());
@@ -58,7 +58,7 @@ class HospitalService
                 throw new Exception("El ID y el nombre del hospital son obligatorios");
             }
             
-            $hospital = new Hospital($id, $nombre);
+            $hospital = new Hospitales($id, $nombre);
             return $this->hospitalRepository->update($hospital);
         } catch (PDOException $e) {
             throw new Exception("Error al actualizar el hospital: " . $e->getMessage());

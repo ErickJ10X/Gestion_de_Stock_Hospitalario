@@ -55,7 +55,7 @@ class AlmacenesRepository
         $sql = "INSERT INTO almacenes (planta_id) VALUES (?)";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
-            $almacen->getPlantaId()
+            $almacen->getIdPlanta()
         ]);
     }
 
@@ -64,8 +64,8 @@ class AlmacenesRepository
         $sql = "UPDATE almacenes SET planta_id = ? WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
-            $almacen->getPlantaId(),
-            $almacen->getId()
+            $almacen->getIdPlanta(),
+            $almacen->getIdAlmacen()
         ]);
     }
 

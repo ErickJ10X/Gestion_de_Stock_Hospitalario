@@ -4,44 +4,45 @@ namespace model\entity;
 
 class Botiquines
 {
-    private $id;
+    private $id_botiquines;
     private $nombre;
-    private $planta_id;
+    private $id_planta;
 
-    public function __construct($id = null, $nombre = null, $planta_id = null)
+    public function __construct($id_botiquines = null, $nombre = null, $id_planta = null)
     {
-        $this->id = $id;
+        $this->id_botiquines = $id_botiquines;
         $this->nombre = $nombre;
-        $this->planta_id = $planta_id;
+        $this->id_planta = $id_planta;
     }
 
-    public function getId()
+    public function getIdBotiquines(): mixed
     {
-        return $this->id;
+        return $this->id_botiquines;
     }
 
-    public function setId($id)
+    public function setIdBotiquines(mixed $id_botiquines): void
     {
-        $this->id = $id;
+        $this->id_botiquines = $id_botiquines;
     }
 
-    public function getNombre()
+    public function getNombre(): mixed
     {
         return $this->nombre;
     }
 
-    public function setNombre($nombre)
+    public function setNombre(mixed $nombre): void
     {
         $this->nombre = $nombre;
     }
 
-    public function getPlantaId()
+    public function getIdPlanta(): mixed
     {
-        return $this->planta_id;
+        return $this->id_planta;
     }
 
-    public function setPlantaId($planta_id)
+    public function setIdPlanta(mixed $id_planta): void
     {
-        $this->planta_id = $planta_id;
+        $this->id_planta = $id_planta;
     }
+
 }

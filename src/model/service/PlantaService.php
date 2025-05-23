@@ -3,12 +3,12 @@
 namespace model\service;
 
 require_once __DIR__ . '/../repository/PlantasRepository.php';
-require_once __DIR__ . '/../entity/Planta.php';
+require_once __DIR__ . '/../entity/Plantas.php';
 require_once __DIR__ . '/../../../config/database.php';
 
 use config\Database;
 use model\repository\PlantasRepository;
-use model\entity\Planta;
+use model\entity\Plantas;
 use Exception;
 use PDO;
 
@@ -53,7 +53,7 @@ class PlantaService
         }
     }
 
-    public function savePlanta(Planta $planta)
+    public function savePlanta(Plantas $planta)
     {
         try {
             return $this->plantasRepository->save($planta);
@@ -63,7 +63,7 @@ class PlantaService
         }
     }
 
-    public function updatePlanta(Planta $planta)
+    public function updatePlanta(Plantas $planta)
     {
         try {
             return $this->plantasRepository->update($planta);

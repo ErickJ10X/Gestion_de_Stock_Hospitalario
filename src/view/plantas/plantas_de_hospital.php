@@ -30,7 +30,7 @@ $hospital = $hospitalController->getHospitalById($hospitalId);
 
 // Si no se encuentra el hospital, redirigir
 if (!$hospital) {
-    $session->setMessage('error', 'Hospital no encontrado');
+    $session->setMessage('error', 'Hospitales no encontrado');
     header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/lista_hospitales.php');
     exit;
 }
@@ -42,7 +42,7 @@ try {
     $session->setMessage('error', 'Error al cargar las plantas: ' . $e->getMessage());
 }
 
-$pageTitle = "Plantas del Hospital: " . $hospital->getNombre();
+$pageTitle = "Plantas del Hospitales: " . $hospital->getNombre();
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id']) || empty($_POS
 $id = $_POST['id'];
 
 if ($plantaController->deletePlanta($id)) {
-    $session->setMessage('success', 'Planta eliminada correctamente');
+    $session->setMessage('success', 'Plantas eliminada correctamente');
 } else {
     $session->setMessage('error', 'No se pudo eliminar la planta');
 }

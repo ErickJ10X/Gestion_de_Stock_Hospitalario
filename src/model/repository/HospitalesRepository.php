@@ -2,9 +2,9 @@
 
 namespace model\repository;
 require_once(__DIR__ . '/../../../config/database.php');
-require_once(__DIR__ . '/../entity/Hospital.php');
+require_once(__DIR__ . '/../entity/Hospitales.php');
 
-use model\entity\Hospital;
+use model\entity\Hospitales;
 use PDO;
 
 class HospitalesRepository
@@ -16,9 +16,9 @@ class HospitalesRepository
         $this->pdo = getConnection();
     }
     
-    private function mapToHospital($row): Hospital
+    private function mapToHospital($row): Hospitales
     {
-        return new Hospital(
+        return new Hospitales(
             $row['id'],
             $row['nombre']
         );
@@ -40,7 +40,7 @@ class HospitalesRepository
         return $this->mapToHospitalArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    public function findById($id): ?Hospital
+    public function findById($id): ?Hospitales
     {
         $sql = "SELECT id, nombre FROM hospitales WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
@@ -49,7 +49,7 @@ class HospitalesRepository
         return $row ? $this->mapToHospital($row) : null;
     }
 
-    public function save(Hospital $hospital): bool
+    public function save(Hospitales $hospital): bool
     {
         $sql = "INSERT INTO hospitales (nombre) VALUES (?)";
         return $this->pdo->prepare($sql)->execute([
@@ -57,12 +57,12 @@ class HospitalesRepository
         ]);
     }
 
-    public function update(Hospital $hospital): bool
+    public function update(Hospitales $hospital): bool
     {
         $sql = "UPDATE hospitales SET nombre = ? WHERE id = ?";
         return $this->pdo->prepare($sql)->execute([
             $hospital->nombre,
-            $hospital->id
+            $hospital->id_hospital
         ]);
     }
     

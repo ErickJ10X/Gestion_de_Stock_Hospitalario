@@ -43,7 +43,7 @@ try {
         }
         
         if ($plantaController->createPlanta($nombre, $hospitalId)) {
-            $session->setMessage('success', 'Planta creada correctamente');
+            $session->setMessage('success', 'Plantas creada correctamente');
         } else {
             $session->setMessage('error', 'Error al crear la planta');
         }
@@ -66,7 +66,7 @@ try {
         }
         
         if ($plantaController->updatePlanta($id, $nombre, $hospitalId)) {
-            $session->setMessage('success', 'Planta actualizada correctamente');
+            $session->setMessage('success', 'Plantas actualizada correctamente');
         } else {
             $session->setMessage('error', 'Error al actualizar la planta');
         }
@@ -87,7 +87,7 @@ try {
         }
         
         if ($plantaController->deletePlanta($id)) {
-            $session->setMessage('success', 'Planta eliminada correctamente');
+            $session->setMessage('success', 'Plantas eliminada correctamente');
         } else {
             $session->setMessage('error', 'Error al eliminar la planta. Puede que tenga botiquines o almacenes asociados.');
         }

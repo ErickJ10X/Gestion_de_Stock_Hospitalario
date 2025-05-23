@@ -24,20 +24,20 @@ $id = $_GET['id'];
 $hospital = $hospitalController->getHospitalById($id);
 
 if (!$hospital) {
-    $session->setMessage('error', 'Hospital no encontrado');
+    $session->setMessage('error', 'Hospitales no encontrado');
     header('Location: lista_hospitales.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
     if ($hospitalController->deleteHospital($id)) {
-        $session->setMessage('success', 'Hospital eliminado correctamente');
+        $session->setMessage('success', 'Hospitales eliminado correctamente');
     }
     header('Location: lista_hospitales.php');
     exit;
 }
 
-$pageTitle = "Eliminar Hospital";
+$pageTitle = "Eliminar Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

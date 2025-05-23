@@ -58,7 +58,7 @@ class BotiquinesRepository
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             $botiquin->getNombre(),
-            $botiquin->getPlantaId()
+            $botiquin->getIdPlanta()
         ]);
     }
 
@@ -68,8 +68,8 @@ class BotiquinesRepository
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             $botiquin->getNombre(),
-            $botiquin->getPlantaId(),
-            $botiquin->getId()
+            $botiquin->getIdPlanta(),
+            $botiquin->getIdBotiquines()
         ]);
     }
 

@@ -73,7 +73,7 @@ $plantas = $botiquinesController->getPlantas();
             <div class="card-body">
                 <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquines/procesar_botiquin.php" method="post">
                     <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="id" value="<?php echo $botiquin->getId(); ?>">
+                    <input type="hidden" name="id" value="<?php echo $botiquin->getIdBotiquines(); ?>">
                     
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre del Botiquín</label>
@@ -85,7 +85,7 @@ $plantas = $botiquinesController->getPlantas();
                         <select class="form-select" id="planta_id" name="planta_id" required>
                             <option value="">Seleccionar planta</option>
                             <?php foreach ($plantas as $planta): ?>
-                                <option value="<?php echo $planta->getId(); ?>" <?php echo ($planta->getId() == $botiquin->getPlantaId()) ? 'selected' : ''; ?>>
+                                <option value="<?php echo $planta->getId(); ?>" <?php echo ($planta->getId() == $botiquin->getIdPlanta()) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($planta->getNombre()); ?>
                                 </option>
                             <?php endforeach; ?>

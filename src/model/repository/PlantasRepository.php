@@ -2,11 +2,11 @@
 
 namespace model\repository;
 
-require_once __DIR__ . '/../entity/Planta.php';
+require_once __DIR__ . '/../entity/Plantas.php';
 
 use PDO;
 use Exception;
-use model\entity\Planta;
+use model\entity\Plantas;
 
 class PlantasRepository
 {
@@ -26,10 +26,10 @@ class PlantasRepository
 
             $plantas = [];
             while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $planta = new Planta();
-                $planta->setId($row['id']);
+                $planta = new Plantas();
+                $planta->setIdPlanta($row['id']);
                 $planta->setNombre($row['nombre']);
-                $planta->setHospitalId($row['hospital_id']);
+                $planta->setIdHospital($row['hospital_id']);
                 $plantas[] = $planta;
             }
 
@@ -49,10 +49,10 @@ class PlantasRepository
 
             $row = $statement->fetch(PDO::FETCH_ASSOC);
             if ($row) {
-                $planta = new Planta();
-                $planta->setId($row['id']);
+                $planta = new Plantas();
+                $planta->setIdPlanta($row['id']);
                 $planta->setNombre($row['nombre']);
-                $planta->setHospitalId($row['hospital_id']);
+                $planta->setIdHospital($row['hospital_id']);
                 return $planta;
             }
             return null;
@@ -71,10 +71,10 @@ class PlantasRepository
 
             $plantas = [];
             while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $planta = new Planta();
-                $planta->setId($row['id']);
+                $planta = new Plantas();
+                $planta->setIdPlanta($row['id']);
                 $planta->setNombre($row['nombre']);
-                $planta->setHospitalId($row['hospital_id']);
+                $planta->setIdHospital($row['hospital_id']);
                 $plantas[] = $planta;
             }
 
@@ -84,13 +84,13 @@ class PlantasRepository
         }
     }
 
-    public function save(Planta $planta)
+    public function save(Plantas $planta)
     {
         try {
             $query = "INSERT INTO plantas (nombre, hospital_id) VALUES (:nombre, :hospital_id)";
             $statement = $this->db->prepare($query);
             $nombre = $planta->getNombre();
-            $hospitalId = $planta->getHospitalId();
+            $hospitalId = $planta->getIdHospital();
             
             $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);
             $statement->bindParam(':hospital_id', $hospitalId, PDO::PARAM_INT);
@@ -101,15 +101,15 @@ class PlantasRepository
         }
     }
 
-    public function update(Planta $planta)
+    public function update(Plantas $planta)
     {
         try {
             $query = "UPDATE plantas SET nombre = :nombre, hospital_id = :hospital_id WHERE id = :id";
             $statement = $this->db->prepare($query);
             
-            $id = $planta->getId();
+            $id = $planta->getIdPlanta();
             $nombre = $planta->getNombre();
-            $hospitalId = $planta->getHospitalId();
+            $hospitalId = $planta->getIdHospital();
             
             $statement->bindParam(':id', $id, PDO::PARAM_INT);
             $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);

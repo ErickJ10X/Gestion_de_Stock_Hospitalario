@@ -24,7 +24,7 @@ $id = $_GET['id'];
 $hospital = $hospitalController->getHospitalById($id);
 
 if (!$hospital) {
-    $session->setMessage('error', 'Hospital no encontrado');
+    $session->setMessage('error', 'Hospitales no encontrado');
     header('Location: lista_hospitales.php');
     exit;
 }
@@ -36,14 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
         $session->setMessage('error', 'El nombre del hospital es obligatorio');
     } else {
         if ($hospitalController->updateHospital($id, $nombre)) {
-            $session->setMessage('success', 'Hospital actualizado correctamente');
+            $session->setMessage('success', 'Hospitales actualizado correctamente');
             header('Location: lista_hospitales.php');
             exit;
         }
     }
 }
 
-$pageTitle = "Editar Hospital";
+$pageTitle = "Editar Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

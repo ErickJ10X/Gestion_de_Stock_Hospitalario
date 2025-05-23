@@ -4,69 +4,71 @@ namespace model\entity;
 
 class Usuario
 {
-    private $id;
+    private $id_usuario;
     private $nombre;
     private $email;
     private $contrasena;
-    private $rol;
+    private $id_rol;
 
-    public function __construct($id = null, $nombre = null, $email = null, $contrasena = null, $rol = null)
+    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null)
     {
-        $this->id = $id;
+        $this->id_usuario = $id_usuario;
         $this->nombre = $nombre;
         $this->email = $email;
         $this->contrasena = $contrasena;
-        $this->rol = $rol;
+        $this->id_rol = $id_rol;
     }
 
-    public function getId()
+    public function getIdUsuario(): mixed
     {
-        return $this->id;
+        return $this->id_usuario;
     }
 
-    public function getNombre()
+    public function setIdUsuario(mixed $id_usuario): void
+    {
+        $this->id_usuario = $id_usuario;
+    }
+
+    public function getNombre(): mixed
     {
         return $this->nombre;
     }
 
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function getRol()
-    {
-        return $this->rol;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-    public function  getContrasena()
-    {
-        return $this->contrasena;
-    }
-
-    public function setNombre($nombre)
+    public function setNombre(mixed $nombre): void
     {
         $this->nombre = $nombre;
     }
 
-    public function setEmail($email)
+    public function getEmail(): mixed
+    {
+        return $this->email;
+    }
+
+    public function setEmail(mixed $email): void
     {
         $this->email = $email;
     }
 
-    public function setContrasena($contrasena)
+    public function getContrasena(): mixed
+    {
+        return $this->contrasena;
+    }
+
+    public function setContrasena(mixed $contrasena): void
     {
         $this->contrasena = $contrasena;
     }
 
-    public function setRol($rol)
+    public function getIdRol(): mixed
     {
-        $this->rol = $rol;
+        return $this->id_rol;
     }
+
+    public function setIdRol(mixed $id_rol): void
+    {
+        $this->id_rol = $id_rol;
+    }
+
 
     public function verificarContrasena($contrasena)
     {

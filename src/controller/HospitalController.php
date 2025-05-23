@@ -2,11 +2,11 @@
 namespace controller;
 
 require_once(__DIR__ . '/../model/service/HospitalService.php');
-require_once(__DIR__ . '/../model/entity/Hospital.php');
+require_once(__DIR__ . '/../model/entity/Hospitales.php');
 include_once(__DIR__ . '/../util/Session.php');
 
 use model\service\HospitalService;
-use model\entity\Hospital;
+use model\entity\Hospitales;
 use util\Session;
 use Exception;
 
@@ -31,7 +31,7 @@ class HospitalController
         }
     }
 
-    public function getHospitalById($id): ?Hospital
+    public function getHospitalById($id): ?Hospitales
     {
         try {
             if (empty($id)) {
@@ -41,7 +41,7 @@ class HospitalController
             $hospital = $this->hospitalService->getHospitalById($id);
             
             if (!$hospital) {
-                throw new Exception("Hospital no encontrado");
+                throw new Exception("Hospitales no encontrado");
             }
             
             return $hospital;
@@ -62,7 +62,7 @@ class HospitalController
                 throw new Exception("No se pudo crear el hospital");
             }
             
-            $this->session->setMessage("success", "Hospital creado correctamente");
+            $this->session->setMessage("success", "Hospitales creado correctamente");
             return true;
         } catch (Exception $e) {
             $this->handleError("Error al crear hospital", $e->getMessage());
@@ -79,14 +79,14 @@ class HospitalController
             
             $hospital = $this->hospitalService->getHospitalById($id);
             if (!$hospital) {
-                throw new Exception("Hospital no encontrado");
+                throw new Exception("Hospitales no encontrado");
             }
             
             if (!$this->hospitalService->updateHospital($id, $nombre)) {
                 throw new Exception("No se pudo actualizar el hospital");
             }
             
-            $this->session->setMessage("success", "Hospital actualizado correctamente");
+            $this->session->setMessage("success", "Hospitales actualizado correctamente");
             return true;
         } catch (Exception $e) {
             $this->handleError("Error al actualizar hospital", $e->getMessage());
@@ -103,14 +103,14 @@ class HospitalController
             
             $hospital = $this->hospitalService->getHospitalById($id);
             if (!$hospital) {
-                throw new Exception("Hospital no encontrado");
+                throw new Exception("Hospitales no encontrado");
             }
             
             if (!$this->hospitalService->deleteHospital($id)) {
                 throw new Exception("No se pudo eliminar el hospital");
             }
             
-            $this->session->setMessage("success", "Hospital eliminado correctamente");
+            $this->session->setMessage("success", "Hospitales eliminado correctamente");
             return true;
         } catch (Exception $e) {
             $this->handleError("Error al eliminar hospital", $e->getMessage());

@@ -4,29 +4,29 @@ namespace model\entity;
 
 class Productos
 {
-    private $id;
+    private $id_producto;
     private $codigo;
     private $nombre;
     private $descripcion;
     private $unidad_medida;
 
-    public function __construct($id, $codigo, $nombre, $descripcion, $unidad_medida)
+    public function __construct($id_producto, $codigo, $nombre, $descripcion, $unidad_medida)
     {
-        $this->id = $id;
+        $this->id_producto = $id_producto;
         $this->codigo = $codigo;
         $this->nombre = $nombre;
         $this->descripcion = $descripcion;
         $this->unidad_medida = $unidad_medida;
     }
 
-    public function getId()
+    public function getIdProducto()
     {
-        return $this->id;
+        return $this->id_producto;
     }
 
-    public function setId($id): void
+    public function setIdProducto($id_producto): void
     {
-        $this->id = $id;
+        $this->id_producto = $id_producto;
     }
 
 
