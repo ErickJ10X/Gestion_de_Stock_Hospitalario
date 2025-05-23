@@ -4,9 +4,9 @@ namespace model\entity;
 
 class Catalogos_productos
 {
-    private $id_catalogo;
-    private $id_producto;
-    private $id_planta;
+    private int $id_catalogo;
+    private int $id_producto;
+    private int $id_planta;
 
     public function __construct($id_catalogo, $id_producto, $id_planta)
     {
@@ -15,7 +15,7 @@ class Catalogos_productos
         $this->id_planta = $id_planta;
     }
 
-    public function getIdCatalogo()
+    public function getIdCatalogo(): int
     {
         return $this->id_catalogo;
     }
@@ -25,7 +25,7 @@ class Catalogos_productos
         $this->id_catalogo = $id_catalogo;
     }
 
-    public function getIdProducto()
+    public function getIdProducto(): int
     {
         return $this->id_producto;
     }
@@ -35,7 +35,7 @@ class Catalogos_productos
         $this->id_producto = $id_producto;
     }
 
-    public function getIdPlanta()
+    public function getIdPlanta(): int
     {
         return $this->id_planta;
     }

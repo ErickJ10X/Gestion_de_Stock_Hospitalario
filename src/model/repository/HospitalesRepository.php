@@ -19,8 +19,9 @@ class HospitalesRepository
     private function mapToHospital($row): Hospitales
     {
         return new Hospitales(
-            $row['id'],
-            $row['nombre']
+            $row['id_hospital'],
+            $row['nombre'],
+            $row['ubicacion']
         );
     }
     
@@ -42,33 +43,29 @@ class HospitalesRepository
 
     public function findById($id): ?Hospitales
     {
-        $sql = "SELECT id, nombre FROM hospitales WHERE id = ?";
+        $sql = "SELECT id_hospital, nombre, ubicacion FROM hospitales WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToHospital($row) : null;
+        return $this->mapToHospital($stmt->fetch(PDO::FETCH_ASSOC));
     }
 
     public function save(Hospitales $hospital): bool
     {
-        $sql = "INSERT INTO hospitales (nombre) VALUES (?)";
-        return $this->pdo->prepare($sql)->execute([
-            $hospital->nombre
-        ]);
+        $sql = "INSERT INTO hospitales (nombre, ubicacion) VALUES (?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$hospital->getNombre(), $hospital->getUbicacion()]);
+        return $this->pdo->lastInsertId();
     }
 
     public function update(Hospitales $hospital): bool
     {
-        $sql = "UPDATE hospitales SET nombre = ? WHERE id = ?";
-        return $this->pdo->prepare($sql)->execute([
-            $hospital->nombre,
-            $hospital->id_hospital
-        ]);
+        $sql = "UPDATE hospitales SET nombre = ? WHERE id_hospital = ?";
+        return $this->pdo->prepare($sql)->execute([$hospital->getNombre(), $hospital->getIdHospital()]);
     }
     
     public function deleteById($id): bool
     {
-        $sql = "DELETE FROM hospitales WHERE id = ?";
+        $sql = "DELETE FROM hospitales WHERE id_hospital = ?";
         return $this->pdo->prepare($sql)->execute([$id]);
     }
 }

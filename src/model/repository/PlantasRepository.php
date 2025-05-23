@@ -3,155 +3,74 @@
 namespace model\repository;
 
 require_once __DIR__ . '/../entity/Plantas.php';
+require_once __DIR__ . '/../../../config/database.php';
 
 use PDO;
-use Exception;
 use model\entity\Plantas;
 
 class PlantasRepository
 {
-    private $db;
+    private PDO $pdo;
 
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->pdo = getConnection();
     }
 
-    public function findAll()
+    public function mapToPlantas($row): Plantas
     {
-        try {
-            $query = "SELECT * FROM plantas ORDER BY id ASC";
-            $statement = $this->db->prepare($query);
-            $statement->execute();
-
-            $plantas = [];
-            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $planta = new Plantas();
-                $planta->setIdPlanta($row['id']);
-                $planta->setNombre($row['nombre']);
-                $planta->setIdHospital($row['hospital_id']);
-                $plantas[] = $planta;
-            }
-
-            return $plantas;
-        } catch (Exception $e) {
-            throw new Exception("Error al consultar todas las plantas: " . $e->getMessage());
+        $planta = new Plantas();
+        $planta->setIdPlanta($row['id_planta']);
+        $planta->setNombre($row['nombre']);
+        $planta->setIdHospital($row['id_hospital']);
+        return $planta;
+    }
+    public function mapToPlantasArray($rows): array
+    {
+        $plantas = [];
+        foreach ($rows as $row) {
+            $plantas[] = $this->mapToPlantas($row);
         }
+        return $plantas;
     }
 
-    public function findById($id)
+    public function findAll(): array
     {
-        try {
-            $query = "SELECT * FROM plantas WHERE id = :id";
-            $statement = $this->db->prepare($query);
-            $statement->bindParam(':id', $id, PDO::PARAM_INT);
-            $statement->execute();
-
-            $row = $statement->fetch(PDO::FETCH_ASSOC);
-            if ($row) {
-                $planta = new Plantas();
-                $planta->setIdPlanta($row['id']);
-                $planta->setNombre($row['nombre']);
-                $planta->setIdHospital($row['hospital_id']);
-                return $planta;
-            }
-            return null;
-        } catch (Exception $e) {
-            throw new Exception("Error al consultar planta por ID: " . $e->getMessage());
-        }
+        $sql = "SELECT * FROM plantas";
+        return $this->mapToPlantasArray($this->pdo->query($sql)->fetchAll());
     }
 
-    public function findByHospitalId($hospitalId)
+    public function findById($id): ?Plantas
     {
-        try {
-            $query = "SELECT * FROM plantas WHERE hospital_id = :hospital_id ORDER BY nombre ASC";
-            $statement = $this->db->prepare($query);
-            $statement->bindParam(':hospital_id', $hospitalId, PDO::PARAM_INT);
-            $statement->execute();
-
-            $plantas = [];
-            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $planta = new Plantas();
-                $planta->setIdPlanta($row['id']);
-                $planta->setNombre($row['nombre']);
-                $planta->setIdHospital($row['hospital_id']);
-                $plantas[] = $planta;
-            }
-
-            return $plantas;
-        } catch (Exception $e) {
-            throw new Exception("Error al consultar plantas por hospital_id: " . $e->getMessage());
-        }
+        $sql = "SELECT * FROM plantas WHERE id_planta = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return $this->mapToPlantas($stmt->fetch(PDO::FETCH_ASSOC));
     }
 
-    public function save(Plantas $planta)
+    public function findByHospitalId($id_hospital): array
     {
-        try {
-            $query = "INSERT INTO plantas (nombre, hospital_id) VALUES (:nombre, :hospital_id)";
-            $statement = $this->db->prepare($query);
-            $nombre = $planta->getNombre();
-            $hospitalId = $planta->getIdHospital();
-            
-            $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-            $statement->bindParam(':hospital_id', $hospitalId, PDO::PARAM_INT);
-            
-            return $statement->execute();
-        } catch (Exception $e) {
-            throw new Exception("Error al guardar planta: " . $e->getMessage());
-        }
+        $sql = "SELECT * FROM plantas WHERE id_hospital = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$id_hospital]);
+        return $this->mapToPlantasArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    public function update(Plantas $planta)
+    public function save(Plantas $planta): bool
     {
-        try {
-            $query = "UPDATE plantas SET nombre = :nombre, hospital_id = :hospital_id WHERE id = :id";
-            $statement = $this->db->prepare($query);
-            
-            $id = $planta->getIdPlanta();
-            $nombre = $planta->getNombre();
-            $hospitalId = $planta->getIdHospital();
-            
-            $statement->bindParam(':id', $id, PDO::PARAM_INT);
-            $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-            $statement->bindParam(':hospital_id', $hospitalId, PDO::PARAM_INT);
-            
-            return $statement->execute();
-        } catch (Exception $e) {
-            throw new Exception("Error al actualizar planta: " . $e->getMessage());
-        }
+        $sql = "INSERT INTO plantas (nombre, hospital_id) VALUES ( ?, ?)";
+        return $this->pdo->prepare($sql)->execute([$planta->getNombre(), $planta->getIdHospital()]);
     }
 
-    public function delete($id)
+    public function update(Plantas $planta): bool
     {
-        try {
-            $checkBotiquines = "SELECT COUNT(*) FROM botiquines WHERE planta_id = :id";
-            $checkAlmacenes = "SELECT COUNT(*) FROM almacenes WHERE planta_id = :id";
-            
-            $stmtBotiquines = $this->db->prepare($checkBotiquines);
-            $stmtBotiquines->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmtBotiquines->execute();
-            $botiquinesCount = $stmtBotiquines->fetchColumn();
-            
-            if ($botiquinesCount > 0) {
-                throw new Exception("No se puede eliminar la planta porque tiene botiquines asociados.");
-            }
-            
-            $stmtAlmacenes = $this->db->prepare($checkAlmacenes);
-            $stmtAlmacenes->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmtAlmacenes->execute();
-            $almacenesCount = $stmtAlmacenes->fetchColumn();
-            
-            if ($almacenesCount > 0) {
-                throw new Exception("No se puede eliminar la planta porque tiene almacenes asociados.");
-            }
-            
-            $query = "DELETE FROM plantas WHERE id = :id";
-            $statement = $this->db->prepare($query);
-            $statement->bindParam(':id', $id, PDO::PARAM_INT);
-            
-            return $statement->execute();
-        } catch (Exception $e) {
-            throw new Exception("Error al eliminar planta: " . $e->getMessage());
-        }
+        $sql = "UPDATE plantas SET nombre = ?, id_hospital = ? WHERE id_planta = ?";
+        return $this->pdo->prepare($sql)->execute([$planta->getNombre(), $planta->getIdHospital(), $planta->getIdPlanta()]);
+    }
+
+    public function delete($id): bool
+    {
+        $sql = "DELETE FROM plantas WHERE id_planta = ?";
+        return $this->pdo->prepare($sql)->execute([$id]);
     }
 }

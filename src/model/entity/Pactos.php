@@ -4,11 +4,11 @@ namespace model\entity;
 
 class Pactos
 {
-    private $id_pacto;
-    private $id_producto;
-    private $tipo_ubicacion;
-    private $id_destino;
-    private $cantidad_pactada;
+    private int $id_pacto;
+    private int $id_producto;
+    private string $tipo_ubicacion;
+    private int $id_destino;
+    private int $cantidad_pactada;
 
     public function __construct($id_pacto, $id_producto, $tipo_ubicacion, $id_destino, $cantidad_pactada)
     {
@@ -19,7 +19,7 @@ class Pactos
         $this->cantidad_pactada = $cantidad_pactada;
     }
 
-    public function getIdPacto()
+    public function getIdPacto(): int
     {
         return $this->id_pacto;
     }
@@ -29,7 +29,7 @@ class Pactos
         $this->id_pacto = $id_pacto;
     }
 
-    public function getIdProducto()
+    public function getIdProducto(): int
     {
         return $this->id_producto;
     }
@@ -39,7 +39,7 @@ class Pactos
         $this->id_producto = $id_producto;
     }
 
-    public function getTipoUbicacion()
+    public function getTipoUbicacion(): string
     {
         return $this->tipo_ubicacion;
     }
@@ -49,7 +49,7 @@ class Pactos
         $this->tipo_ubicacion = $tipo_ubicacion;
     }
 
-    public function getIdDestino()
+    public function getIdDestino(): int
     {
         return $this->id_destino;
     }
@@ -59,7 +59,7 @@ class Pactos
         $this->id_destino = $id_destino;
     }
 
-    public function getCantidadPactada()
+    public function getCantidadPactada(): int
     {
         return $this->cantidad_pactada;
     }
@@ -68,5 +68,4 @@ class Pactos
     {
         $this->cantidad_pactada = $cantidad_pactada;
     }
-
 }

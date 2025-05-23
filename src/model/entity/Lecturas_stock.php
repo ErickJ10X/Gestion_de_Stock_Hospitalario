@@ -4,12 +4,12 @@ namespace model\entity;
 
 class Lecturas_stock
 {
-    private $id_lectura;
-    private $id_producto;
-    private $id_botiquin;
-    private $cantidad_disponible;
-    private $fecha_lectura;
-    private $registrado_por;
+    private int $id_lectura;
+    private int $id_producto;
+    private int $id_botiquin;
+    private int $cantidad_disponible;
+    private string $fecha_lectura;
+    private int $registrado_por;
 
     public function __construct($id_lectura, $id_producto, $id_botiquin, $cantidad_disponible, $fecha_lectura, $registrado_por)
     {

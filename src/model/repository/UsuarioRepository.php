@@ -20,11 +20,12 @@ class UsuarioRepository
     public function mapToUsuario($row): Usuario
     {
         return new Usuario(
-            $row['id'],
+            $row['id_usuario'],
             $row['nombre'],
             $row['email'],
             $row['contrasena'],
-            $row['rol']
+            $row['id_rol'],
+            $row['activo']
         );
     }
     
@@ -39,8 +40,12 @@ class UsuarioRepository
 
     public function findAll(): array
     {
-        $sql = "SELECT id, nombre, email, contrasena, rol FROM usuarios";
-        return $this->mapToUsuarioArray($this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
+        $sql = "SELECT * FROM usuarios";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->mapToUsuarioArray($rows);
     }
 
     public function findById($id): ?Usuario
@@ -49,23 +54,12 @@ class UsuarioRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($row) {
-            $usuario = new Usuario();
-            $usuario->setId($row['id']);
-            $usuario->setNombre($row['nombre']);
-            $usuario->setEmail($row['email']);
-            $usuario->setRol($row['rol']);
-            
-            return $usuario;
-        }
-        
-        return null;
+        return $row ? $this->mapToUsuario($row) : null;
     }
 
     public function findByEmail($email): ?Usuario
     {
-        $sql = "SELECT id, nombre, email, contrasena, rol FROM usuarios WHERE email = ?";
+        $sql = "SELECT id_usuario, nombre, email, contrasena, id_rol, activo FROM usuarios WHERE email = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -74,12 +68,13 @@ class UsuarioRepository
 
     public function save(Usuario $usuario): bool
     {
-        $sql = "INSERT INTO usuarios (nombre, email, contrasena, rol) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO usuarios (nombre, email, contrasena, id_rol, activo) VALUES (?, ?, ?, ?, ?)";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
             $usuario->getEmail(),
             $usuario->getContrasena(),
-            $usuario->getRol()
+            $usuario->getIdRol(),
+            $usuario->getActivo()
         ]);
     }
     
@@ -90,13 +85,14 @@ class UsuarioRepository
     
     public function update(Usuario $usuario): bool
     {
-        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, rol = ? WHERE id = ?";
+        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, id_rol = ?, activo = ? WHERE id = ?";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
             $usuario->getEmail(),
             $usuario->getContrasena(),
-            $usuario->getRol(),
-            $usuario->getId()
+            $usuario->getIdRol(),
+            $usuario->getActivo(),
+            $usuario->getIdUsuario()
         ]);
     }
 }

@@ -12,13 +12,13 @@ class ProductosRepository
 
     public function __construct()
     {
-        $this->pdo = \getConnection();
+        $this->pdo = getConnection();
     }
 
     public function mapToProducto(array $row): Productos
     {
         return new Productos(
-            $row['id'],
+            $row['id_producto'],
             $row['codigo'],
             $row['nombre'],
             $row['descripcion'],
@@ -41,15 +41,12 @@ class ProductosRepository
         $sql = "SELECT * FROM productos";
         return $this->mapToProductoArray($this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
     }
-    public function findById($id)
+    public function findById($id): ?Productos
     {
         $sql = "SELECT * FROM productos WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if ($row) {
-            return $this->mapToProducto($row);
-        }
+        return $this->mapToProducto($stmt->fetch(PDO::FETCH_ASSOC));
     }
 
     public function save($producto): bool

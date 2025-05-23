@@ -17,65 +17,56 @@ class BotiquinesRepository
         $this->pdo = getConnection();
     }
 
+    public function mapToBotiquines(array $row): Botiquines
+    {
+        return new Botiquines(
+            $row['id_botiquin'],
+            $row['nombre'],
+            $row['id_planta']
+        );
+    }
+
+    public function mapToBotiquinesArray(array $rows): array
+    {
+        $botiquines = [];
+        foreach ($rows as $row) {
+            $botiquines[] = $this->mapToBotiquines($row);
+        }
+        return $botiquines;
+    }
     public function findAll(): array
     {
         $sql = "SELECT * FROM botiquines";
         $stmt = $this->pdo->query($sql);
-        $result = [];
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $result[] = new Botiquines(
-                $row['id'],
-                $row['nombre'],
-                $row['planta_id']
-            );
-        }
-        
-        return $result;
+        return $this->mapToBotiquinesArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findById($id): ?Botiquines
     {
-        $sql = "SELECT * FROM botiquines WHERE id = ?";
+        $sql = "SELECT * FROM botiquines WHERE id_botiquin = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$row) {
-            return null;
-        }
-        
-        return new Botiquines(
-            $row['id'],
-            $row['nombre'],
-            $row['planta_id']
-        );
+        return $this->mapToBotiquines($stmt->fetch(PDO::FETCH_ASSOC));
+
     }
 
     public function save(Botiquines $botiquin): bool
     {
-        $sql = "INSERT INTO botiquines (nombre, planta_id) VALUES (?, ?)";
+        $sql = "INSERT INTO botiquines (nombre, id_planta) VALUES (?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            $botiquin->getNombre(),
-            $botiquin->getIdPlanta()
-        ]);
+        return $stmt->execute([$botiquin->getNombre(), $botiquin->getIdPlanta()]);
     }
 
     public function update(Botiquines $botiquin): bool
     {
-        $sql = "UPDATE botiquines SET nombre = ?, planta_id = ? WHERE id = ?";
+        $sql = "UPDATE botiquines SET nombre = ?, id_planta = ? WHERE id_botiquin = ?";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            $botiquin->getNombre(),
-            $botiquin->getIdPlanta(),
-            $botiquin->getIdBotiquines()
-        ]);
+        return $stmt->execute([$botiquin->getNombre(), $botiquin->getIdPlanta(), $botiquin->getIdBotiquines()]);
     }
 
     public function delete($id): bool
     {
-        $sql = "DELETE FROM botiquines WHERE id = ?";
+        $sql = "DELETE FROM botiquines WHERE id_botiquin = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$id]);
     }

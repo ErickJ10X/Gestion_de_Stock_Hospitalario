@@ -4,13 +4,13 @@ namespace model\entity;
 
 class Reposiciones
 {
-    private $id_reposicion;
-    private $id_producto;
-    private $desde_almacen;
-    private $hasta_botiquin;
-    private $cantidad_repuesta;
-    private $fecha;
-    private $urgente;
+    private int $id_reposicion;
+    private int $id_producto;
+    private int $desde_almacen;
+    private int $hasta_botiquin;
+    private int $cantidad_repuesta;
+    private string $fecha;
+    private bool $urgente;
 
     public function __construct($id_reposicion, $id_producto, $desde_almacen, $hasta_botiquin, $cantidad_repuesta, $fecha, $urgente)
     {
@@ -23,7 +23,7 @@ class Reposiciones
         $this->urgente = $urgente;
     }
 
-    public function getIdReposicion()
+    public function getIdReposicion(): int
     {
         return $this->id_reposicion;
     }
@@ -33,7 +33,7 @@ class Reposiciones
         $this->id_reposicion = $id_reposicion;
     }
 
-    public function getIdProducto()
+    public function getIdProducto(): int
     {
         return $this->id_producto;
     }
@@ -43,7 +43,7 @@ class Reposiciones
         $this->id_producto = $id_producto;
     }
 
-    public function getDesdeAlmacen()
+    public function getDesdeAlmacen(): int
     {
         return $this->desde_almacen;
     }
@@ -53,7 +53,7 @@ class Reposiciones
         $this->desde_almacen = $desde_almacen;
     }
 
-    public function getHastaBotiquin()
+    public function getHastaBotiquin(): int
     {
         return $this->hasta_botiquin;
     }
@@ -63,7 +63,7 @@ class Reposiciones
         $this->hasta_botiquin = $hasta_botiquin;
     }
 
-    public function getCantidadRepuesta()
+    public function getCantidadRepuesta(): int
     {
         return $this->cantidad_repuesta;
     }
@@ -73,7 +73,7 @@ class Reposiciones
         $this->cantidad_repuesta = $cantidad_repuesta;
     }
 
-    public function getFecha()
+    public function getFecha(): string
     {
         return $this->fecha;
     }
@@ -83,7 +83,7 @@ class Reposiciones
         $this->fecha = $fecha;
     }
 
-    public function getUrgente()
+    public function getUrgente(): bool
     {
         return $this->urgente;
     }
@@ -93,6 +93,4 @@ class Reposiciones
     {
         $this->urgente = $urgente;
     }
-
-
 }

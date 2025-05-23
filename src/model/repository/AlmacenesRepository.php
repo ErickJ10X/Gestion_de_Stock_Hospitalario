@@ -17,61 +17,58 @@ class AlmacenesRepository
         $this->pdo = getConnection();
     }
 
+    public function mapToAlmacenes(array $row): Almacenes
+    {
+        return new Almacenes(
+            $row['id_almacen'],
+            $row['id_planta'],
+            $row['tipo'],
+            $row['id_hospital']
+        );
+    }
+
+    public function mapToAlmacenesArray(array $rows): array
+    {
+        $almacenes = [];
+        foreach ($rows as $row) {
+            $almacenes[] = $this->mapToAlmacenes($row);
+        }
+        return $almacenes;
+    }
+
     public function findAll(): array
     {
         $sql = "SELECT * FROM almacenes";
-        $stmt = $this->pdo->query($sql);
-        $result = [];
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $result[] = new Almacenes(
-                $row['id'],
-                $row['planta_id']
-            );
-        }
-        
-        return $result;
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $this->mapToAlmacenesArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findById($id): ?Almacenes
     {
-        $sql = "SELECT * FROM almacenes WHERE id = ?";
+        $sql = "SELECT * FROM almacenes WHERE id_almacen = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$row) {
-            return null;
-        }
-        
-        return new Almacenes(
-            $row['id'],
-            $row['planta_id']
-        );
+        return $this->mapToAlmacenes($stmt->fetch(PDO::FETCH_ASSOC));
     }
 
     public function save(Almacenes $almacen): bool
     {
-        $sql = "INSERT INTO almacenes (planta_id) VALUES (?)";
+        $sql = "INSERT INTO almacenes (id_planta, tipo, id_hospital) VALUES (?)";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            $almacen->getIdPlanta()
-        ]);
+        return $stmt->execute([$almacen->getIdPlanta(), $almacen->getTipo(), $almacen->getIdHospital()]);
     }
 
     public function update(Almacenes $almacen): bool
     {
-        $sql = "UPDATE almacenes SET planta_id = ? WHERE id = ?";
+        $sql = "UPDATE almacenes SET id_planta = ?, tipo = ?, id_hospital = ? WHERE id_almacen = ?";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            $almacen->getIdPlanta(),
-            $almacen->getIdAlmacen()
-        ]);
+        return $stmt->execute([$almacen->getIdPlanta(), $almacen->getTipo(), $almacen->getIdHospital(), $almacen->getIdAlmacen()]);
     }
 
     public function delete($id): bool
     {
-        $sql = "DELETE FROM almacenes WHERE id = ?";
+        $sql = "DELETE FROM almacenes WHERE id_almacen = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$id]);
     }

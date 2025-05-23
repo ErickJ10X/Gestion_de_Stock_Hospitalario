@@ -4,12 +4,12 @@ namespace model\entity;
 
 class Etiquetas
 {
-    private $id_etiqueta;
-    private $id_producto;
-    private $id_reposicion;
-    private $tipo;
-    private $prioridad;
-    private $Impresa;
+    private int $id_etiqueta;
+    private int $id_producto;
+    private int $id_reposicion;
+    private string $tipo;
+    private string $prioridad;
+    private bool $Impresa;
 
     public function __construct($id_etiqueta, $id_producto, $id_reposicion, $tipo, $prioridad, $Impresa)
     {
@@ -21,7 +21,7 @@ class Etiquetas
         $this->Impresa = $Impresa;
     }
 
-    public function getIdEtiqueta()
+    public function getIdEtiqueta(): int
     {
         return $this->id_etiqueta;
     }
@@ -31,7 +31,7 @@ class Etiquetas
         $this->id_etiqueta = $id_etiqueta;
     }
 
-    public function getIdProducto()
+    public function getIdProducto(): int
     {
         return $this->id_producto;
     }
@@ -41,7 +41,7 @@ class Etiquetas
         $this->id_producto = $id_producto;
     }
 
-    public function getIdReposicion()
+    public function getIdReposicion(): int
     {
         return $this->id_reposicion;
     }
@@ -51,7 +51,7 @@ class Etiquetas
         $this->id_reposicion = $id_reposicion;
     }
 
-    public function getTipo()
+    public function getTipo(): string
     {
         return $this->tipo;
     }
@@ -61,7 +61,7 @@ class Etiquetas
         $this->tipo = $tipo;
     }
 
-    public function getPrioridad()
+    public function getPrioridad(): string
     {
         return $this->prioridad;
     }
@@ -71,7 +71,7 @@ class Etiquetas
         $this->prioridad = $prioridad;
     }
 
-    public function getImpresa()
+    public function getImpresa(): bool
     {
         return $this->Impresa;
     }
@@ -80,6 +80,4 @@ class Etiquetas
     {
         $this->Impresa = $Impresa;
     }
-
-
 }
