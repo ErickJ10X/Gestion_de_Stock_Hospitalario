@@ -44,8 +44,4 @@ class Hospitales
     {
         $this->ubicacion = $ubicacion;
     }
-
-
-
-
 }

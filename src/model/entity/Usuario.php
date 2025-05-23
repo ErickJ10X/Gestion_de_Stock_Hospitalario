@@ -4,19 +4,21 @@ namespace model\entity;
 
 class Usuario
 {
-    private $id_usuario;
-    private $nombre;
-    private $email;
-    private $contrasena;
-    private $id_rol;
+    private int $id_usuario;
+    private string $nombre;
+    private string $email;
+    private string $contrasena;
+    private int $id_rol;
+    private bool $activo;
 
-    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null)
+    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null, $activo = null)
     {
         $this->id_usuario = $id_usuario;
         $this->nombre = $nombre;
         $this->email = $email;
-        $this->contrasena = $contrasena;
+        $this->contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
         $this->id_rol = $id_rol;
+        $this->activo = $activo;
     }
 
     public function getIdUsuario(): mixed
@@ -49,12 +51,12 @@ class Usuario
         $this->email = $email;
     }
 
-    public function getContrasena(): mixed
+    public function getContrasena(): string
     {
         return $this->contrasena;
     }
 
-    public function setContrasena(mixed $contrasena): void
+    public function setContrasena(string $contrasena): void
     {
         $this->contrasena = $contrasena;
     }
@@ -68,6 +70,18 @@ class Usuario
     {
         $this->id_rol = $id_rol;
     }
+
+    public function getActivo(): mixed
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(mixed $activo): void
+    {
+        $this->activo = $activo;
+    }
+
+
 
 
     public function verificarContrasena($contrasena)

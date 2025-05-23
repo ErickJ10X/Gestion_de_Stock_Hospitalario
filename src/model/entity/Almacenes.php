@@ -4,10 +4,10 @@ namespace model\entity;
 
 class Almacenes
 {
-    private $id_almacen;
-    private $id_planta;
-    private $tipo;
-    private $id_hospital;
+    private int $id_almacen;
+    private int $id_planta;
+    private string $tipo;
+    private int $id_hospital;
 
     public function __construct($id_almacen, $id_planta, $tipo, $id_hospital)
     {
@@ -27,7 +27,7 @@ class Almacenes
         $this->id_almacen = $id_almacen;
     }
 
-    public function getIdPlanta()
+    public function getIdPlanta(): int
     {
         return $this->id_planta;
     }
@@ -37,7 +37,7 @@ class Almacenes
         $this->id_planta = $id_planta;
     }
 
-    public function getTipo()
+    public function getTipo(): string
     {
         return $this->tipo;
     }
@@ -47,7 +47,7 @@ class Almacenes
         $this->tipo = $tipo;
     }
 
-    public function getIdHospital()
+    public function getIdHospital(): int
     {
         return $this->id_hospital;
     }

@@ -4,8 +4,8 @@ namespace model\entity;
 
 class Roles
 {
-    private $id_rol;
-    private $nombre;
+    private int $id_rol;
+    private string $nombre;
 
     public function __construct($id_rol = null, $nombre = null)
     {

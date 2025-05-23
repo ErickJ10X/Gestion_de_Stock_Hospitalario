@@ -4,11 +4,11 @@ namespace model\entity;
 
 class Productos
 {
-    private $id_producto;
-    private $codigo;
-    private $nombre;
-    private $descripcion;
-    private $unidad_medida;
+    private int $id_producto;
+    private string $codigo;
+    private string $nombre;
+    private string $descripcion;
+    private string $unidad_medida;
 
     public function __construct($id_producto, $codigo, $nombre, $descripcion, $unidad_medida)
     {
@@ -19,7 +19,7 @@ class Productos
         $this->unidad_medida = $unidad_medida;
     }
 
-    public function getIdProducto()
+    public function getIdProducto(): int
     {
         return $this->id_producto;
     }
@@ -30,7 +30,7 @@ class Productos
     }
 
 
-    public function getCodigo()
+    public function getCodigo(): string
     {
         return $this->codigo;
     }
@@ -40,7 +40,7 @@ class Productos
         $this->codigo = $codigo;
     }
 
-    public function getNombre()
+    public function getNombre(): string
     {
         return $this->nombre;
     }
@@ -50,7 +50,7 @@ class Productos
         $this->nombre = $nombre;
     }
 
-    public function getDescripcion()
+    public function getDescripcion(): string
     {
         return $this->descripcion;
     }
@@ -60,7 +60,7 @@ class Productos
         $this->descripcion = $descripcion;
     }
 
-    public function getUnidadMedida()
+    public function getUnidadMedida(): string
     {
         return $this->unidad_medida;
     }

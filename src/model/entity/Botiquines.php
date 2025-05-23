@@ -4,9 +4,9 @@ namespace model\entity;
 
 class Botiquines
 {
-    private $id_botiquines;
-    private $nombre;
-    private $id_planta;
+    private int $id_botiquines;
+    private string $nombre;
+    private int $id_planta;
 
     public function __construct($id_botiquines = null, $nombre = null, $id_planta = null)
     {
