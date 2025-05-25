@@ -8,7 +8,7 @@ class Hospitales
     public string $nombre;
     public string $ubicacion;
 
-    public function __construct($id, $nombre, $ubicacion)
+    public function __construct($id = 0, $nombre = '', $ubicacion = '')
     {
         $this->id_hospital = $id;
         $this->nombre = $nombre;
@@ -32,6 +32,9 @@ class Hospitales
 
     public function setNombre(string $nombre): void
     {
+        if (empty(trim($nombre))) {
+            throw new \InvalidArgumentException("El nombre del hospital no puede estar vacío");
+        }
         $this->nombre = $nombre;
     }
 

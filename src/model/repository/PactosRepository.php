@@ -2,6 +2,9 @@
 
 namespace model\repository;
 
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Pactos.php');
+
 use model\entity\Pactos;
 use PDO;
 
@@ -42,40 +45,40 @@ class PactosRepository
         return $row ? $this->mapToPactos($row) : null;
     }
 
-    public function findByIdProducto($id_producto): ?Pactos
+    public function findByIdProducto($id_producto): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pactos WHERE id_producto = :id_producto");
         $stmt->bindParam(':id_producto', $id_producto);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToPactos($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToPactos'], $rows);
     }
 
-    public function findByTipoUbicacion($tipo_ubicacion): ?Pactos
+    public function findByTipoUbicacion($tipo_ubicacion): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pactos WHERE tipo_ubicacion = :tipo_ubicacion");
         $stmt->bindParam(':tipo_ubicacion', $tipo_ubicacion);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToPactos($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToPactos'], $rows);
     }
 
-    public function findByIdDestino($id_destino): ?Pactos
+    public function findByIdDestino($id_destino): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pactos WHERE id_destino = :id_destino");
         $stmt->bindParam(':id_destino', $id_destino);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToPactos($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToPactos'], $rows);
     }
 
-    public function findByCantidadPactada($cantidad_pactada): ?Pactos
+    public function findByCantidadPactada($cantidad_pactada): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pactos WHERE cantidad_pactada = :cantidad_pactada");
         $stmt->bindParam(':cantidad_pactada', $cantidad_pactada);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToPactos($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToPactos'], $rows);
     }
 
     public function save(Pactos $pacto): bool

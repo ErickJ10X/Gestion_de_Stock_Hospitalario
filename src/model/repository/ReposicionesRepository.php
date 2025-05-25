@@ -2,6 +2,9 @@
 
 namespace model\repository;
 
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Reposiciones.php');
+
 use model\entity\Reposiciones;
 use PDO;
 
@@ -53,40 +56,40 @@ class ReposicionesRepository
         return $row ? $this->mapToReposiciones($row) : null;
     }
 
-    public function findByIdProducto($id_producto): ?Reposiciones
+    public function findByIdProducto($id_producto): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM reposiciones WHERE id_producto = :id_producto");
         $stmt->bindParam(':id_producto', $id_producto);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToReposiciones($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToReposicionesList($rows);
     }
 
-    public function findByIdBotiquin($id_botiquin): ?Reposiciones
+    public function findByIdBotiquin($id_botiquin): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM reposiciones WHERE hasta_botiquin = :id_botiquin");
         $stmt->bindParam(':id_botiquin', $id_botiquin);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToReposiciones($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToReposicionesList($rows);
     }
 
-    public function findByIdAlmacen($id_almacen): ?Reposiciones
+    public function findByIdAlmacen($id_almacen): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM reposiciones WHERE desde_almacen = :id_almacen");
         $stmt->bindParam(':id_almacen', $id_almacen);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToReposiciones($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToReposicionesList($rows);
     }
 
-    public function findByUrgente($urgente): ?Reposiciones
+    public function findByUrgente($urgente): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM reposiciones WHERE urgente = :urgente");
         $stmt->bindParam(':urgente', $urgente);
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapToReposiciones($row) : null;
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToReposicionesList($rows);
     }
 
     public function save(Reposiciones $reposicion): bool

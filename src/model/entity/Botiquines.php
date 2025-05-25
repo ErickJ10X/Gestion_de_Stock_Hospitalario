@@ -2,47 +2,54 @@
 
 namespace model\entity;
 
+use InvalidArgumentException;
+
 class Botiquines
 {
-    private int $id_botiquines;
+    private int $id_botiquin;
     private string $nombre;
     private int $id_planta;
 
-    public function __construct($id_botiquines = null, $nombre = null, $id_planta = null)
+    public function __construct($id_botiquin = null, $nombre = null, $id_planta = null)
     {
-        $this->id_botiquines = $id_botiquines;
-        $this->nombre = $nombre;
-        $this->id_planta = $id_planta;
+        $this->id_botiquin = $id_botiquin ?? 0;
+        $this->nombre = $nombre ?? '';
+        $this->id_planta = $id_planta ?? 0;
     }
 
-    public function getIdBotiquines(): mixed
+    public function getIdBotiquines(): int
     {
-        return $this->id_botiquines;
+        return $this->id_botiquin;
     }
 
-    public function setIdBotiquines(mixed $id_botiquines): void
+    public function setIdBotiquines(int $id_botiquin): void
     {
-        $this->id_botiquines = $id_botiquines;
+        $this->id_botiquin = $id_botiquin;
     }
 
-    public function getNombre(): mixed
+    public function getNombre(): string
     {
         return $this->nombre;
     }
 
-    public function setNombre(mixed $nombre): void
+    public function setNombre(string $nombre): void
     {
+        if (empty(trim($nombre))) {
+            throw new InvalidArgumentException("El nombre del botiquín no puede estar vacío");
+        }
         $this->nombre = $nombre;
     }
 
-    public function getIdPlanta(): mixed
+    public function getIdPlanta(): int
     {
         return $this->id_planta;
     }
 
-    public function setIdPlanta(mixed $id_planta): void
+    public function setIdPlanta(int $id_planta): void
     {
+        if ($id_planta <= 0) {
+            throw new InvalidArgumentException("El ID de la planta debe ser un número positivo");
+        }
         $this->id_planta = $id_planta;
     }
-
 }

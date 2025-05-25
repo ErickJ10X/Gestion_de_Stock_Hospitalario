@@ -11,14 +11,14 @@ class Usuario
     private int $id_rol;
     private bool $activo;
 
-    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null, $activo = null)
+    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null, $activo = true)
     {
-        $this->id_usuario = $id_usuario;
-        $this->nombre = $nombre;
-        $this->email = $email;
-        $this->contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
-        $this->id_rol = $id_rol;
-        $this->activo = $activo;
+        $this->id_usuario = $id_usuario ?? 0;
+        $this->nombre = $nombre ?? '';
+        $this->email = $email ?? '';
+        $this->contrasena = $contrasena ?? '';
+        $this->id_rol = $id_rol ?? 5;
+        $this->activo = $activo ?? true;
     }
 
     public function getIdUsuario(): mixed
@@ -81,13 +81,20 @@ class Usuario
         $this->activo = $activo;
     }
 
+    public function hashPassword(): void
+    {
+        if (!empty($this->contrasena) && !$this->esContrasenaHasheada()) {
+            $this->contrasena = password_hash($this->contrasena, PASSWORD_DEFAULT);
+        }
+    }
 
+    private function esContrasenaHasheada(): bool
+    {
+        return strlen($this->contrasena) === 60 && substr($this->contrasena, 0, 1) === '$';
+    }
 
-
-    public function verificarContrasena($contrasena)
+    public function verificarContrasena($contrasena): bool
     {
         return password_verify($contrasena, $this->contrasena);
     }
-
-
 }

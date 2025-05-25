@@ -2,6 +2,7 @@
 
 namespace model\repository;
 require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Productos.php');
 
 use model\entity\Productos;
 use PDO;
@@ -18,11 +19,11 @@ class ProductosRepository
     public function mapToProducto(array $row): Productos
     {
         return new Productos(
-            $row['id_producto'],
-            $row['codigo'],
-            $row['nombre'],
-            $row['descripcion'],
-            $row['unidad_medida']
+            $row['id_producto'] ?? null,
+            $row['codigo'] ?? '',
+            $row['nombre'] ?? '',
+            $row['descripcion'] ?? '',
+            $row['unidad_medida'] ?? ''
         );
     }
 
@@ -35,51 +36,50 @@ class ProductosRepository
         return $productos;
     }
 
-
     public function findAll(): array
     {
         $sql = "SELECT * FROM productos";
         return $this->mapToProductoArray($this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
     }
+
     public function findById($id): ?Productos
     {
-        $sql = "SELECT * FROM productos WHERE id = ?";
+        $sql = "SELECT * FROM productos WHERE id_producto = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        return $this->mapToProducto($stmt->fetch(PDO::FETCH_ASSOC));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $this->mapToProducto($row) : null;
     }
 
-    public function save($producto): bool
+    public function save(Productos $producto): bool
     {
         $sql = "INSERT INTO productos (codigo, nombre, descripcion, unidad_medida) VALUES (?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
+        return $stmt->execute([
             $producto->getCodigo(),
             $producto->getNombre(),
             $producto->getDescripcion(),
             $producto->getUnidadMedida()
         ]);
-        return $stmt->rowCount() > 0;
     }
-    public function update($producto): bool
+
+    public function update(Productos $producto): bool
     {
-        $sql = "UPDATE productos SET codigo = ?, nombre = ?, descripcion = ?, unidad_medida = ? WHERE id = ?";
+        $sql = "UPDATE productos SET codigo = ?, nombre = ?, descripcion = ?, unidad_medida = ? WHERE id_producto = ?";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
+        return $stmt->execute([
             $producto->getCodigo(),
             $producto->getNombre(),
             $producto->getDescripcion(),
             $producto->getUnidadMedida(),
-            $producto->getId()
+            $producto->getIdProducto()
         ]);
-        return $stmt->rowCount() > 0;
     }
 
     public function delete($id): bool
     {
-        $sql = "DELETE FROM productos WHERE id = ?";
+        $sql = "DELETE FROM productos WHERE id_producto = ?";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->rowCount() > 0;
+        return $stmt->execute([$id]);
     }
 }

@@ -46,15 +46,22 @@ class BotiquinesRepository
         $sql = "SELECT * FROM botiquines WHERE id_botiquin = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        return $this->mapToBotiquines($stmt->fetch(PDO::FETCH_ASSOC));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        return $row ? $this->mapToBotiquines($row) : null;
     }
 
     public function save(Botiquines $botiquin): bool
     {
         $sql = "INSERT INTO botiquines (nombre, id_planta) VALUES (?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$botiquin->getNombre(), $botiquin->getIdPlanta()]);
+        $result = $stmt->execute([$botiquin->getNombre(), $botiquin->getIdPlanta()]);
+
+        if ($result) {
+            $botiquin->setIdBotiquines((int)$this->pdo->lastInsertId());
+        }
+
+        return $result;
     }
 
     public function update(Botiquines $botiquin): bool

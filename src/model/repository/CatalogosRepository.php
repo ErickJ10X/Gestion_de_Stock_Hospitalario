@@ -2,6 +2,9 @@
 
 namespace model\repository;
 
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Catalogos_productos.php');
+
 use model\entity\Catalogos_productos;
 use PDO;
 
@@ -49,6 +52,24 @@ class CatalogosRepository
         return $row ? $this->mapToCatalogos($row) : null;
     }
 
+    public function findByProducto($idProducto): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM catalogos_productos WHERE id_producto = :id_producto");
+        $stmt->bindParam(':id_producto', $idProducto);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToCatalogosArray($rows);
+    }
+
+    public function findByPlanta($idPlanta): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM catalogos_productos WHERE id_planta = :id_planta");
+        $stmt->bindParam(':id_planta', $idPlanta);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToCatalogosArray($rows);
+    }
+
     public function save(Catalogos_productos $catalogo): bool
     {
         $sql = "INSERT INTO catalogos_productos (id_catalogo, id_producto, id_planta) VALUES (:id_catalogo, :id_producto, :id_planta)";
@@ -70,6 +91,7 @@ class CatalogosRepository
             ':id_planta' => $catalogo->getIdPlanta()
         ]);
     }
+
     public function delete($id): bool
     {
         $sql = "DELETE FROM catalogos_productos WHERE id_catalogo = :id";

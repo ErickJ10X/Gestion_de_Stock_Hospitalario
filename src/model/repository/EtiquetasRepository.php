@@ -2,6 +2,9 @@
 
 namespace model\repository;
 
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Etiquetas.php');
+
 use model\entity\Etiquetas;
 use PDO;
 
@@ -24,6 +27,7 @@ class EtiquetasRepository
             $row['Impresa']
         );
     }
+    
     public function mapToEtiquetasArray($rows): array
     {
         $etiquetas = [];
@@ -44,8 +48,56 @@ class EtiquetasRepository
     public function findById($id): ?Etiquetas
     {
         $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE id_etiqueta = ?");
-        return $this->mapToEtiquetas($stmt->fetch(PDO::FETCH_ASSOC));
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$result) {
+            return null;
+        }
+        
+        return $this->mapToEtiquetas($result);
     }
+    
+    public function findByProducto($idProducto): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE id_producto = ?");
+        $stmt->execute([$idProducto]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToEtiquetasArray($rows);
+    }
+    
+    public function findByReposicion($idReposicion): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE id_reposicion = ?");
+        $stmt->execute([$idReposicion]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToEtiquetasArray($rows);
+    }
+    
+    public function findByTipo($tipo): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE tipo = ?");
+        $stmt->execute([$tipo]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToEtiquetasArray($rows);
+    }
+    
+    public function findByPrioridad($prioridad): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE prioridad = ?");
+        $stmt->execute([$prioridad]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToEtiquetasArray($rows);
+    }
+    
+    public function findByImpresa($impresa): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM etiquetas WHERE Impresa = ?");
+        $stmt->execute([$impresa]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->mapToEtiquetasArray($rows);
+    }
+
     public function save(Etiquetas $etiqueta): bool
     {
         $sql = "INSERT INTO etiquetas (id_producto, id_reposicion, tipo, prioridad, Impresa) VALUES (?, ?, ?, ?, ?)";

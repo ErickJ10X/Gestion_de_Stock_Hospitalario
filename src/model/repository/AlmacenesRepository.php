@@ -49,12 +49,18 @@ class AlmacenesRepository
         $sql = "SELECT * FROM almacenes WHERE id_almacen = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        return $this->mapToAlmacenes($stmt->fetch(PDO::FETCH_ASSOC));
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->mapToAlmacenes($result);
     }
 
     public function save(Almacenes $almacen): bool
     {
-        $sql = "INSERT INTO almacenes (id_planta, tipo, id_hospital) VALUES (?)";
+        $sql = "INSERT INTO almacenes (id_planta, tipo, id_hospital) VALUES (?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$almacen->getIdPlanta(), $almacen->getTipo(), $almacen->getIdHospital()]);
     }

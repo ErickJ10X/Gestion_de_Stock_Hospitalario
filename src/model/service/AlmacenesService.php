@@ -12,7 +12,7 @@ require_once(__DIR__ . '/../entity/Almacenes.php');
 
 class AlmacenesService
 {
-    private $almacenesRepository;
+    private AlmacenesRepository $almacenesRepository;
 
     public function __construct()
     {
@@ -27,7 +27,7 @@ class AlmacenesService
             throw new Exception("Error al cargar los almacenes: " . $e->getMessage());
         }
     }
-    
+
     public function getAlmacenById($id): ?Almacenes
     {
         try {
@@ -36,7 +36,7 @@ class AlmacenesService
             throw new Exception("Error al cargar el almacén: " . $e->getMessage());
         }
     }
-    
+
     public function deleteAlmacen($id): bool
     {
         try {
@@ -46,20 +46,26 @@ class AlmacenesService
         }
     }
 
-    public function updateAlmacen($id, $planta_id): bool
+    public function updateAlmacen($id, $planta_id, $tipo, $id_hospital): bool
     {
         try {
-            $almacen = new Almacenes($id, $planta_id);
+            $almacenExistente = $this->almacenesRepository->findById($id);
+
+            if (!$almacenExistente) {
+                throw new Exception("No se encontró el almacén con ID: " . $id);
+            }
+
+            $almacen = new Almacenes($id, $planta_id, $tipo, $id_hospital);
             return $this->almacenesRepository->update($almacen);
         } catch (PDOException $e) {
             throw new Exception("Error al actualizar el almacén: " . $e->getMessage());
         }
     }
 
-    public function createAlmacen($planta_id): bool
+    public function createAlmacen($planta_id, $tipo, $id_hospital): bool
     {
         try {
-            $almacen = new Almacenes(null, $planta_id);
+            $almacen = new Almacenes(0, $planta_id, $tipo, $id_hospital);
             return $this->almacenesRepository->save($almacen);
         } catch (PDOException $e) {
             throw new Exception("Error al crear el almacén: " . $e->getMessage());

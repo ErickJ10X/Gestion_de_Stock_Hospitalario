@@ -45,7 +45,9 @@ class PlantasRepository
         $sql = "SELECT * FROM plantas WHERE id_planta = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        return $this->mapToPlantas($stmt->fetch(PDO::FETCH_ASSOC));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? $this->mapToPlantas($row) : null;
     }
 
     public function findByHospitalId($id_hospital): array
@@ -58,7 +60,7 @@ class PlantasRepository
 
     public function save(Plantas $planta): bool
     {
-        $sql = "INSERT INTO plantas (nombre, hospital_id) VALUES ( ?, ?)";
+        $sql = "INSERT INTO plantas (nombre, id_hospital) VALUES (?, ?)";
         return $this->pdo->prepare($sql)->execute([$planta->getNombre(), $planta->getIdHospital()]);
     }
 

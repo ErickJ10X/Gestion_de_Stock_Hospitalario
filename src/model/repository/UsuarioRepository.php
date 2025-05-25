@@ -20,12 +20,12 @@ class UsuarioRepository
     public function mapToUsuario($row): Usuario
     {
         return new Usuario(
-            $row['id_usuario'],
-            $row['nombre'],
-            $row['email'],
-            $row['contrasena'],
-            $row['id_rol'],
-            $row['activo']
+            $row['id_usuario'] ?? null,
+            $row['nombre'] ?? null,
+            $row['email'] ?? null,
+            $row['contrasena'] ?? null,
+            $row['id_rol'] ?? null,
+            $row['activo'] ?? true
         );
     }
     
@@ -50,7 +50,7 @@ class UsuarioRepository
 
     public function findById($id): ?Usuario
     {
-        $sql = "SELECT * FROM usuarios WHERE id = ?";
+        $sql = "SELECT * FROM usuarios WHERE id_usuario = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -68,6 +68,8 @@ class UsuarioRepository
 
     public function save(Usuario $usuario): bool
     {
+        $usuario->hashPassword();
+        
         $sql = "INSERT INTO usuarios (nombre, email, contrasena, id_rol, activo) VALUES (?, ?, ?, ?, ?)";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
@@ -80,12 +82,12 @@ class UsuarioRepository
     
     public function deleteById($id): bool
     {
-        return $this->pdo->prepare("DELETE FROM usuarios WHERE id = ?")->execute([$id]);
+        return $this->pdo->prepare("DELETE FROM usuarios WHERE id_usuario = ?")->execute([$id]);
     }
     
     public function update(Usuario $usuario): bool
     {
-        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, id_rol = ?, activo = ? WHERE id = ?";
+        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, id_rol = ?, activo = ? WHERE id_usuario = ?";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
             $usuario->getEmail(),

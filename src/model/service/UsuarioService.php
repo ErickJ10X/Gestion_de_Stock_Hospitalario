@@ -39,7 +39,7 @@ class UsuarioService
         }
     }
 
-    public function updateUser($id, $nombre, $email, $password, $rol): bool
+    public function updateUser($id, $nombre, $email, $password, $rol, $activo = true): bool
     {
         try {
             $usuario = $this->usuarioRepository->findById($id);
@@ -47,30 +47,35 @@ class UsuarioService
                 throw new Exception("Usuario no encontrado");
             }
             
-            $usuarioActualizado = new Usuario(
-                $id,
-                $nombre,
-                $email,
-                !empty($password) ? $password : $usuario->getContrasena(),
-                $rol
-            );
+            $usuario->setNombre($nombre);
+            $usuario->setEmail($email);
+            $usuario->setIdRol($rol);
+            $usuario->setActivo($activo);
+
+            if (!empty($password)) {
+                $usuario->setContrasena($password);
+                $usuario->hashPassword();
+            }
             
-            return $this->usuarioRepository->update($usuarioActualizado);
+            return $this->usuarioRepository->update($usuario);
         } catch (PDOException $e) {
             throw new Exception("Error al actualizar el usuario: " . $e->getMessage());
         }
     }
 
-    public function createUser($nombre, $email, $password, $rol = 'Usuario de botiquín'): bool
+    public function createUser($nombre, $email, $password, $rol = 5, $activo = true): bool
     {
         try {
             $usuario = new Usuario(
-                0,
+                null,
                 $nombre,
                 $email,
                 $password,
-                $rol
+                $rol,
+                $activo
             );
+
+            $usuario->hashPassword();
             
             return $this->usuarioRepository->save($usuario);
         } catch (PDOException $e) {
@@ -85,10 +90,10 @@ class UsuarioService
             
             if ($usuario && $usuario->verificarContrasena($contrasena)) {
                 return [
-                    'id' => $usuario->getId(),
+                    'id' => $usuario->getIdUsuario(),
                     'nombre' => $usuario->getNombre(),
                     'email' => $usuario->getEmail(),
-                    'rol' => $usuario->getRol()
+                    'rol' => $usuario->getIdRol()
                 ];
             }
             return false;
@@ -118,13 +123,5 @@ class UsuarioService
     public function getRolOptions(): array
     {
         return RolEnum::getValues();
-    }
-
-    public function getUsuarioById($id) {
-        try {
-            return $this->usuarioRepository->findById($id);
-        } catch (PDOException $e) {
-            throw new Exception("Error al obtener usuario: " . $e->getMessage());
-        }
     }
 }

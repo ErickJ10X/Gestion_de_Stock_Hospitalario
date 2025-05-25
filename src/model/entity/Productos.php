@@ -10,9 +10,9 @@ class Productos
     private string $descripcion;
     private string $unidad_medida;
 
-    public function __construct($id_producto, $codigo, $nombre, $descripcion, $unidad_medida)
+    public function __construct($id_producto = null, $codigo = '', $nombre = '', $descripcion = '', $unidad_medida = '')
     {
-        $this->id_producto = $id_producto;
+        $this->id_producto = $id_producto ?? 0;
         $this->codigo = $codigo;
         $this->nombre = $nombre;
         $this->descripcion = $descripcion;

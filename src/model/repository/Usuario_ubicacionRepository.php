@@ -2,6 +2,9 @@
 
 namespace model\repository;
 
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Usuario_Ubicacion.php');
+
 use model\entity\Usuario_Ubicacion;
 use PDO;
 
@@ -32,6 +35,24 @@ class Usuario_ubicacionRepository
         return $usbus;
     }
 
+    public function mapToUsuario_Ubicacion($row): Usuario_Ubicacion
+    {
+        return new Usuario_Ubicacion(
+            $row['id_usuario'],
+            $row['tipo_ubicacion'],
+            $row['id_ubicacion']
+        );
+    }
+
+    public function mapToUsuario_UbicacionArray($rows): array
+    {
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $this->mapToUsuario_Ubicacion($row);
+        }
+        return $result;
+    }
+
     public function findByUsuario($id_usuario): array
     {
         $sql = "SELECT * FROM usuario_ubicacion WHERE id_usuario = :id_usuario";
@@ -39,6 +60,14 @@ class Usuario_ubicacionRepository
         $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
         $stmt->execute();
         return $this->mapToUsUbArray($stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    public function findAll(): array
+    {
+        $sql = "SELECT * FROM usuario_ubicacion";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $this->mapToUsuario_UbicacionArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function save(Usuario_Ubicacion $usub): bool
@@ -67,11 +96,13 @@ class Usuario_ubicacionRepository
         $sql = "DELETE FROM usuario_ubicacion WHERE id_usuario = ?";
         return $this->pdo->prepare($sql)->execute([$id_usuario]);
     }
+
     public function deleteByUbicacion($id_ubicacion): bool
     {
         $sql = "DELETE FROM usuario_ubicacion WHERE id_ubicacion = ?";
         return $this->pdo->prepare($sql)->execute([$id_ubicacion]);
     }
+
     public function update(Usuario_Ubicacion $usub): bool
     {
         $sql = "UPDATE usuario_ubicacion SET tipo_ubicacion = ?, id_ubicacion = ? WHERE id_usuario = ?";

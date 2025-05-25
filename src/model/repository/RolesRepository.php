@@ -40,8 +40,15 @@ class RolesRepository
     public function findById(int $id): ?Roles
     {
         $sql = "SELECT * FROM roles WHERE id_rol = ?";
-        $stmt  = $this->pdo->prepare($sql);
-        return $this->mapToRol($stmt->execute([$id]) ? $stmt->fetch(PDO::FETCH_ASSOC) : null);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->mapToRol($result);
     }
 
     public function save(Roles $rol): void

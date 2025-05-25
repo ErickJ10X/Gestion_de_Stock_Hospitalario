@@ -36,31 +36,43 @@ class HospitalesRepository
 
     public function findAll(): array
     {
-        $sql = "SELECT id, nombre FROM hospitales";
+        $sql = "SELECT id_hospital, nombre, ubicacion FROM hospitales";
         $stmt = $this->pdo->query($sql);
         return $this->mapToHospitalArray($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findById($id): ?Hospitales
     {
-        $sql = "SELECT id_hospital, nombre, ubicacion FROM hospitales WHERE id = ?";
+        $sql = "SELECT id_hospital, nombre, ubicacion FROM hospitales WHERE id_hospital = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
-        return $this->mapToHospital($stmt->fetch(PDO::FETCH_ASSOC));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $row ? $this->mapToHospital($row) : null;
     }
 
     public function save(Hospitales $hospital): bool
     {
         $sql = "INSERT INTO hospitales (nombre, ubicacion) VALUES (?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$hospital->getNombre(), $hospital->getUbicacion()]);
-        return $this->pdo->lastInsertId();
+        $result = $stmt->execute([$hospital->getNombre(), $hospital->getUbicacion()]);
+        
+        if ($result) {
+            $hospital->setIdHospital((int)$this->pdo->lastInsertId());
+            return true;
+        }
+        
+        return false;
     }
 
     public function update(Hospitales $hospital): bool
     {
-        $sql = "UPDATE hospitales SET nombre = ? WHERE id_hospital = ?";
-        return $this->pdo->prepare($sql)->execute([$hospital->getNombre(), $hospital->getIdHospital()]);
+        $sql = "UPDATE hospitales SET nombre = ?, ubicacion = ? WHERE id_hospital = ?";
+        return $this->pdo->prepare($sql)->execute([
+            $hospital->getNombre(), 
+            $hospital->getUbicacion(), 
+            $hospital->getIdHospital()
+        ]);
     }
     
     public function deleteById($id): bool

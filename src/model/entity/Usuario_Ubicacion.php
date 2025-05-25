@@ -4,9 +4,9 @@ namespace model\entity;
 
 class Usuario_Ubicacion
 {
-    private $id_usuario;
-    private $tipo_ubicacion;
-    private $id_ubicacion;
+    private int $id_usuario;
+    private string $tipo_ubicacion;
+    private int $id_ubicacion;
 
     public function __construct($id_usuario = null, $tipo_ubicacion = null, $id_ubicacion = null)
     {

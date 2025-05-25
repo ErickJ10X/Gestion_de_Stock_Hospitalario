@@ -4,26 +4,21 @@ namespace model\service;
 
 require_once __DIR__ . '/../repository/PlantasRepository.php';
 require_once __DIR__ . '/../entity/Plantas.php';
-require_once __DIR__ . '/../../../config/database.php';
 
-use config\Database;
 use model\repository\PlantasRepository;
 use model\entity\Plantas;
 use Exception;
-use PDO;
 
 class PlantaService
 {
-    private $plantasRepository;
-    private $db;
+    private PlantasRepository $plantasRepository;
 
     public function __construct()
     {
-        $this->db = getConnection();
-        $this->plantasRepository = new PlantasRepository($this->db);
+        $this->plantasRepository = new PlantasRepository();
     }
 
-    public function getAllPlantas()
+    public function getAllPlantas(): array
     {
         try {
             return $this->plantasRepository->findAll();
@@ -33,7 +28,7 @@ class PlantaService
         }
     }
 
-    public function getPlantaById($id)
+    public function getPlantaById($id): ?Plantas
     {
         try {
             return $this->plantasRepository->findById($id);
@@ -43,7 +38,7 @@ class PlantaService
         }
     }
 
-    public function getPlantasByHospitalId($hospitalId)
+    public function getPlantasByHospitalId($hospitalId): array
     {
         try {
             return $this->plantasRepository->findByHospitalId($hospitalId);
@@ -53,7 +48,7 @@ class PlantaService
         }
     }
 
-    public function savePlanta(Plantas $planta)
+    public function savePlanta(Plantas $planta): bool
     {
         try {
             return $this->plantasRepository->save($planta);
@@ -63,7 +58,7 @@ class PlantaService
         }
     }
 
-    public function updatePlanta(Plantas $planta)
+    public function updatePlanta(Plantas $planta): bool
     {
         try {
             return $this->plantasRepository->update($planta);
@@ -73,7 +68,7 @@ class PlantaService
         }
     }
 
-    public function deletePlanta($id)
+    public function deletePlanta($id): bool
     {
         try {
             return $this->plantasRepository->delete($id);
