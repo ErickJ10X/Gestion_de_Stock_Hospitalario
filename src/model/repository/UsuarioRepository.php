@@ -6,6 +6,7 @@ require_once(__DIR__ . '/../entity/Usuario.php');
 require_once(__DIR__ . '/../enum/RolEnum.php');
 
 use model\entity\Usuario;
+use model\enum\RolEnum;
 use PDO;
 
 class UsuarioRepository
@@ -24,7 +25,7 @@ class UsuarioRepository
             $row['nombre'] ?? null,
             $row['email'] ?? null,
             $row['contrasena'] ?? null,
-            $row['id_rol'] ?? null,
+            $row['rol'] ?? RolEnum::USUARIO_BOTIQUIN,
             $row['activo'] ?? true
         );
     }
@@ -59,7 +60,7 @@ class UsuarioRepository
 
     public function findByEmail($email): ?Usuario
     {
-        $sql = "SELECT id_usuario, nombre, email, contrasena, id_rol, activo FROM usuarios WHERE email = ?";
+        $sql = "SELECT id_usuario, nombre, email, contrasena, rol, activo FROM usuarios WHERE email = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -70,12 +71,17 @@ class UsuarioRepository
     {
         $usuario->hashPassword();
         
-        $sql = "INSERT INTO usuarios (nombre, email, contrasena, id_rol, activo) VALUES (?, ?, ?, ?, ?)";
+        // Verificar que el rol sea válido
+        if (!RolEnum::isValid($usuario->getRol())) {
+            $usuario->setRol(RolEnum::USUARIO_BOTIQUIN);
+        }
+        
+        $sql = "INSERT INTO usuarios (nombre, email, contrasena, rol, activo) VALUES (?, ?, ?, ?, ?)";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
             $usuario->getEmail(),
             $usuario->getContrasena(),
-            $usuario->getIdRol(),
+            $usuario->getRol(),
             $usuario->getActivo()
         ]);
     }
@@ -87,12 +93,17 @@ class UsuarioRepository
     
     public function update(Usuario $usuario): bool
     {
-        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, id_rol = ?, activo = ? WHERE id_usuario = ?";
+        // Verificar que el rol sea válido
+        if (!RolEnum::isValid($usuario->getRol())) {
+            $usuario->setRol(RolEnum::USUARIO_BOTIQUIN);
+        }
+        
+        $sql = "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, rol = ?, activo = ? WHERE id_usuario = ?";
         return $this->pdo->prepare($sql)->execute([
             $usuario->getNombre(),
             $usuario->getEmail(),
             $usuario->getContrasena(),
-            $usuario->getIdRol(),
+            $usuario->getRol(),
             $usuario->getActivo(),
             $usuario->getIdUsuario()
         ]);

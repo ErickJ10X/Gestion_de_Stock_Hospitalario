@@ -11,14 +11,11 @@ use model\enum\RolEnum;
 class AuthGuard
 {
     private Session $session;
-    private RolEnum $rolEnum;
 
     public function __construct()
     {
         $this->session = new Session();
-        $this->rolEnum = new RolEnum();
     }
-
 
     public function requireAuth()
     {
@@ -38,18 +35,16 @@ class AuthGuard
         return true;
     }
 
-
-
     public function requireUsuarioBotiquin()
     {
         $this->requireAuth();
         $userRole = $this->session->getUserData('rol');
         $rolAllowed = [
-            $this->rolEnum::USUARIO_BOTIQUIN,
-            $this->rolEnum::ADMINISTRADOR,
-            $this->rolEnum::GESTOR_HOSPITAL,
-            $this->rolEnum::GESTOR_PLANTA,
-            $this->rolEnum::GESTOR_GENERAL
+            RolEnum::USUARIO_BOTIQUIN,
+            RolEnum::ADMINISTRADOR,
+            RolEnum::GESTOR_HOSPITAL,
+            RolEnum::GESTOR_PLANTA,
+            RolEnum::GESTOR_GENERAL
         ];
         if (!in_array($userRole, $rolAllowed)) {
             Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
@@ -63,10 +58,10 @@ class AuthGuard
         $this->requireAuth();
         $userRole = $this->session->getUserData('rol');
         $rolAllowed = [
-            $this->rolEnum::GESTOR_PLANTA,
-            $this->rolEnum::ADMINISTRADOR,
-            $this->rolEnum::GESTOR_HOSPITAL,
-            $this->rolEnum::GESTOR_GENERAL
+            RolEnum::GESTOR_PLANTA,
+            RolEnum::ADMINISTRADOR,
+            RolEnum::GESTOR_HOSPITAL,
+            RolEnum::GESTOR_GENERAL
         ];
         if (!in_array($userRole, $rolAllowed)) {
             Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
@@ -80,9 +75,9 @@ class AuthGuard
         $this->requireAuth();
         $userRole = $this->session->getUserData('rol');
         $rolAllowed = [
-            $this->rolEnum::GESTOR_HOSPITAL,
-            $this->rolEnum::ADMINISTRADOR,
-            $this->rolEnum::GESTOR_GENERAL
+            RolEnum::GESTOR_HOSPITAL,
+            RolEnum::ADMINISTRADOR,
+            RolEnum::GESTOR_GENERAL
         ];
         if (!in_array($userRole, $rolAllowed)) {
             Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
@@ -92,15 +87,13 @@ class AuthGuard
         return true;
     }
 
-
-
     public function requireGeneralGestor()
     {
         $this->requireAuth();
         $userRole = $this->session->getUserData('rol');
         $rolAllowed = [
-            $this->rolEnum::GESTOR_GENERAL,
-            $this->rolEnum::ADMINISTRADOR
+            RolEnum::GESTOR_GENERAL,
+            RolEnum::ADMINISTRADOR
         ];
         if (!in_array($userRole, $rolAllowed)) {
             Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
@@ -114,7 +107,7 @@ class AuthGuard
         $this->requireAuth();
         $userRole = $this->session->getUserData('rol');
 
-        if ($userRole !==  $this->rolEnum::ADMINISTRADOR) {
+        if ($userRole !== RolEnum::ADMINISTRADOR) {
             Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/error/403.php');
             exit;
         }

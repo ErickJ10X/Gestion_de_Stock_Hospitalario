@@ -6,11 +6,13 @@ use util\Redirect;
 use util\Session;
 use util\AuthGuard;
 use Exception;
+use model\enum\RolEnum;
 
 include_once(__DIR__ . '/../util/Session.php');
 include_once(__DIR__ . '/../util/Redirect.php');
 include_once(__DIR__ . '/../util/AuthGuard.php');
 require_once(__DIR__ . '/UsuarioController.php');
+require_once(__DIR__ . '/../model/enum/RolEnum.php');
 
 class AuthController {
     private Session $session;
@@ -33,13 +35,14 @@ class AuthController {
             try {
                 $user = $this->userController->login($email, $password);
                 if ($user) {
-                    // Verificamos si el usuario tiene ubicaciones asignadas
-                    // y si su rol lo requiere, redirigimos a seleccionar ubicación
                     if (isset($user['ubicaciones']) && !empty($user['ubicaciones'])) {
                         Redirect::toHome();
                     } else {
-                        // Si el usuario no tiene ubicaciones asignadas pero debería tenerlas según su rol
-                        $rolRequiereUbicacion = in_array($user['rol'], ['Usuario de botiquín', 'Gestor de planta']);
+                        $rolRequiereUbicacion = in_array($user['rol'], [
+                            RolEnum::USUARIO_BOTIQUIN, 
+                            RolEnum::GESTOR_PLANTA
+                        ]);
+                        
                         if ($rolRequiereUbicacion) {
                             Redirect::withWarning('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php', 'Tu cuenta no tiene ubicaciones asignadas. Contacta con un administrador.');
                         } else {
@@ -60,7 +63,7 @@ class AuthController {
         Redirect::toLogin();
     }
 
-    public function register(): void{
+    public function register(): void {
         $this->authGuard->requireNoAuth();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -68,7 +71,6 @@ class AuthController {
             $email = $this->sanitizar($_POST['email'] ?? '');
             $password = $_POST['contrasena'] ?? '';
             $confirmPassword = $_POST['confirmar_contrasena'] ?? '';
-            $rol = $_POST['rol'] ?? 'Usuario de botiquín';
 
             if (!$this->confirmPassword($password, $confirmPassword)) {
                 Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php', 'Las contraseñas no coinciden');
@@ -76,14 +78,9 @@ class AuthController {
             }
 
             try {
-                // Verifica y obtiene el ID numérico del rol en lugar del texto
-                $rolNumerico = $this->userController->getRolIdByName($rol);
-                
-                // Registra el usuario con el ID del rol
-                $this->userController->register($name, $email, $password, $rolNumerico);
-                
-                // Si tiene acceso a la selección de ubicaciones, redirigir a la página para asignar ubicaciones
-                if ($this->session->isLoggedIn() && $this->session->getUserData('rol') == 'Administrador') {
+                $this->userController->register($name, $email, $password);
+
+                if ($this->session->isLoggedIn() && $this->session->getUserData('rol') == RolEnum::ADMINISTRADOR) {
                     Redirect::withSuccess('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/usuarios.php', 'Usuario registrado correctamente. Recuerda asignarle ubicaciones si es necesario.');
                 } else {
                     Redirect::withSuccess('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php', 'Usuario registrado correctamente');
@@ -93,10 +90,10 @@ class AuthController {
             }
         }
     }
-    
+
     public function updateUserProfile(): void {
         $this->authGuard->requireAuth();
-        
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? $this->session->getUserData('id');
             $name = $this->sanitizar($_POST['nombre'] ?? '');
@@ -104,25 +101,23 @@ class AuthController {
             $currentPassword = $_POST['current_password'] ?? '';
             $newPassword = $_POST['new_password'] ?? '';
             $confirmNewPassword = $_POST['confirm_new_password'] ?? '';
-            
+
             try {
-                // Si se está cambiando la contraseña
                 if (!empty($newPassword)) {
-                    // Verificar que la contraseña actual es correcta
                     $user = $this->userController->getUserById($id);
                     if (!$user->verificarContrasena($currentPassword)) {
                         throw new Exception("La contraseña actual es incorrecta");
                     }
-                    
+
                     if (!$this->confirmPassword($newPassword, $confirmNewPassword)) {
                         throw new Exception("Las nuevas contraseñas no coinciden");
                     }
-                    
+
                     $this->userController->updateProfile($id, $name, $email, $newPassword);
                 } else {
                     $this->userController->updateProfile($id, $name, $email);
                 }
-                
+
                 Redirect::withSuccess('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php', 'Perfil actualizado correctamente');
             } catch (Exception $e) {
                 Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/edit_profile.php', $e->getMessage());

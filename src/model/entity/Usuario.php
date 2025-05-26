@@ -2,22 +2,24 @@
 
 namespace model\entity;
 
+use model\enum\RolEnum;
+
 class Usuario
 {
     private int $id_usuario;
     private string $nombre;
     private string $email;
     private string $contrasena;
-    private int $id_rol;
+    private string $rol;
     private bool $activo;
 
-    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null, $activo = true)
+    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $rol = null, $activo = true)
     {
         $this->id_usuario = $id_usuario ?? 0;
         $this->nombre = $nombre ?? '';
         $this->email = $email ?? '';
         $this->contrasena = $contrasena ?? '';
-        $this->id_rol = $id_rol ?? 5;
+        $this->rol = $rol ?? RolEnum::USUARIO_BOTIQUIN;
         $this->activo = $activo ?? true;
     }
 
@@ -61,14 +63,24 @@ class Usuario
         $this->contrasena = $contrasena;
     }
 
-    public function getIdRol(): mixed
+    /**
+     * Obtiene el rol como string
+     */
+    public function getRol(): string
     {
-        return $this->id_rol;
+        return $this->rol;
     }
 
-    public function setIdRol(mixed $id_rol): void
+    /**
+     * Establece el rol validando que sea un valor válido
+     */
+    public function setRol(string $rol): void
     {
-        $this->id_rol = $id_rol;
+        // Aseguramos que el rol sea válido según el enum
+        if (!RolEnum::isValid($rol)) {
+            $rol = RolEnum::USUARIO_BOTIQUIN;
+        }
+        $this->rol = $rol;
     }
 
     public function getActivo(): mixed
