@@ -21,7 +21,6 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-// Usar el método show() que devuelve un array con la clave 'hospital'
 $response = $hospitalController->show($id);
 
 if ($response['error']) {
@@ -38,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     if (empty($nombre)) {
         $session->setMessage('error', 'El nombre del hospital es obligatorio');
     } else {
-        // Usar el método update() que devuelve un array con las claves 'error' y 'mensaje'
         $resultado = $hospitalController->update($id, $nombre);
         
         if (!$resultado['error']) {

@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     if (empty($nombre)) {
         $session->setMessage('error', 'El nombre del hospital es obligatorio');
     } else {
-        // Usar el método store() que devuelve un array con las claves 'error' y 'mensaje'
         $resultado = $hospitalController->store($nombre);
         
         if (!$resultado['error']) {

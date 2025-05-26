@@ -21,7 +21,6 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-// Usar el método show() que devuelve un array con la clave 'hospital'
 $response = $hospitalController->show($id);
 
 if ($response['error']) {
@@ -33,7 +32,6 @@ if ($response['error']) {
 $hospital = $response['hospital'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
-    // Usar el método destroy() que devuelve un array con las claves 'error' y 'mensaje'
     $resultado = $hospitalController->destroy($id);
     
     if (!$resultado['error']) {

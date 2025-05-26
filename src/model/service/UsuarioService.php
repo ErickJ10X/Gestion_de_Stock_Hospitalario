@@ -49,8 +49,7 @@ class UsuarioService
 
             $usuario->setNombre($nombre);
             $usuario->setEmail($email);
-            
-            // Verifica que el rol sea un valor válido del enum
+
             if (!RolEnum::isValid($rol)) {
                 $rol = RolEnum::USUARIO_BOTIQUIN;
             }
@@ -72,12 +71,11 @@ class UsuarioService
     public function createUser($nombre, $email, $password, $rol = null, $activo = true): bool
     {
         try {
-            // Si no se especifica rol, usar el predeterminado (Usuario de botiquín)
+
             if ($rol === null) {
                 $rol = RolEnum::USUARIO_BOTIQUIN;
             }
-            
-            // Verifica que el rol sea un valor válido del enum
+
             if (!RolEnum::isValid($rol)) {
                 $rol = RolEnum::USUARIO_BOTIQUIN;
             }
@@ -135,18 +133,12 @@ class UsuarioService
             throw new Exception("Error al obtener el usuario por ID: " . $e->getMessage());
         }
     }
-    
-    /**
-     * Obtiene todas las opciones de roles disponibles
-     */
+
     public function getRolOptions(): array
     {
         return RolEnum::getValues();
     }
-    
-    /**
-     * Obtiene el mapeo de clave => valor de los roles
-     */
+
     public function getRolKeyValues(): array
     {
         return RolEnum::getKeyValues();
