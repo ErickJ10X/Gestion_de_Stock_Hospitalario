@@ -1,0 +1,309 @@
+/* Estilos para el sistema de pestañas */
+:root {
+  --primary: #004b87; /* Azul Pegasus */
+  --secondary: #7cc242; /* Verde Pegasus */
+  --light: #f8f9fa;
+  --gray: #6c757d;
+  --dark: #212529;
+  --white: #ffffff;
+  --border-color: #e9ecef;
+  --danger: #dc3545;
+  --success: #28a745;
+  --warning: #ffc107;
+  --info: #0dcaf0;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Contenedor de pestañas */
+.tabs-container {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+/* Navegación de pestañas */
+.tabs-nav {
+  display: flex;
+  background-color: var(--primary);
+  padding: 0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  color: var(--white);
+}
+
+.tab-btn.active {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--secondary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tab-btn.active::after {
+  transform: scaleX(1);
+}
+
+/* Contenido de pestañas */
+.tab-content {
+  background-color: var(--white);
+  padding: 1.5rem;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Estilos para la pestaña de ubicaciones */
+.ubicaciones-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ubicacion-section {
+  margin-bottom: 1.5rem;
+}
+
+.ubicacion-section-title {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--secondary);
+  display: inline-block;
+}
+
+.ubicacion-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.ubicacion-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--border-color);
+}
+
+.ubicacion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+.ubicacion-card-header {
+  padding: 1rem;
+  color: var(--white);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.ubicacion-card-header--hospital {
+  background-color: var(--primary);
+}
+
+.ubicacion-card-header--planta {
+  background-color: var(--secondary);
+}
+
+.ubicacion-card-header--botiquin {
+  background-color: #6f42c1;
+}
+
+.ubicacion-card-body {
+  padding: 1rem;
+}
+
+.ubicacion-card-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.75rem;
+}
+
+.count-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.count-label {
+  font-size: 0.9rem;
+  color: var(--gray);
+  text-transform: uppercase;
+}
+
+.ubicacion-card-users {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: var(--light);
+  border-radius: 4px;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.user-item i {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.user-item--more {
+  justify-content: center;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray);
+  font-style: italic;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+/* Estilos para la pestaña de roles */
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.role-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.role-card-header {
+  padding: 1rem;
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.role-count {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.role-card-body {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.role-users-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.role-user-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.role-user-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.role-user-name i {
+  color: var(--primary);
+}
+
+.role-user-email {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.role-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--gray);
+  font-style: italic;
+}
+
+/* Media queries para dispositivos móviles */
+@media (max-width: 768px) {
+  .tabs-nav {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+  
+  .ubicacion-cards, 
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tab-content {
+    padding: 1rem;
+  }
+}

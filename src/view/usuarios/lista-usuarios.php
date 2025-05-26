@@ -18,17 +18,16 @@ $authGuard->requireAdministrador();
 
 $usuarios = $usuarioController->getAllUsers();
 
-$pageTitle = "Gestión de Usuarios";
+$pageTitle = "Usuarios";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
-<!-- No necesitamos cargar usuarios.css ya que sus estilos están incluidos en card-form.css -->
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
 
 <div class="list-container">
     <div class="list-header">
-        <h1 class="list-header__title">Gestión de Usuarios</h1>
         <div class="list-header__actions">
             <button id="btn-add-usuario" class="list-button list-button--success">
                 <i class="bi bi-person-plus"></i> Nuevo Usuario
@@ -52,75 +51,199 @@ include_once(__DIR__ . '/../templates/header.php');
         <?php $session->clearMessage('error'); ?>
     <?php endif; ?>
 
-    <div class="list-card">
-        <div class="list-card__header">
-            <h5 class="list-card__title">Listado de Usuarios</h5>
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-lista">Lista</button>
+            <button class="tab-btn" data-tab="tab-ubicaciones">Ubicaciones</button>
+            <button class="tab-btn" data-tab="tab-roles">Roles</button>
         </div>
-        <div class="list-card__body">
-            <div class="table-responsive">
-                <table class="list-table">
-                    <thead class="list-table__head">
-                        <tr>
-                            <th class="list-table__header">#</th>
-                            <th class="list-table__header">Nombre</th>
-                            <th class="list-table__header">Email</th>
-                            <th class="list-table__header">Rol</th>
-                            <th class="list-table__header">Estado</th>
-                            <th class="list-table__header">Ubicaciones</th>
-                            <th class="list-table__header text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($usuarios)): ?>
+        
+        <div class="tab-content">
+            <!-- Pestaña Lista -->
+            <div id="tab-lista" class="tab-pane active">
+                <div class="table-responsive">
+                    <table class="list-table">
+                        <thead class="list-table__head">
                             <tr>
-                                <td colspan="7" class="list-table__empty">No hay usuarios registrados</td>
+                                <th class="list-table__header">#</th>
+                                <th class="list-table__header">Nombre</th>
+                                <th class="list-table__header">Email</th>
+                                <th class="list-table__header">Rol</th>
+                                <th class="list-table__header">Estado</th>
+                                <th class="list-table__header">Ubicaciones</th>
+                                <th class="list-table__header text-center">Acciones</th>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($usuarios as $index => $usuario): ?>
-                                <tr class="list-table__body-row">
-                                    <td class="list-table__body-cell" data-label="#"><?= $usuario->getIdUsuario() ?></td>
-                                    <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($usuario->getNombre()) ?></td>
-                                    <td class="list-table__body-cell" data-label="Email"><?= htmlspecialchars($usuario->getEmail()) ?></td>
-                                    <td class="list-table__body-cell" data-label="Rol">
-                                        <span class="badge bg-<?= getBadgeColorForRole($usuario->getRol()) ?>">
-                                            <?= htmlspecialchars($usuario->getRol()) ?>
-                                        </span>
-                                    </td>
-                                    <td class="list-table__body-cell" data-label="Estado">
-                                        <span class="badge <?= $usuario->getActivo() ? 'bg-success' : 'bg-danger' ?>">
-                                            <?= $usuario->getActivo() ? 'Activo' : 'Inactivo' ?>
-                                        </span>
-                                    </td>
-                                    <td class="list-table__body-cell" data-label="Ubicaciones">
-                                        <?php 
-                                        $ubicaciones = $usuarioController->getUbicacionesUsuario($usuario->getIdUsuario());
-                                        if (empty($ubicaciones)): 
-                                        ?>
-                                            <span class="badge bg-warning">Sin ubicaciones</span>
-                                        <?php else: ?>
-                                            <button class="list-table__button list-table__button--view btn-view-ubicaciones" data-id="<?= $usuario->getIdUsuario() ?>">
-                                                <i class="bi bi-geo-alt list-table__button-icon"></i> Ver (<?= count($ubicaciones) ?>)
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="list-table__body-cell" data-label="Acciones">
-                                        <div class="list-table__actions">
-                                            <button class="list-table__button list-table__button--edit btn-edit-usuario" data-id="<?= $usuario->getIdUsuario() ?>">
-                                                <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
-                                            </button>
-                                            <button class="list-table__button list-table__button--view btn-asign-ubicacion" data-id="<?= $usuario->getIdUsuario() ?>">
-                                                <i class="bi bi-geo-alt list-table__button-icon"></i> Ubicaciones
-                                            </button>
-                                            <button class="list-table__button list-table__button--delete btn-delete-usuario" data-id="<?= $usuario->getIdUsuario() ?>">
-                                                <i class="bi bi-trash list-table__button-icon"></i> Eliminar
-                                            </button>
-                                        </div>
-                                    </td>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($usuarios)): ?>
+                                <tr>
+                                    <td colspan="7" class="list-table__empty">No hay usuarios registrados</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php else: ?>
+                                <?php foreach ($usuarios as $index => $usuario): ?>
+                                    <tr class="list-table__body-row">
+                                        <td class="list-table__body-cell" data-label="#"><?= $usuario->getIdUsuario() ?></td>
+                                        <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($usuario->getNombre()) ?></td>
+                                        <td class="list-table__body-cell" data-label="Email"><?= htmlspecialchars($usuario->getEmail()) ?></td>
+                                        <td class="list-table__body-cell" data-label="Rol">
+                                            <span class="badge bg-<?= getBadgeColorForRole($usuario->getRol()) ?>">
+                                                <?= htmlspecialchars($usuario->getRol()) ?>
+                                            </span>
+                                        </td>
+                                        <td class="list-table__body-cell" data-label="Estado">
+                                            <span class="badge <?= $usuario->getActivo() ? 'bg-success' : 'bg-danger' ?>">
+                                                <?= $usuario->getActivo() ? 'Activo' : 'Inactivo' ?>
+                                            </span>
+                                        </td>
+                                        <td class="list-table__body-cell" data-label="Ubicaciones">
+                                            <?php 
+                                            $ubicaciones = $usuarioController->getUbicacionesUsuario($usuario->getIdUsuario());
+                                            if (empty($ubicaciones)): 
+                                            ?>
+                                                <span class="badge bg-warning">Sin ubicaciones</span>
+                                            <?php else: ?>
+                                                <button class="list-table__button list-table__button--view btn-view-ubicaciones" data-id="<?= $usuario->getIdUsuario() ?>">
+                                                    <i class="bi bi-geo-alt list-table__button-icon"></i> Ver (<?= count($ubicaciones) ?>)
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="list-table__body-cell" data-label="Acciones">
+                                            <div class="list-table__actions">
+                                                <button class="list-table__button list-table__button--edit btn-edit-usuario" data-id="<?= $usuario->getIdUsuario() ?>">
+                                                    <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
+                                                </button>
+                                                <button class="list-table__button list-table__button--view btn-asign-ubicacion" data-id="<?= $usuario->getIdUsuario() ?>">
+                                                    <i class="bi bi-geo-alt list-table__button-icon"></i> Ubicaciones
+                                                </button>
+                                                <button class="list-table__button list-table__button--delete btn-delete-usuario" data-id="<?= $usuario->getIdUsuario() ?>">
+                                                    <i class="bi bi-trash list-table__button-icon"></i> Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Pestaña Ubicaciones -->
+            <div id="tab-ubicaciones" class="tab-pane">
+                <div class="ubicaciones-grid">
+                    <?php
+                    // Agrupar usuarios por ubicación
+                    $ubicacionesData = [];
+                    foreach ($usuarios as $usuario) {
+                        $userUbicaciones = $usuarioController->getUbicacionesUsuario($usuario->getIdUsuario());
+                        foreach ($userUbicaciones as $ubicacion) {
+                            if (!isset($ubicacionesData[$ubicacion['tipo']][$ubicacion['id']])) {
+                                $ubicacionesData[$ubicacion['tipo']][$ubicacion['id']] = [
+                                    'nombre' => $ubicacion['nombre'],
+                                    'usuarios' => []
+                                ];
+                            }
+                            $ubicacionesData[$ubicacion['tipo']][$ubicacion['id']]['usuarios'][] = [
+                                'id' => $usuario->getIdUsuario(),
+                                'nombre' => $usuario->getNombre(),
+                                'email' => $usuario->getEmail()
+                            ];
+                        }
+                    }
+
+                    $tiposUbicacion = ['hospital', 'planta', 'botiquin'];
+                    
+                    foreach ($tiposUbicacion as $tipo):
+                        if (isset($ubicacionesData[$tipo])):
+                    ?>
+                        <div class="ubicacion-section">
+                            <h3 class="ubicacion-section-title"><?= ucfirst(getTipoUbicacion($tipo)) ?>s</h3>
+                            <div class="ubicacion-cards">
+                                <?php foreach ($ubicacionesData[$tipo] as $id => $ubicacion): ?>
+                                    <div class="ubicacion-card">
+                                        <div class="ubicacion-card-header ubicacion-card-header--<?= $tipo ?>">
+                                            <?= htmlspecialchars($ubicacion['nombre']) ?>
+                                        </div>
+                                        <div class="ubicacion-card-body">
+                                            <div class="ubicacion-card-count">
+                                                <span class="count-number"><?= count($ubicacion['usuarios']) ?></span>
+                                                <span class="count-label">Usuarios</span>
+                                            </div>
+                                            <div class="ubicacion-card-users">
+                                                <?php foreach ($ubicacion['usuarios'] as $i => $user): ?>
+                                                    <?php if ($i < 3): ?>
+                                                        <div class="user-item">
+                                                            <i class="bi bi-person-circle"></i>
+                                                            <span><?= htmlspecialchars($user['nombre']) ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                                <?php if (count($ubicacion['usuarios']) > 3): ?>
+                                                    <div class="user-item user-item--more">
+                                                        <span>+<?= count($ubicacion['usuarios']) - 3 ?> más</span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php 
+                        endif;
+                    endforeach; 
+                    
+                    if (empty($ubicacionesData)):
+                    ?>
+                        <div class="empty-message">No hay ubicaciones asignadas a usuarios</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <!-- Pestaña Roles -->
+            <div id="tab-roles" class="tab-pane">
+                <div class="roles-grid">
+                    <?php
+                    $roleUsers = [];
+                    foreach (RolEnum::getValues() as $rol) {
+                        $roleUsers[$rol] = [];
+                    }
+                    
+                    // Agrupar usuarios por rol
+                    foreach ($usuarios as $usuario) {
+                        $rol = $usuario->getRol();
+                        if (isset($roleUsers[$rol])) {
+                            $roleUsers[$rol][] = $usuario;
+                        }
+                    }
+                    
+                    foreach ($roleUsers as $rol => $users):
+                    ?>
+                        <div class="role-card">
+                            <div class="role-card-header bg-<?= getBadgeColorForRole($rol) ?>">
+                                <?= htmlspecialchars($rol) ?>
+                                <span class="role-count"><?= count($users) ?></span>
+                            </div>
+                            <div class="role-card-body">
+                                <?php if (empty($users)): ?>
+                                    <div class="role-empty">No hay usuarios con este rol</div>
+                                <?php else: ?>
+                                    <ul class="role-users-list">
+                                        <?php foreach ($users as $usuario): ?>
+                                            <li class="role-user-item">
+                                                <div class="role-user-name">
+                                                    <i class="bi bi-person"></i>
+                                                    <?= htmlspecialchars($usuario->getNombre()) ?>
+                                                </div>
+                                                <div class="role-user-email"><?= htmlspecialchars($usuario->getEmail()) ?></div>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -300,5 +423,6 @@ function getTipoUbicacion($tipo) {
 ?>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario-cards.js"></script>
+<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario-tabs.js"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>
