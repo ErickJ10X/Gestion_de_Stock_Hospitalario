@@ -1,18 +1,18 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../controller/BotiquinesController.php';
+require_once __DIR__ . '/../../controller/BotiquinController.php';
 require_once __DIR__ . '/../../util/Session.php';
 require_once __DIR__ . '/../../util/AuthGuard.php';
 require_once __DIR__ . '/../../model/service/PlantaService.php';
 
-use controller\BotiquinesController;
+use controller\BotiquinController;
 use util\Session;
 use util\AuthGuard;
 
 $authGuard = new AuthGuard();
 $authGuard->requireHospitalGestor();
 
-$botiquinesController = new BotiquinesController();
+$botiquinesController = new BotiquinController();
 $botiquinesWithPlantas = $botiquinesController->getBotiquinesWithPlantas();
 $plantas = $botiquinesController->getPlantas();
 

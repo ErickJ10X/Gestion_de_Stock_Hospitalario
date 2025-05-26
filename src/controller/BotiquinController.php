@@ -7,7 +7,7 @@ use model\service\BotiquinesService;
 
 require_once(__DIR__ . '/../model/service/BotiquinesService.php');
 
-class BotiquinesController
+class BotiquinController
 {
     private BotiquinesService $botiquinesService;
 

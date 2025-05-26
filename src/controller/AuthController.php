@@ -44,7 +44,7 @@ class AuthController {
                         ]);
                         
                         if ($rolRequiereUbicacion) {
-                            Redirect::withWarning('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php', 'Tu cuenta no tiene ubicaciones asignadas. Contacta con un administrador.');
+                            Redirect::withWarning('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php', 'Tu cuenta no tiene ubicaciones asignadas. Contacta con un dashboard.');
                         } else {
                             Redirect::toHome();
                         }

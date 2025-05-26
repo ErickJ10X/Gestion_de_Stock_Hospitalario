@@ -18,21 +18,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $userId = (int)$_POST['user_id'];
     
     if ($userId === (int)$_SESSION['id']) {
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php?error=no_self_delete');
+        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/general.php?error=no_self_delete');
         exit;
     }
     
     try {
         $result = $usuarioController->deleteUser($userId);
         if ($result) {
-            header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php?success=1');
+            header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/general.php?success=1');
             exit;
         } else {
-            header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php?error=delete_failed');
+            header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/general.php?error=delete_failed');
             exit;
         }
     } catch (Exception $e) {
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php?error=delete_failed&message=' . urlencode($e->getMessage()));
+        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/general.php?error=delete_failed&message=' . urlencode($e->getMessage()));
         exit;
     }
 }

@@ -17,45 +17,63 @@ use model\enum\RolEnum;
 <body>
 <header class="header">
     <div class="container header__container">
-        <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Gestor Hospitalario</a>
+        <?php if (!isset($_SESSION['id'])): ?>
+            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Gestor Hospitalario</a>
+        <?php else: ?>
+            <div class="header__spacer"></div>
+        <?php endif; ?>
         <button class="header__toggle" id="navToggle">
             <i class="bi bi-list"></i>
         </button>
         
         <nav class="nav" id="mainNav">
             <ul class="nav__list">
-                <li class="nav__item">
-                    <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Inicio</a>
-                </li>
-
-                <?php if (isset($_SESSION['id'])): ?>
-                    <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === RolEnum::ADMINISTRADOR || $_SESSION['rol'] === RolEnum::GESTOR_GENERAL || $_SESSION['rol'] === RolEnum::GESTOR_HOSPITAL)): ?>
+                <?php if (!isset($_SESSION['id'])): ?>
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Inicio</a>
+                    </li>
+                <?php else: ?>
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php">Dashboard</a>
+                    </li>
+                    
+                    <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === RolEnum::ADMINISTRADOR)): ?>
                         <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/lista_hospitales.php">Hospitales</a>
-                        </li>
-
-                        <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/plantas/listar_plantas.php">Plantas</a>
-                        </li>
-                        
-                        <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/tabla_almacenes.php">Almacenes</a>
-                        </li>
-                        
-                        <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquines/tabla_botiquines.php">Botiquines</a>
-                        </li>
-
-                        <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/productos/lista_productos.php">Productos</a>
+                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php">Usuarios</a>
                         </li>
                     <?php endif; ?>
-
-                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === RolEnum::ADMINISTRADOR): ?>
-                        <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php">Panel de Administración</a>
-                        </li>
-                    <?php endif; ?>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/lista_hospitales.php">Hospitales</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/tabla_almacenes.php">Almacenes</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/productos/lista_productos.php">Productos</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/stock/gestion_stock.php">Stock</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/reposiciones/lista_reposiciones.php">Reposiciones</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/etiquetas/generar_etiquetas.php">Etiquetas</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/informes/panel_informes.php">Informes</a>
+                    </li>
+                    
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/configuracion/ajustes.php">Configuración</a>
+                    </li>
                 <?php endif; ?>
             </ul>
 

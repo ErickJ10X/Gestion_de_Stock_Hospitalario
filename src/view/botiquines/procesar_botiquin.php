@@ -1,17 +1,17 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../controller/BotiquinesController.php';
+require_once __DIR__ . '/../../controller/BotiquinController.php';
 require_once __DIR__ . '/../../util/Session.php';
 require_once __DIR__ . '/../../util/AuthGuard.php';
 require_once __DIR__ . '/../../util/Redirect.php';
 
-use controller\BotiquinesController;
+use controller\BotiquinController;
 use util\AuthGuard;
 
 $authGuard = new AuthGuard();
 $authGuard->requireAuth();
 
-$controller = new BotiquinesController();
+$controller = new BotiquinController();
 
 $controller->processForm();
 
