@@ -20,15 +20,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     if (empty($nombre)) {
         $session->setMessage('error', 'El nombre del hospital es obligatorio');
     } else {
-        if ($hospitalController->createHospital($nombre)) {
-            $session->setMessage('success', 'Hospitales registrado correctamente');
+        // Usar el método store() que devuelve un array con las claves 'error' y 'mensaje'
+        $resultado = $hospitalController->store($nombre);
+        
+        if (!$resultado['error']) {
+            $session->setMessage('success', $resultado['mensaje']);
             header('Location: lista_hospitales.php');
             exit;
+        } else {
+            $session->setMessage('error', $resultado['mensaje']);
         }
     }
 }
 
-$pageTitle = "Registrar Hospitales";
+$pageTitle = "Registrar Hospital";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

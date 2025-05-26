@@ -21,13 +21,16 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$hospital = $hospitalController->getHospitalById($id);
+// Usar el método show() que devuelve un array con la clave 'hospital'
+$response = $hospitalController->show($id);
 
-if (!$hospital) {
-    $session->setMessage('error', 'Hospitales no encontrado');
+if ($response['error']) {
+    $session->setMessage('error', $response['mensaje']);
     header('Location: lista_hospitales.php');
     exit;
 }
+
+$hospital = $response['hospital'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     $nombre = trim($_POST['nombre']);
@@ -35,15 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     if (empty($nombre)) {
         $session->setMessage('error', 'El nombre del hospital es obligatorio');
     } else {
-        if ($hospitalController->updateHospital($id, $nombre)) {
-            $session->setMessage('success', 'Hospitales actualizado correctamente');
+        // Usar el método update() que devuelve un array con las claves 'error' y 'mensaje'
+        $resultado = $hospitalController->update($id, $nombre);
+        
+        if (!$resultado['error']) {
+            $session->setMessage('success', $resultado['mensaje']);
             header('Location: lista_hospitales.php');
             exit;
+        } else {
+            $session->setMessage('error', $resultado['mensaje']);
         }
     }
 }
 
-$pageTitle = "Editar Hospitales";
+$pageTitle = "Editar Hospital";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 

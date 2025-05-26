@@ -14,7 +14,8 @@ $authGuard = new AuthGuard();
 
 $authGuard->requireHospitalGestor();
 
-$hospitales = $hospitalController->getAllHospitales();
+$response = $hospitalController->index();
+$hospitales = $response['error'] ? [] : $response['hospitales'];
 
 $pageTitle = "Lista de Hospitales";
 include_once(__DIR__ . '/../templates/header.php');

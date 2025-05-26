@@ -21,23 +21,32 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$hospital = $hospitalController->getHospitalById($id);
+// Usar el método show() que devuelve un array con la clave 'hospital'
+$response = $hospitalController->show($id);
 
-if (!$hospital) {
-    $session->setMessage('error', 'Hospitales no encontrado');
+if ($response['error']) {
+    $session->setMessage('error', $response['mensaje']);
     header('Location: lista_hospitales.php');
     exit;
 }
+
+$hospital = $response['hospital'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
-    if ($hospitalController->deleteHospital($id)) {
-        $session->setMessage('success', 'Hospitales eliminado correctamente');
+    // Usar el método destroy() que devuelve un array con las claves 'error' y 'mensaje'
+    $resultado = $hospitalController->destroy($id);
+    
+    if (!$resultado['error']) {
+        $session->setMessage('success', $resultado['mensaje']);
+    } else {
+        $session->setMessage('error', $resultado['mensaje']);
     }
+    
     header('Location: lista_hospitales.php');
     exit;
 }
 
-$pageTitle = "Eliminar Hospitales";
+$pageTitle = "Eliminar Hospital";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
