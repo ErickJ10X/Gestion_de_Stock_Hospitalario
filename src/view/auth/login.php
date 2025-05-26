@@ -6,6 +6,7 @@ use util\AuthGuard;
 session_start();
 require_once(__DIR__ . '/../../controller/AuthController.php');
 require_once(__DIR__ . '/../../util/AuthGuard.php');
+require_once(__DIR__ . '/../../model/enum/RolEnum.php');
 
 $authGuard = new AuthGuard();
 $authGuard->requireNoAuth();
@@ -20,20 +21,22 @@ include('../templates/header.php');
     <div>
         <div>
             <div>
+                <h2>Iniciar Sesión</h2>
+                
                 <?php if (isset($_GET['error'])): ?>
-                    <div>
+                    <div class="alert alert-danger">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'; ?>
                     </div>
                 <?php endif; ?>
                 
                 <?php if (isset($_GET['success'])): ?>
-                    <div>
+                    <div class="alert alert-success">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Operación completada con éxito.'; ?>
                     </div>
                 <?php endif; ?>
                 
                 <?php if (isset($_GET['warning'])): ?>
-                    <div>
+                    <div class="alert alert-warning">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Atención: se requiere acción.'; ?>
                     </div>
                 <?php endif; ?>
