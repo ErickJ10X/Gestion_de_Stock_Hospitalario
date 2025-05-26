@@ -2,11 +2,13 @@
 namespace controller;
 
 use model\service\UsuarioService;
+use model\service\Usuario_UbicacionService;
 use model\enum\RolEnum;
 use util\Session;
 use Exception;
 
 require_once(__DIR__ . '/../model/service/UsuarioService.php');
+require_once(__DIR__ . '/../model/service/Usuario_UbicacionService.php');
 require_once(__DIR__ . '/../model/entity/Usuario.php');
 require_once(__DIR__ . '/../model/enum/RolEnum.php');
 include_once(__DIR__ . '/../util/Session.php');
@@ -14,11 +16,13 @@ include_once(__DIR__ . '/../util/Session.php');
 class UsuarioController
 {
     private UsuarioService $userService;
+    private Usuario_UbicacionService $userUbicacionService;
     private Session $session;
 
     public function __construct()
     {
         $this->userService = new UsuarioService();
+        $this->userUbicacionService = new Usuario_UbicacionService();
         $this->session = new Session();
     }
 
@@ -35,17 +39,23 @@ class UsuarioController
             throw new Exception("Email o contraseña incorrectos");
         }
 
+        // Obtener las ubicaciones asociadas al usuario
+        $ubicaciones = $this->userUbicacionService->getUbicacionesByUsuario($user['id']);
+        $user['ubicaciones'] = $ubicaciones;
+
         session_regenerate_id(true);
 
         $_SESSION['id'] = $user['id'];
         $_SESSION['nombre'] = $user['nombre'];
         $_SESSION['email'] = $user['email'];
         $_SESSION['rol'] = $user['rol'];
+        $_SESSION['ubicaciones'] = $ubicaciones;
 
         $this->session->set('id', $user['id']);
         $this->session->set('nombre', $user['nombre']);
         $this->session->set('email', $user['email']);
         $this->session->set('rol', $user['rol']);
+        $this->session->set('ubicaciones', $ubicaciones);
 
         return $user;
     }
@@ -60,7 +70,12 @@ class UsuarioController
             throw new Exception("El email no es válido");
         }
 
-        if (!RolEnum::isValid($rol)) {
+        // Validar el rol de manera adecuada, permitiendo tanto IDs como nombres
+        if (is_string($rol) && !is_numeric($rol)) {
+            $rol = $this->getRolIdByName($rol);
+        }
+        
+        if (!$this->isValidRolId($rol)) {
             throw new Exception("El rol especificado no es válido");
         }
 
@@ -74,12 +89,15 @@ class UsuarioController
             throw new Exception(implode(", ", $passwordValidation));
         }
 
+        // Convertir rol a entero si es necesario
+        $rol = (int)$rol;
+        
         if (!$this->userService->createUser($nombre, $email, $password, $rol)) {
             throw new Exception("Error al crear el usuario");
         }
     }
 
-    public function updateProfile($id, $nombre, $email, $password = null, $rol = null): void
+    public function updateProfile($id, $nombre, $email, $password = null, $rol = null, $ubicaciones = null): void
     {
         if (empty($id) || empty($nombre) || empty($email)) {
             throw new Exception("El ID, nombre y email son obligatorios");
@@ -118,11 +136,36 @@ class UsuarioController
             throw new Exception("Error al actualizar el usuario");
         }
 
+        // Actualizar ubicaciones del usuario si se proporcionaron
+        if ($ubicaciones !== null) {
+            // Eliminar ubicaciones actuales
+            $this->userUbicacionService->deleteUbicacionesByUsuario($id);
+
+            // Añadir nuevas ubicaciones
+            foreach ($ubicaciones as $ubicacion) {
+                if (!isset($ubicacion['tipo']) || !isset($ubicacion['id'])) {
+                    continue;
+                }
+                $this->userUbicacionService->createUsuarioUbicacion(
+                    $id,
+                    $ubicacion['tipo'],
+                    $ubicacion['id']
+                );
+            }
+
+            // Actualizar la sesión con las nuevas ubicaciones si es el usuario actual
+            if ((int)$id === (int)$this->session->get('id')) {
+                $userUbicaciones = $this->userUbicacionService->getUbicacionesByUsuario($id);
+                $_SESSION['ubicaciones'] = $userUbicaciones;
+                $this->session->set('ubicaciones', $userUbicaciones);
+            }
+        }
+
         if ((int)$id === (int)$this->session->get('id')) {
             $_SESSION['nombre'] = $nombre;
             $_SESSION['email'] = $email;
             $_SESSION['rol'] = $rol;
-            
+
             $this->session->set('nombre', $nombre);
             $this->session->set('email', $email);
             $this->session->set('rol', $rol);
@@ -144,6 +187,10 @@ class UsuarioController
             throw new Exception("El usuario no existe");
         }
 
+        // Eliminar primero las ubicaciones asociadas al usuario
+        $this->userUbicacionService->deleteUbicacionesByUsuario($id);
+
+        // Después eliminar el usuario
         if (!$this->userService->deleteUser($id)) {
             throw new Exception("Error al eliminar el usuario");
         }
@@ -153,7 +200,7 @@ class UsuarioController
     {
         return $this->userService->getAllUsuarios();
     }
-    
+
     public function getRolOptions(): array
     {
         return $this->userService->getRolOptions();
@@ -177,7 +224,7 @@ class UsuarioController
         if (!preg_match('/[\W_]/', $password)) {
             $errors[] = "La contraseña debe tener al menos un carácter especial.";
         }
-        
+
         return empty($errors) ? true : $errors;
     }
 
@@ -196,9 +243,63 @@ class UsuarioController
 
     public function getUserById($id) {
         try {
-            return $this->userService->getUsuarioById($id);
+            $usuario = $this->userService->getUserById($id);
+            if ($usuario) {
+                $ubicaciones = $this->userUbicacionService->getUbicacionesByUsuario($id);
+                $usuario->setUbicaciones($ubicaciones);
+            }
+            return $usuario;
         } catch (Exception $e) {
             throw new Exception("Error al obtener el usuario: " . $e->getMessage());
         }
+    }
+
+    public function asignarUbicacion($idUsuario, $tipoUbicacion, $idUbicacion): bool {
+        try {
+            return $this->userUbicacionService->createUsuarioUbicacion($idUsuario, $tipoUbicacion, $idUbicacion);
+        } catch (Exception $e) {
+            throw new Exception("Error al asignar ubicación al usuario: " . $e->getMessage());
+        }
+    }
+
+    public function eliminarUbicacion($idUsuario, $tipoUbicacion, $idUbicacion): bool {
+        try {
+            return $this->userUbicacionService->deleteUsuarioUbicacion($idUsuario, $tipoUbicacion, $idUbicacion);
+        } catch (Exception $e) {
+            throw new Exception("Error al eliminar ubicación del usuario: " . $e->getMessage());
+        }
+    }
+
+    public function getUbicacionesUsuario($idUsuario): array {
+        try {
+            return $this->userUbicacionService->getUbicacionesByUsuario($idUsuario);
+        } catch (Exception $e) {
+            throw new Exception("Error al obtener las ubicaciones del usuario: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Obtiene el ID numérico de un rol a partir de su nombre
+     */
+    public function getRolIdByName($rolName): int
+    {
+        $roles = RolEnum::getKeyValues();
+        foreach ($roles as $id => $name) {
+            if ($name === $rolName) {
+                return $id;
+            }
+        }
+        // Si no encuentra el rol, devuelve el ID de usuario de botiquín por defecto
+        return RolEnum::USUARIO_BOTIQUIN;
+    }
+    
+    /**
+     * Verifica si un ID de rol es válido
+     */
+    public function isValidRolId($rolId): bool
+    {
+        $rolId = (int)$rolId;
+        $roles = RolEnum::getKeyValues();
+        return array_key_exists($rolId, $roles);
     }
 }

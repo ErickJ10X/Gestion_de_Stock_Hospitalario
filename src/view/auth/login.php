@@ -32,6 +32,12 @@ include('../templates/header.php');
                     </div>
                 <?php endif; ?>
                 
+                <?php if (isset($_GET['warning'])): ?>
+                    <div>
+                        <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Atención: se requiere acción.'; ?>
+                    </div>
+                <?php endif; ?>
+                
                 <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php" method="post" class="main__form">
                     <div>
                         <label for="email">Email</label>

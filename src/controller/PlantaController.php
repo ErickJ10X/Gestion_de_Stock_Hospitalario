@@ -2,89 +2,143 @@
 
 namespace controller;
 
-require_once __DIR__ . '/../model/entity/Plantas.php';
-require_once __DIR__ . '/../model/service/PlantaService.php';
-require_once __DIR__ . '/../model/repository/PlantasRepository.php';
-
 use Exception;
 use model\entity\Plantas;
 use model\service\PlantaService;
 
+require_once(__DIR__ . '/../model/service/PlantaService.php');
+require_once(__DIR__ . '/../model/entity/Plantas.php');
+
 class PlantaController
 {
-    private $plantaService;
+    private PlantaService $plantaService;
 
     public function __construct()
     {
         $this->plantaService = new PlantaService();
     }
 
-    public function getAllPlantas()
+    public function index(): array
     {
         try {
-            return $this->plantaService->getAllPlantas();
+            return ['error' => false, 'plantas' => $this->plantaService->getAllPlantas()];
         } catch (Exception $e) {
-            error_log("Error en PlantaController::getAllPlantas: " . $e->getMessage());
-            throw new Exception("Error al obtener las plantas: " . $e->getMessage());
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function getPlantaById($id)
+    public function show($id): array
     {
         try {
-            return $this->plantaService->getPlantaById($id);
-        } catch (Exception $e) {
-            error_log("Error en PlantaController::getPlantaById: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    public function getPlantasByHospitalId($hospitalId)
-    {
-        try {
-            return $this->plantaService->getPlantasByHospitalId($hospitalId);
-        } catch (Exception $e) {
-            error_log("Error en PlantaController::getPlantasByHospitalId: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function createPlanta($nombre, $hospitalId)
-    {
-        try {
-            $planta = new Plantas();
-            $planta->setNombre($nombre);
-            $planta->setIdHospital($hospitalId);
-            return $this->plantaService->savePlanta($planta);
-        } catch (Exception $e) {
-            error_log("Error en PlantaController::createPlanta: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function updatePlanta($id, $nombre, $hospitalId)
-    {
-        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            }
+            
             $planta = $this->plantaService->getPlantaById($id);
             if ($planta) {
-                $planta->setNombre($nombre);
-                $planta->setIdHospital($hospitalId);
-                return $this->plantaService->updatePlanta($planta);
+                return ['error' => false, 'planta' => $planta];
+            } else {
+                return ['error' => true, 'mensaje' => 'Planta no encontrada'];
             }
-            return false;
         } catch (Exception $e) {
-            error_log("Error en PlantaController::updatePlanta: " . $e->getMessage());
-            return false;
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function deletePlanta($id)
+    public function getByHospital($hospitalId): array
     {
         try {
-            return $this->plantaService->deletePlanta($id);
+            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            }
+            
+            $plantas = $this->plantaService->getPlantasByHospitalId($hospitalId);
+            return ['error' => false, 'plantas' => $plantas];
         } catch (Exception $e) {
-            error_log("Error en PlantaController::deletePlanta: " . $e->getMessage());
-            return false;
+            return ['error' => true, 'mensaje' => $e->getMessage()];
+        }
+    }
+
+    public function store($numero, $descripcion, $hospitalId): array
+    {
+        try {
+            if (!is_numeric($numero)) {
+                return ['error' => true, 'mensaje' => 'El número de planta debe ser un valor numérico'];
+            }
+
+            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            }
+
+            $planta = new Plantas(null, $numero, $descripcion, $hospitalId);
+            $resultado = $this->plantaService->savePlanta($planta);
+            
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Planta creada correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo crear la planta'];
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'mensaje' => $e->getMessage()];
+        }
+    }
+
+    public function update($id, $numero, $descripcion, $hospitalId): array
+    {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            }
+
+            if (!is_numeric($numero)) {
+                return ['error' => true, 'mensaje' => 'El número de planta debe ser un valor numérico'];
+            }
+
+            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            }
+
+            // Verificar que la planta existe
+            $plantaExistente = $this->plantaService->getPlantaById($id);
+            if (!$plantaExistente) {
+                return ['error' => true, 'mensaje' => 'La planta no existe'];
+            }
+
+            $planta = new Plantas($id, $numero, $descripcion, $hospitalId);
+            $resultado = $this->plantaService->updatePlanta($planta);
+            
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Planta actualizada correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo actualizar la planta'];
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'mensaje' => $e->getMessage()];
+        }
+    }
+
+    public function destroy($id): array
+    {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            }
+            
+            // Verificar que la planta existe
+            $plantaExistente = $this->plantaService->getPlantaById($id);
+            if (!$plantaExistente) {
+                return ['error' => true, 'mensaje' => 'La planta no existe'];
+            }
+
+            $resultado = $this->plantaService->deletePlanta($id);
+            
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Planta eliminada correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo eliminar la planta'];
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 }

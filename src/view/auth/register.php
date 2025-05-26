@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $userService = new model\service\UsuarioService();
 $rolOptions = $userService->getRolOptions();
+$rolKeyValues = $userService->getRolKeyValues();
 
 include('../templates/header.php');
 ?>
@@ -60,14 +61,14 @@ include('../templates/header.php');
                         <label for="confirmar_contrasena">Confirmar Contraseña:</label>
                         <input type="password" name="confirmar_contrasena" required>
                     </div>
-                    
-                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === RolEnum::ADMINISTRADOR): ?>
+
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === RolEnum::getValue(RolEnum::ADMINISTRADOR)): ?>
                     <div>
                         <label for="rol">Rol:</label>
                         <select name="rol">
-                            <?php foreach ($rolOptions as $rol): ?>
-                                <option value="<?php echo htmlspecialchars($rol); ?>">
-                                    <?php echo htmlspecialchars($rol); ?>
+                            <?php foreach ($rolKeyValues as $id => $nombre): ?>
+                                <option value="<?php echo htmlspecialchars($nombre); ?>">
+                                    <?php echo htmlspecialchars($nombre); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

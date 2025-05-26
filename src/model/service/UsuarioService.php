@@ -46,7 +46,7 @@ class UsuarioService
             if (!$usuario) {
                 throw new Exception("Usuario no encontrado");
             }
-            
+
             $usuario->setNombre($nombre);
             $usuario->setEmail($email);
             $usuario->setIdRol($rol);
@@ -56,16 +56,24 @@ class UsuarioService
                 $usuario->setContrasena($password);
                 $usuario->hashPassword();
             }
-            
+
             return $this->usuarioRepository->update($usuario);
         } catch (PDOException $e) {
             throw new Exception("Error al actualizar el usuario: " . $e->getMessage());
         }
     }
 
-    public function createUser($nombre, $email, $password, $rol = 5, $activo = true): bool
+    public function createUser($nombre, $email, $password, $rol = RolEnum::USUARIO_BOTIQUIN, $activo = true): bool
     {
         try {
+            // Asegurarse de que el rol es un entero
+            $rol = (int)$rol;
+
+            // Verifica que el rol sea válido
+            if (!RolEnum::isValid($rol)) {
+                throw new Exception("El rol especificado no es válido");
+            }
+
             $usuario = new Usuario(
                 null,
                 $nombre,
@@ -76,7 +84,7 @@ class UsuarioService
             );
 
             $usuario->hashPassword();
-            
+
             return $this->usuarioRepository->save($usuario);
         } catch (PDOException $e) {
             throw new Exception("Error al crear el usuario: " . $e->getMessage());
@@ -87,7 +95,7 @@ class UsuarioService
     {
         try {
             $usuario = $this->usuarioRepository->findByEmail($email);
-            
+
             if ($usuario && $usuario->verificarContrasena($contrasena)) {
                 return [
                     'id' => $usuario->getIdUsuario(),
@@ -109,19 +117,5 @@ class UsuarioService
         } catch (PDOException $e) {
             throw new Exception("Error al obtener el usuario por email: " . $e->getMessage());
         }
-    }
-
-    public function getUserById($userId): ?Usuario
-    {
-        try {
-            return $this->usuarioRepository->findById($userId);
-        } catch (PDOException $e) {
-            throw new Exception("Error al obtener el usuario por ID: " . $e->getMessage());
-        }
-    }
-    
-    public function getRolOptions(): array
-    {
-        return RolEnum::getValues();
     }
 }

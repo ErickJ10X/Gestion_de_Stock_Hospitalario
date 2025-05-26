@@ -1,5 +1,6 @@
 <?php
 
+use controller\AuthController;
 use controller\UsuarioController;
 use util\AuthGuard;
 
@@ -12,23 +13,12 @@ $authGuard = new AuthGuard();
 $authGuard->requireAuth();
 
 $usuarioController = new UsuarioController();
+$authController = new AuthController();
 $user = $usuarioController->getUserById($_SESSION['id']);
+$ubicaciones = $usuarioController->getUbicacionesUsuario($_SESSION['id']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = $_SESSION['id'];
-    $nombre = $_POST['nombre'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['contrasena'] ?? null;
-    
-    try {
-        $result = $usuarioController->updateProfile($id, $nombre, $email, $password);
-        if ($result) {
-            header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php?success=1&message=' . urlencode('Perfil actualizado correctamente'));
-            exit;
-        }
-    } catch (Exception $e) {
-        $error_message = $e->getMessage();
-    }
+    $authController->updateUserProfile();
 }
 
 include('../templates/header.php');
@@ -58,9 +48,36 @@ include('../templates/header.php');
                 <input type="email" name="email" value="<?php echo htmlspecialchars($user->getEmail()); ?>" required>
             </div>
             <div>
-                <label for="contrasena">Nueva Contraseña (dejar en blanco para no cambiar):</label>
-                <input type="password" name="contrasena">
+                <label for="current_password">Contraseña actual (solo si deseas cambiarla):</label>
+                <input type="password" name="current_password">
             </div>
+            <div>
+                <label for="new_password">Nueva Contraseña (dejar en blanco para no cambiar):</label>
+                <input type="password" name="new_password">
+            </div>
+            <div>
+                <label for="confirm_new_password">Confirmar Nueva Contraseña:</label>
+                <input type="password" name="confirm_new_password">
+            </div>
+
+            <input type="hidden" name="id" value="<?php echo htmlspecialchars($user->getId()); ?>">
+
+            <h3>Ubicaciones asignadas:</h3>
+            <ul>
+                <?php if (!empty($ubicaciones)): ?>
+                    <?php foreach ($ubicaciones as $ubicacion): ?>
+                        <li>
+                            <?php 
+                                echo htmlspecialchars($ubicacion['tipo']) . ': ' . 
+                                     htmlspecialchars($ubicacion['nombre']); 
+                            ?>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li>No tienes ubicaciones asignadas.</li>
+                <?php endif; ?>
+            </ul>
+            <p><em>Para modificar tus ubicaciones, contacta con un administrador.</em></p>
 
             <button type="submit">Guardar Cambios</button>
             <a href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php">Cancelar</a>

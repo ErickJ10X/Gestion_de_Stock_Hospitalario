@@ -1,125 +1,103 @@
 <?php
+
 namespace controller;
 
-require_once(__DIR__ . '/../model/service/HospitalService.php');
-require_once(__DIR__ . '/../model/entity/Hospitales.php');
-include_once(__DIR__ . '/../util/Session.php');
-
-use model\service\HospitalService;
-use model\entity\Hospitales;
-use util\Session;
 use Exception;
+use model\service\HospitalService;
+
+require_once(__DIR__ . '/../model/service/HospitalService.php');
 
 class HospitalController
 {
     private HospitalService $hospitalService;
-    private Session $session;
 
     public function __construct()
     {
         $this->hospitalService = new HospitalService();
-        $this->session = new Session();
     }
 
-    public function getAllHospitales(): array
+    public function index(): array
     {
         try {
-            return $this->hospitalService->getAllHospitales();
+            return ['error' => false, 'hospitales' => $this->hospitalService->getAllHospitales()];
         } catch (Exception $e) {
-            $this->handleError("Error al obtener hospitales", $e->getMessage());
-            return [];
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function getHospitalById($id): ?Hospitales
+    public function show($id): array
     {
         try {
-            if (empty($id)) {
-                throw new Exception("El ID del hospital es requerido");
+            if (empty($id) || !is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
             }
             
             $hospital = $this->hospitalService->getHospitalById($id);
-            
-            if (!$hospital) {
-                throw new Exception("Hospitales no encontrado");
+            if ($hospital) {
+                return ['error' => false, 'hospital' => $hospital];
+            } else {
+                return ['error' => true, 'mensaje' => 'Hospital no encontrado'];
             }
-            
-            return $hospital;
         } catch (Exception $e) {
-            $this->handleError("Error al obtener hospital", $e->getMessage());
-            return null;
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function createHospital($nombre): bool
+    public function store($nombre, $ubicacion = ''): array
     {
         try {
-            if (empty($nombre)) {
-                throw new Exception("El nombre del hospital es requerido");
+            if (empty(trim($nombre))) {
+                return ['error' => true, 'mensaje' => 'El nombre del hospital es obligatorio'];
             }
-            
-            if (!$this->hospitalService->createHospital($nombre)) {
-                throw new Exception("No se pudo crear el hospital");
+
+            $resultado = $this->hospitalService->createHospital($nombre, $ubicacion);
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Hospital creado correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo crear el hospital'];
             }
-            
-            $this->session->setMessage("success", "Hospitales creado correctamente");
-            return true;
         } catch (Exception $e) {
-            $this->handleError("Error al crear hospital", $e->getMessage());
-            return false;
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function updateHospital($id, $nombre): bool
+    public function update($id, $nombre, $ubicacion = null): array
     {
         try {
-            if (empty($id) || empty($nombre)) {
-                throw new Exception("El ID y nombre del hospital son requeridos");
+            if (empty($id) || !is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
             }
-            
-            $hospital = $this->hospitalService->getHospitalById($id);
-            if (!$hospital) {
-                throw new Exception("Hospitales no encontrado");
+
+            if (empty(trim($nombre))) {
+                return ['error' => true, 'mensaje' => 'El nombre del hospital es obligatorio'];
             }
-            
-            if (!$this->hospitalService->updateHospital($id, $nombre)) {
-                throw new Exception("No se pudo actualizar el hospital");
+
+            $resultado = $this->hospitalService->updateHospital($id, $nombre, $ubicacion);
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Hospital actualizado correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo actualizar el hospital'];
             }
-            
-            $this->session->setMessage("success", "Hospitales actualizado correctamente");
-            return true;
         } catch (Exception $e) {
-            $this->handleError("Error al actualizar hospital", $e->getMessage());
-            return false;
+            return ['error' => true, 'mensaje' => $e->getMessage()];
         }
     }
 
-    public function deleteHospital($id): bool
+    public function destroy($id): array
     {
         try {
-            if (empty($id)) {
-                throw new Exception("El ID del hospital es requerido");
+            if (empty($id) || !is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
             }
-            
-            $hospital = $this->hospitalService->getHospitalById($id);
-            if (!$hospital) {
-                throw new Exception("Hospitales no encontrado");
-            }
-            
-            if (!$this->hospitalService->deleteHospital($id)) {
-                throw new Exception("No se pudo eliminar el hospital");
-            }
-            
-            $this->session->setMessage("success", "Hospitales eliminado correctamente");
-            return true;
-        } catch (Exception $e) {
-            $this->handleError("Error al eliminar hospital", $e->getMessage());
-            return false;
-        }
-    }
 
-    private function handleError($title, $message): void
-    {
-        $this->session->setMessage("error", $title . ": " . $message);
+            $resultado = $this->hospitalService->deleteHospital($id);
+            if ($resultado) {
+                return ['error' => false, 'mensaje' => 'Hospital eliminado correctamente'];
+            } else {
+                return ['error' => true, 'mensaje' => 'No se pudo eliminar el hospital'];
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'mensaje' => $e->getMessage()];
+        }
     }
 }
