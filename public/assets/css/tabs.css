@@ -27,7 +27,7 @@
 /* Navegación de pestañas */
 .tabs-nav {
   display: flex;
-  background-color: var(--primary);
+  background-color: #222831; /* Cambiado para coincidir con el header */
   padding: 0;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -47,11 +47,13 @@
 
 .tab-btn:hover {
   color: var(--white);
+  background-color: rgba(255, 255, 255, 0.1); /* Efecto hover similar al header */
 }
 
 .tab-btn.active {
   color: var(--white);
   font-weight: 600;
+  background-color: rgba(124, 194, 66, 0.2); /* Fondo verde transparente cuando está activo */
 }
 
 .tab-btn::after {

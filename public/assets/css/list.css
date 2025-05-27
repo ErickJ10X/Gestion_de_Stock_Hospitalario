@@ -199,6 +199,11 @@
   border-left: 4px solid var(--danger);
 }
 
+/* Ocultar encabezados de la tabla */
+.list-table__head {
+  display: none;
+}
+
 /* Tabla principal */
 .list-table {
   width: 100%;
@@ -207,31 +212,17 @@
   font-size: 0.95rem;
 }
 
-.list-table__head {
-  background-color: var(--primary);
-  color: var(--white);
-}
-
-.list-table__header {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 2px solid var(--secondary);
-  white-space: nowrap;
-  letter-spacing: 0.01em;
-}
-
 .list-table__body-row {
   border-bottom: 1px solid var(--border-color);
   transition: var(--transition);
 }
 
-.list-table__body-row:hover {
-  background-color: rgba(0, 75, 135, 0.03);
+.list-table__body-row:first-child {
+  border-top: 1px solid var(--border-color);
 }
 
-.list-table__body-row:last-child {
-  border-bottom: none;
+.list-table__body-row:hover {
+  background-color: rgba(0, 75, 135, 0.03);
 }
 
 .list-table__body-cell {
@@ -364,12 +355,12 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .list-header__actions {
     margin-top: 1rem;
     width: 100%;
   }
-  
+
   .list-button {
     flex: 1;
     justify-content: center;
@@ -377,44 +368,35 @@
 }
 
 @media (max-width: 768px) {
-  .list-table__head {
-    display: none;
-  }
-
-  .list-table, 
-  .list-table__body-row, 
+  .list-table,
+  .list-table__body-row,
   .list-table__body-cell {
     display: block;
     width: 100%;
     box-sizing: border-box;
   }
-  
+
   .list-table__body-row {
     margin-bottom: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
-  
+
   .list-table__body-cell {
     display: flex;
     padding: 0.75rem 1rem;
-    text-align: right;
+    text-align: left;
     border-bottom: 1px solid var(--border-color);
     align-items: center;
   }
-  
-  .list-table__body-cell:last-child {
-    border-bottom: none;
-  }
 
   .list-table__body-cell::before {
-    content: attr(data-label);
-    font-weight: 600;
-    width: 40%;
-    margin-right: 5%;
-    text-align: left;
-    color: var(--primary);
+    display: none; /* Ocultar los data-label en dispositivos móviles */
+  }
+
+  .list-table__body-cell:last-child {
+    border-bottom: none;
   }
 
   .list-table__actions {

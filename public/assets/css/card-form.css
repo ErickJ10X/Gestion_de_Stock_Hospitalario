@@ -44,6 +44,43 @@
   font-family: 'Roboto', Arial, sans-serif;
 }
 
+/* Estilos mejorados para tarjetas modales */
+.hospital-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 95vw;
+  max-height: 90vh;
+  z-index: 1000;
+  display: none;
+  overflow-y: auto;
+}
+
+.hospital-card[style*="display: block"] {
+  display: block !important;
+}
+
+/* Overlay para tarjetas modales */
+.hospital-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: none;
+}
+
+.hospital-overlay[style*="display: block"] {
+  display: block !important;
+}
+
 /* Estilos comunes para los headers de tarjetas */
 .hospital-card__header,
 .almacen-card__header,
@@ -51,7 +88,7 @@
 .planta-card__header,
 .producto-card__header,
 .usuario-card__header {
-  padding: 1.25rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -59,7 +96,7 @@
   position: sticky;
   top: 0;
   background: inherit;
-  z-index: 5;
+  z-index: 1002 !important;
   border-radius: 8px 8px 0 0;
 }
 
@@ -157,6 +194,8 @@
 .producto-card__body,
 .usuario-card__body {
   padding: 1.5rem;
+  background-color: white;
+  z-index: 1002 !important;
 }
 
 /* Estilos para pies de tarjetas */
@@ -166,11 +205,11 @@
 .planta-card__footer,
 .producto-card__footer,
 .usuario-card__footer {
-  padding: 1.25rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 /* Estilos para overlays */
@@ -197,14 +236,17 @@
 .botiquin-card--active,
 .planta-card--active,
 .producto-card--active,
-.usuario-card--active,
+.usuario-card--active {
+  display: block !important; /* Forzar visualización */
+}
+
 .hospital-overlay--active,
 .almacen-overlay--active,
 .botiquin-overlay--active,
 .planta-overlay--active,
 .producto-overlay--active,
 .usuario-overlay--active {
-  display: block;
+  display: block !important; /* Forzar visualización */
 }
 
 /* Clases de animación */
@@ -224,7 +266,7 @@
 .planta-form__group,
 .producto-form__group,
 .usuario-form__group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 /* Estilos comunes para etiquetas */
@@ -255,11 +297,11 @@
 .producto-form__select,
 .usuario-form__select {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
+  padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
   transition: var(--transition);
   background-color: var(--white);
   color: var(--dark);
@@ -290,12 +332,11 @@
 .producto-form__button,
 .usuario-form__button {
   padding: 0.5rem 1rem;
-  font-size: 1rem;
   border-radius: 4px;
   cursor: pointer;
-  border: none;
-  transition: var(--transition);
   font-weight: 500;
+  transition: all 0.2s;
+  font-size: 1rem;
   text-align: center;
   min-width: 120px;
 }
@@ -307,8 +348,9 @@
 .planta-form__button--primary,
 .producto-form__button--primary,
 .usuario-form__button--primary {
-  background-color: var(--primary);
-  color: var(--white);
+  background: #0d6efd;
+  border: 1px solid #0d6efd;
+  color: white;
 }
 
 .hospital-form__button--primary:hover,
@@ -327,8 +369,9 @@
 .planta-form__button--secondary,
 .producto-form__button--secondary,
 .usuario-form__button--secondary {
-  background-color: var(--gray);
-  color: var(--white);
+  background: #6c757d;
+  border: 1px solid #6c757d;
+  color: white;
 }
 
 .hospital-form__button--secondary:hover,
@@ -347,8 +390,9 @@
 .planta-form__button--danger,
 .producto-form__button--danger,
 .usuario-form__button--danger {
-  background-color: var(--danger);
-  color: var(--white);
+  background: #dc3545;
+  border: 1px solid #dc3545;
+  color: white;
 }
 
 .hospital-form__button--danger:hover,
@@ -430,6 +474,21 @@
   background-color: rgba(255, 193, 7, 0.1);
   color: #856404;
   border-left: 4px solid var(--warning);
+}
+
+/* Estilos para mensajes de error */
+.hospital-form__error {
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.hospital-form__error p {
+  margin: 0;
 }
 
 /* Estilos responsivos */
