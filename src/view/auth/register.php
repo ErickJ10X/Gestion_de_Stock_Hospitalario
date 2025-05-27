@@ -26,6 +26,15 @@ include('../templates/header.php');
         <div>
             <h2>Registro de Usuario</h2>
 
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger">
+                    <?php
+                    echo htmlspecialchars($_SESSION['error_message']);
+                    unset($_SESSION['error_message']);
+                    ?>
+                </div>
+            <?php endif; ?>
+
             <?php if (isset($_GET['error'])): ?>
                 <div>
                     <?php

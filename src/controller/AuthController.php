@@ -39,10 +39,10 @@ class AuthController {
                         Redirect::toHome();
                     } else {
                         $rolRequiereUbicacion = in_array($user['rol'], [
-                            RolEnum::USUARIO_BOTIQUIN, 
+                            RolEnum::USUARIO_BOTIQUIN,
                             RolEnum::GESTOR_PLANTA
                         ]);
-                        
+
                         if ($rolRequiereUbicacion) {
                             Redirect::withWarning('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php', 'Tu cuenta no tiene ubicaciones asignadas. Contacta con un dashboard.');
                         } else {
@@ -73,7 +73,8 @@ class AuthController {
             $confirmPassword = $_POST['confirmar_contrasena'] ?? '';
 
             if (!$this->confirmPassword($password, $confirmPassword)) {
-                Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php', 'Las contraseñas no coinciden');
+                $_SESSION['error_message'] = 'Las contraseñas no coinciden';
+                Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php');
                 return;
             }
 
@@ -86,7 +87,8 @@ class AuthController {
                     Redirect::withSuccess('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php', 'Usuario registrado correctamente');
                 }
             } catch (Exception $e) {
-                Redirect::withError('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php', $e->getMessage());
+                $_SESSION['error_message'] = $e->getMessage();
+                Redirect::to('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php');
             }
         }
     }
