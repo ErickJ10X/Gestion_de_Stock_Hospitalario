@@ -59,18 +59,18 @@ class PlantaController
         }
     }
 
-    public function store($numero, $descripcion, $hospitalId): array
+    public function store($nombre, $idHospital): array
     {
         try {
-            if (!is_numeric($numero)) {
-                return ['error' => true, 'mensaje' => 'El número de planta debe ser un valor numérico'];
+            if (empty($nombre)) {
+                return ['error' => true, 'mensaje' => 'El nombre de la planta es obligatorio'];
             }
 
-            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
+            if (!is_numeric($idHospital) || $idHospital <= 0) {
                 return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
             }
 
-            $planta = new Plantas(null, $numero, $descripcion, $hospitalId);
+            $planta = new Plantas(null, $nombre, $idHospital);
             $resultado = $this->plantaService->savePlanta($planta);
             
             if ($resultado) {
@@ -83,18 +83,18 @@ class PlantaController
         }
     }
 
-    public function update($id, $numero, $descripcion, $hospitalId): array
+    public function update($id, $nombre, $idHospital): array
     {
         try {
             if (!is_numeric($id) || $id <= 0) {
                 return ['error' => true, 'mensaje' => 'ID de planta inválido'];
             }
 
-            if (!is_numeric($numero)) {
-                return ['error' => true, 'mensaje' => 'El número de planta debe ser un valor numérico'];
+            if (empty($nombre)) {
+                return ['error' => true, 'mensaje' => 'El nombre de la planta es obligatorio'];
             }
 
-            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
+            if (!is_numeric($idHospital) || $idHospital <= 0) {
                 return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
             }
 
@@ -104,7 +104,7 @@ class PlantaController
                 return ['error' => true, 'mensaje' => 'La planta no existe'];
             }
 
-            $planta = new Plantas($id, $numero, $descripcion, $hospitalId);
+            $planta = new Plantas($id, $nombre, $idHospital);
             $resultado = $this->plantaService->updatePlanta($planta);
             
             if ($resultado) {

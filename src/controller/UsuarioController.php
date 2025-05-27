@@ -15,7 +15,7 @@ include_once(__DIR__ . '/../util/Session.php');
 
 class UsuarioController
 {
-    private UsuarioService $userService;
+    public $userService;
     private Usuario_UbicacionService $userUbicacionService;
     private Session $session;
 
@@ -236,7 +236,6 @@ class UsuarioController
             $usuario = $this->userService->getUserById($id);
             if ($usuario) {
                 $ubicaciones = $this->userUbicacionService->getUbicacionesByUsuario($id);
-                $usuario->setUbicaciones($ubicaciones);
             }
             return $usuario;
         } catch (Exception $e) {
@@ -289,5 +288,136 @@ class UsuarioController
     public function isValidRol(string $rol): bool
     {
         return RolEnum::isValid($rol);
+    }
+
+    /**
+     * Maneja las acciones del formulario de usuarios
+     */
+    public function handleAction(string $action = null): void
+    {
+        if (!$action && isset($_POST['action'])) {
+            $action = $_POST['action'];
+        }
+        
+        if (!$action) {
+            $this->redirectToList('error', 'Acción no especificada');
+        }
+        
+        switch ($action) {
+            case 'crear':
+                $this->handleCreateUser();
+                break;
+            case 'editar':
+                $this->handleUpdateUser();
+                break;
+            case 'eliminar':
+                $this->handleDeleteUser();
+                break;
+            default:
+                $this->redirectToList('error', 'Acción no válida');
+                break;
+        }
+    }
+
+    /**
+     * Maneja la creación de un nuevo usuario desde el formulario
+     */
+    public function handleCreateUser(): void
+    {
+        $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : '';
+        $confirmarContrasena = isset($_POST['confirmar_contrasena']) ? $_POST['confirmar_contrasena'] : '';
+        $rol = isset($_POST['rol']) ? $_POST['rol'] : '';
+        
+        if (empty($nombre) || empty($email) || empty($contrasena) || empty($confirmarContrasena) || empty($rol)) {
+            $this->redirectToList('modal_error', 'Todos los campos son obligatorios');
+        }
+        
+        if ($contrasena !== $confirmarContrasena) {
+            $this->redirectToList('modal_error', 'Las contraseñas no coinciden');
+        }
+        
+        try {
+            $this->register($nombre, $email, $contrasena, $rol);
+            $this->redirectToList('success', 'Usuario creado correctamente');
+        } catch (\Exception $e) {
+            $this->redirectToList('modal_error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Maneja la actualización de un usuario existente desde el formulario
+     */
+    public function handleUpdateUser(): void
+    {
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+        $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : '';
+        $confirmarContrasena = isset($_POST['confirmar_contrasena']) ? $_POST['confirmar_contrasena'] : '';
+        $rol = isset($_POST['rol']) ? $_POST['rol'] : '';
+        $activo = isset($_POST['activo']) ? (int)$_POST['activo'] : 1;
+        
+        if ($id <= 0 || empty($nombre) || empty($email) || empty($rol)) {
+            $this->redirectToList('modal_error_edit_' . $id, 'El ID, nombre, email y rol son obligatorios');
+        }
+        
+        if (!empty($contrasena) && $contrasena !== $confirmarContrasena) {
+            $this->redirectToList('modal_error_edit_' . $id, 'Las contraseñas no coinciden');
+        }
+        
+        try {
+            $usuario = $this->getUserById($id);
+            if (!$usuario) {
+                throw new \Exception("Usuario no encontrado");
+            }
+            
+            $this->updateProfile(
+                $id,
+                $nombre,
+                $email,
+                !empty($contrasena) ? $contrasena : null,
+                $rol,
+                null
+            );
+            
+            if ($usuario->getActivo() != $activo) {
+                $this->userService->updateActivo($id, $activo);
+            }
+            
+            $this->redirectToList('success', 'Usuario actualizado correctamente');
+        } catch (\Exception $e) {
+            $this->redirectToList('modal_error_edit_' . $id, $e->getMessage());
+        }
+    }
+
+    /**
+     * Maneja la eliminación de un usuario desde el formulario
+     */
+    public function handleDeleteUser(): void
+    {
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+        
+        if ($id <= 0) {
+            $this->redirectToList('error', 'ID de usuario no válido');
+        }
+        
+        try {
+            $this->deleteUser($id);
+            $this->redirectToList('success', 'Usuario eliminado correctamente');
+        } catch (\Exception $e) {
+            $this->redirectToList('error', $e->getMessage());
+        }
+    }
+    
+    /**
+     * Redirecciona a la lista de usuarios con un mensaje
+     */
+    private function redirectToList(string $messageType, string $message): void
+    {
+        $this->session->setMessage($messageType, $message);
+        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php');
+        exit;
     }
 }
