@@ -110,6 +110,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Validar formulario de creación
+    const formCrearUsuario = document.getElementById('form-crear-usuario');
+    if (formCrearUsuario) {
+        formCrearUsuario.addEventListener('submit', function(e) {
+            const password = document.getElementById('contrasena-create').value;
+            const confirmPassword = document.getElementById('confirmar_contrasena-create').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 8 caracteres');
+                return false;
+            }
+        });
+    }
+    
+    // Validar formularios de edición
+    const editForms = document.querySelectorAll('[id^="form-editar-usuario-"]');
+    editForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const userId = form.querySelector('input[name="id"]').value;
+            const passwordField = document.getElementById(`contrasena-edit-${userId}`);
+            const confirmPasswordField = document.getElementById(`confirmar_contrasena-edit-${userId}`);
+            
+            if (passwordField && confirmPasswordField) {
+                const password = passwordField.value;
+                const confirmPassword = confirmPasswordField.value;
+                
+                if (password !== '' && password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden');
+                    return false;
+                }
+                
+                if (password !== '' && password.length < 8) {
+                    e.preventDefault();
+                    alert('La contraseña debe tener al menos 8 caracteres');
+                    return false;
+                }
+            }
+        });
+    });
+    
     // Cerrar alertas manualmente
     alertCloseButtons.forEach(button => {
         button.addEventListener('click', function() {
