@@ -63,17 +63,6 @@ include_once(__DIR__ . '/../templates/header.php');
             <div id="tab-lista" class="tab-pane active">
                 <div class="table-responsive">
                     <table class="list-table">
-                        <thead class="list-table__head">
-                            <tr>
-                                <th class="list-table__header">#</th>
-                                <th class="list-table__header">Nombre</th>
-                                <th class="list-table__header">Email</th>
-                                <th class="list-table__header">Rol</th>
-                                <th class="list-table__header">Estado</th>
-                                <th class="list-table__header">Ubicaciones</th>
-                                <th class="list-table__header text-center">Acciones</th>
-                            </tr>
-                        </thead>
                         <tbody>
                             <?php if (empty($usuarios)): ?>
                                 <tr>
@@ -82,7 +71,6 @@ include_once(__DIR__ . '/../templates/header.php');
                             <?php else: ?>
                                 <?php foreach ($usuarios as $index => $usuario): ?>
                                     <tr class="list-table__body-row">
-                                        <td class="list-table__body-cell" data-label="#"><?= $usuario->getIdUsuario() ?></td>
                                         <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($usuario->getNombre()) ?></td>
                                         <td class="list-table__body-cell" data-label="Email"><?= htmlspecialchars($usuario->getEmail()) ?></td>
                                         <td class="list-table__body-cell" data-label="Rol">
@@ -259,7 +247,14 @@ include_once(__DIR__ . '/../templates/header.php');
         <button type="button" class="usuario-card__close">&times;</button>
     </div>
     <div class="usuario-card__body">
-        <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php" method="post" class="usuario-form">
+        <?php if ($session->hasMessage('modal_error')): ?>
+            <div class="usuario-form__error">
+                <p><?= $session->getMessage('modal_error') ?></p>
+            </div>
+            <?php $session->clearMessage('modal_error'); ?>
+        <?php endif; ?>
+        <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/usuario-actions.php" method="post" class="usuario-form" id="form-crear-usuario">
+            <input type="hidden" name="action" value="crear">
             <div class="usuario-form__group">
                 <label for="nombre-create" class="usuario-form__label">Nombre:</label>
                 <input type="text" id="nombre-create" name="nombre" class="usuario-form__input" required>
@@ -300,7 +295,14 @@ include_once(__DIR__ . '/../templates/header.php');
             <button type="button" class="usuario-card__close">&times;</button>
         </div>
         <div class="usuario-card__body">
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/editar-usuario.php" method="post" class="usuario-form">
+            <?php if ($session->hasMessage('modal_error_edit_' . $usuario->getIdUsuario())): ?>
+                <div class="usuario-form__error">
+                    <p><?= $session->getMessage('modal_error_edit_' . $usuario->getIdUsuario()) ?></p>
+                </div>
+                <?php $session->clearMessage('modal_error_edit_' . $usuario->getIdUsuario()); ?>
+            <?php endif; ?>
+            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/usuario-actions.php" method="post" class="usuario-form" id="form-editar-usuario-<?= $usuario->getIdUsuario() ?>">
+                <input type="hidden" name="action" value="editar">
                 <input type="hidden" name="id" value="<?= $usuario->getIdUsuario() ?>">
                 <div class="usuario-form__group">
                     <label for="nombre-edit-<?= $usuario->getIdUsuario() ?>" class="usuario-form__label">Nombre:</label>
@@ -313,6 +315,10 @@ include_once(__DIR__ . '/../templates/header.php');
                 <div class="usuario-form__group">
                     <label for="contrasena-edit-<?= $usuario->getIdUsuario() ?>" class="usuario-form__label">Contraseña (dejar en blanco para mantener la actual):</label>
                     <input type="password" id="contrasena-edit-<?= $usuario->getIdUsuario() ?>" name="contrasena" class="usuario-form__input">
+                </div>
+                <div class="usuario-form__group">
+                    <label for="confirmar_contrasena-edit-<?= $usuario->getIdUsuario() ?>" class="usuario-form__label">Confirmar Contraseña:</label>
+                    <input type="password" id="confirmar_contrasena-edit-<?= $usuario->getIdUsuario() ?>" name="confirmar_contrasena" class="usuario-form__input">
                 </div>
                 <div class="usuario-form__group">
                     <label for="rol-edit-<?= $usuario->getIdUsuario() ?>" class="usuario-form__label">Rol:</label>
@@ -346,7 +352,8 @@ include_once(__DIR__ . '/../templates/header.php');
         <div class="usuario-card__body">
             <h4>¿Estás seguro de que deseas eliminar al usuario "<?= htmlspecialchars($usuario->getNombre()) ?>"?</h4>
             <p class="text-danger">Esta acción no se puede deshacer.</p>
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/eliminar-usuario.php" method="post">
+            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/usuario-actions.php" method="post">
+                <input type="hidden" name="action" value="eliminar">
                 <input type="hidden" name="id" value="<?= $usuario->getIdUsuario() ?>">
                 <div class="usuario-card__footer">
                     <button type="button" class="usuario-form__button usuario-form__button--secondary usuario-form__button--cancel">Cancelar</button>
