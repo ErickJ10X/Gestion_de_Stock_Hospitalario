@@ -4,18 +4,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elementos DOM
     const overlay = document.querySelector('.hospital-overlay');
     const addHospitalButton = document.getElementById('btn-add-hospital');
+    const addPlantaButton = document.getElementById('btn-add-planta');
     const createHospitalCard = document.getElementById('hospital-card-create');
+    const createPlantaCard = document.getElementById('planta-card-create');
     
     // Log de estados iniciales para verificar
     console.log('Overlay encontrado:', overlay !== null);
     console.log('Botón agregar hospital encontrado:', addHospitalButton !== null);
+    console.log('Botón agregar planta encontrado:', addPlantaButton !== null);
     console.log('Card crear hospital encontrada:', createHospitalCard !== null);
+    console.log('Card crear planta encontrada:', createPlantaCard !== null);
     
     const editHospitalButtons = document.querySelectorAll('.btn-edit-hospital');
     console.log('Botones editar hospital encontrados:', editHospitalButtons.length);
     
     const deleteHospitalButtons = document.querySelectorAll('.btn-delete-hospital');
     console.log('Botones eliminar hospital encontrados:', deleteHospitalButtons.length);
+    
+    const editPlantaButtons = document.querySelectorAll('.btn-edit-planta');
+    console.log('Botones editar planta encontrados:', editPlantaButtons.length);
+    
+    const deletePlantaButtons = document.querySelectorAll('.btn-delete-planta');
+    console.log('Botones eliminar planta encontrados:', deletePlantaButtons.length);
     
     const closeButtons = document.querySelectorAll('.hospital-card__close');
     console.log('Botones cerrar encontrados:', closeButtons.length);
@@ -68,6 +78,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Evento para el botón de agregar planta
+    if (addPlantaButton) {
+        addPlantaButton.addEventListener('click', function(e) {
+            console.log('Click en botón agregar planta');
+            e.preventDefault();
+            showCard(createPlantaCard);
+        });
+    }
+    
     // Eventos para los botones de editar hospital
     editHospitalButtons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -88,6 +107,32 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const hospitalId = this.getAttribute('data-id');
             const deleteCard = document.getElementById(`hospital-card-delete-${hospitalId}`);
+            if (deleteCard) {
+                showCard(deleteCard);
+            }
+        });
+    });
+    
+    // Eventos para los botones de editar planta
+    editPlantaButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón editar planta');
+            e.preventDefault();
+            const plantaId = this.getAttribute('data-id');
+            const editCard = document.getElementById(`planta-card-edit-${plantaId}`);
+            if (editCard) {
+                showCard(editCard);
+            }
+        });
+    });
+    
+    // Eventos para los botones de eliminar planta
+    deletePlantaButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón eliminar planta');
+            e.preventDefault();
+            const plantaId = this.getAttribute('data-id');
+            const deleteCard = document.getElementById(`planta-card-delete-${plantaId}`);
             if (deleteCard) {
                 showCard(deleteCard);
             }

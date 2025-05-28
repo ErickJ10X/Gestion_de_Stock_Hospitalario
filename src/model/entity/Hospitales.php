@@ -4,9 +4,9 @@ namespace model\entity;
 
 class Hospitales
 {
-    public int $id_hospital;
-    public string $nombre;
-    public string $ubicacion;
+    private int $id_hospital;
+    private string $nombre;
+    private string $ubicacion;
 
     public function __construct($id = 0, $nombre = '', $ubicacion = '')
     {

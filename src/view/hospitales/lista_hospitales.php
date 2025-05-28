@@ -21,8 +21,8 @@ $authGuard = new AuthGuard();
 $authGuard->requireHospitalGestor();
 
 $hospitales = $hospitalController->index()['hospitales'] ?? [];
-// Comentamos temporalmente la carga de plantas y botiquines
-// $plantas = $plantaController->index()['plantas'] ?? [];
+// Descomentar para cargar las plantas
+$plantas = $plantaController->index()['plantas'] ?? [];
 // $botiquines = $botiquinController->index()['botiquines'] ?? [];
 
 $pageTitle = "Hospitales";
@@ -39,10 +39,10 @@ include_once(__DIR__ . '/../templates/header.php');
             <button id="btn-add-hospital" class="list-button list-button--success">
                 <i class="bi bi-hospital"></i> Nuevo Hospital
             </button>
-            <!-- Ocultamos botones temporalmente
             <button id="btn-add-planta" class="list-button list-button--primary">
                 <i class="bi bi-building"></i> Nueva Planta
             </button>
+            <!-- Ocultamos botones temporalmente
             <button id="btn-add-botiquin" class="list-button list-button--info">
                 <i class="bi bi-box"></i> Nuevo Botiquín
       -      </button>
@@ -79,15 +79,16 @@ include_once(__DIR__ . '/../templates/header.php');
                 <?php include_once(__DIR__ . '/hospitales_tab.php'); ?>
             </div>
             
-            <!-- Pestaña Plantas (vacía por el momento) -->
-            <div id="tab-plantas" class="tab-pane">
-                <div class="empty-message">
-                    <p>No hay información de plantas disponible.</p>
-                </div>
+            <!-- Pestaña Plantas -->
+            <div id="tab-plantas" class="tab-pane ">
+                <?php include_once(__DIR__ . '/plantas_tab.php'); ?>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Overlay para ventanas modales -->
+<div class="hospital-overlay"></div>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-tabs.js"></script>

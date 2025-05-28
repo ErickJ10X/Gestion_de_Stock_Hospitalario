@@ -37,8 +37,7 @@ class HospitalesRepository
     public function findAll(): array
     {
         $sql = "SELECT id_hospital, nombre, ubicacion FROM hospitales";
-        $stmt = $this->pdo->query($sql);
-        return $this->mapToHospitalArray($stmt->fetchAll(PDO::FETCH_ASSOC));
+        return $this->mapToHospitalArray($this->pdo->query($sql)->fetchAll());
     }
 
     public function findById($id): ?Hospitales
