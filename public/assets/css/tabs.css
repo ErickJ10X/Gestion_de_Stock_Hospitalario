@@ -21,7 +21,7 @@
   border-radius: 8px;
   box-shadow: var(--shadow);
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: 2rem; /* Este margen puede estar causando problemas de alineación vertical */
 }
 
 /* Navegación de pestañas */
@@ -75,7 +75,7 @@
 /* Contenido de pestañas */
 .tab-content {
   background-color: var(--white);
-  padding: 1.5rem;
+  padding: 1.5rem; /* Asegúrate de que este padding sea consistente con otros elementos */
 }
 
 .tab-pane {
@@ -97,7 +97,7 @@
   .tabs-nav {
     flex-direction: column;
   }
-  
+
   .tab-btn {
     width: 100%;
     text-align: center;

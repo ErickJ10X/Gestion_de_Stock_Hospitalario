@@ -18,7 +18,7 @@
 .list-container {
   width: 100%;
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: 0 auto; /* Modificado: cambiado de 2rem auto a 0 auto para alinearse con .container */
   padding: 0 15px;
   font-family: 'Roboto', Arial, sans-serif;
 }
@@ -403,7 +403,7 @@
     justify-content: flex-end;
     flex-wrap: wrap;
   }
-  
+
   .list-table__empty {
     text-align: center;
     border: 1px solid var(--border-color);
@@ -420,13 +420,13 @@
   .list-card__body {
     padding: 1rem;
   }
-  
+
   .list-table__actions {
     flex-direction: column;
     width: 100%;
     gap: 0.5rem;
   }
-  
+
   .list-table__button {
     width: 100%;
     padding: 0.5rem;

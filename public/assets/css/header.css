@@ -162,22 +162,17 @@ body {
   position: absolute;
   top: calc(100% + 5px);
   right: 0;
-  min-width: 220px;
+  width: 180px; /* Tamaño fijo */
+  max-width: 180px; /* Límite máximo estricto */
   background-color: var(--white);
   border-radius: 6px;
   box-shadow: var(--shadow);
   z-index: 1000;
   overflow: hidden;
-  animation: dropdown-fade-in 0.2s ease;
-}
-
-@keyframes dropdown-fade-in {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .nav__dropdown:hover .nav__dropdown-menu {
-  display: block;
+  display: block; /* Sin animación */
 }
 
 .nav__dropdown-item {
@@ -187,12 +182,9 @@ body {
   text-decoration: none;
   transition: all 0.2s;
   font-weight: 500;
-}
-
-.nav__dropdown-item:hover {
-  background-color: var(--light);
-  color: var(--primary);
-  padding-left: 1.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav__dropdown-divider {
@@ -257,7 +249,7 @@ body {
 
 .main {
   flex: 1;
-  padding: 2rem 0;
+  padding: 2rem 0; /* Este padding también puede estar causando problemas de alineación */
 }
 
 /* Estilos específicos para dispositivos móviles */
@@ -318,19 +310,12 @@ body {
     box-shadow: none;
     border-radius: 0;
     display: none;
-    animation: none;
     background-color: rgba(0, 75, 135, 0.05);
     margin: 0.2rem 0;
     padding: 0.5rem 0;
-  }
-
-  .nav__dropdown-toggle::after {
-    margin-left: auto;
-  }
-
-  .nav__dropdown-toggle {
     width: 100%;
-    justify-content: space-between;
+    max-width: 100%;
+    min-width: initial; /* Eliminamos el min-width */
   }
 
   .nav__dropdown.active .nav__dropdown-menu {
@@ -339,6 +324,7 @@ body {
 
   .nav__dropdown-item {
     padding-left: 2rem;
+    white-space: normal;
   }
 
   .nav__dropdown-item:hover {
