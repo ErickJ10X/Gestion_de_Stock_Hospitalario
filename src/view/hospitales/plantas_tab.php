@@ -1,14 +1,9 @@
 <?php
-// Este archivo contiene la tabla de plantas y sus formularios
-// Es incluido desde lista_hospitales.php
-
-// Verificar que tenemos acceso a las variables necesarias
 if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !isset($session)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
 ?>
 
-<!-- Contenido de la pestaña Plantas -->
 <div class="table-responsive">
     <table class="list-table">
         <thead>
@@ -57,7 +52,6 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
     </table>
 </div>
 
-<!-- Ventana modal para crear planta -->
 <div id="planta-card-create" class="hospital-card">
     <div class="hospital-card__header hospital-card__header--create">
         <h3 class="hospital-card__title">Nueva Planta</h3>
@@ -93,9 +87,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
     </div>
 </div>
 
-<!-- Modales para edición y eliminación de plantas -->
 <?php foreach ($plantas as $planta): ?>
-    <!-- Ventana modal para editar planta -->
     <div id="planta-card-edit-<?= $planta->getIdPlanta() ?>" class="hospital-card">
         <div class="hospital-card__header hospital-card__header--edit">
             <h3 class="hospital-card__title">Editar Planta</h3>
@@ -134,7 +126,6 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
         </div>
     </div>
 
-    <!-- Ventana modal para eliminar planta -->
     <div id="planta-card-delete-<?= $planta->getIdPlanta() ?>" class="hospital-card">
         <div class="hospital-card__header hospital-card__header--delete">
             <h3 class="hospital-card__title">Eliminar Planta</h3>

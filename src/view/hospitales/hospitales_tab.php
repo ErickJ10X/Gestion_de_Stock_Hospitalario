@@ -1,14 +1,9 @@
 <?php
-// Este archivo contiene la tabla de hospitales y sus formularios
-// Es incluido desde lista_hospitales.php
-
-// Verificar que tenemos acceso a las variables necesarias
 if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
 ?>
 
-<!-- Contenido de la pestaña Hospitales -->
 <div class="table-responsive">
     <table class="list-table">
         <thead>
@@ -53,10 +48,8 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
     </table>
 </div>
 
-<!-- Overlay para ventanas modales -->
 <div class="hospital-overlay"></div>
 
-<!-- Ventana modal para crear hospital -->
 <div id="hospital-card-create" class="hospital-card">
     <div class="hospital-card__header hospital-card__header--create">
         <h3 class="hospital-card__title">Nuevo Hospital</h3>
@@ -83,9 +76,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
     </div>
 </div>
 
-<!-- Modales para edición y eliminación de hospitales -->
 <?php foreach ($hospitales as $hospital): ?>
-    <!-- Ventana modal para editar hospital -->
     <div id="hospital-card-edit-<?= $hospital->getIdHospital() ?>" class="hospital-card">
         <div class="hospital-card__header hospital-card__header--edit">
             <h3 class="hospital-card__title">Editar Hospital</h3>
@@ -113,7 +104,6 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
         </div>
     </div>
     
-    <!-- Ventana modal para eliminar hospital -->
     <div id="hospital-card-delete-<?= $hospital->getIdHospital() ?>" class="hospital-card">
         <div class="hospital-card__header hospital-card__header--delete">
             <h3 class="hospital-card__title">Eliminar Hospital</h3>
