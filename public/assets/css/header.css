@@ -31,8 +31,17 @@ body {
 .container {
   width: 95%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
   padding: 0 15px;
+}
+
+/* Regla específica para el contenedor dentro del header */
+.header .container {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  max-width: 100%;
 }
 
 .header {
@@ -341,6 +350,15 @@ body {
 @media (min-width: 768px) and (max-width: 991px) {
   .container {
     width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+  
+  /* Mantener la regla específica para el header también en tablets */
+  .header .container {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
@@ -348,6 +366,8 @@ body {
 @media (max-width: 767px) {
   .container {
     width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     padding: 0 10px;
   }
 
