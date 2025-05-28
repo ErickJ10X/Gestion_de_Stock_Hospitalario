@@ -70,6 +70,7 @@ include_once(__DIR__ . '/../templates/header.php');
     <div class="tabs-container">
         <div class="tabs-nav">
             <button class="tab-btn active" data-tab="tab-hospitales">Hospitales</button>
+            <button class="tab-btn" data-tab="tab-plantas">Plantas</button>
         </div>
         
         <div class="tab-content">
@@ -117,6 +118,13 @@ include_once(__DIR__ . '/../templates/header.php');
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            
+            <!-- Pestaña Plantas (vacía por el momento) -->
+            <div id="tab-plantas" class="tab-pane">
+                <div class="empty-message">
+                    <p>No hay información de plantas disponible.</p>
                 </div>
             </div>
         </div>
