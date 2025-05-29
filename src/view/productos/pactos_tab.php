@@ -1,5 +1,5 @@
 <?php
-if (!isset($pactos) || !isset($session)) {
+if (!isset($pactos) || !isset($session) || !isset($productos) || !isset($catalogos)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
 ?>
