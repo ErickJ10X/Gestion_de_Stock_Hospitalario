@@ -5,7 +5,7 @@ if (!isset($hospitales) || !isset($plantas) || !isset($botiquines) || !isset($se
 ?>
 
 <div class="list-header__actions">
-    <button id="btn-add-hospital" class="list-button list-button--success">
+    <button id="btn-add-botiquin" class="list-button list-button--success">
         <i class="bi bi-plus-circle"></i> Nuevo
     </button>
 </div>

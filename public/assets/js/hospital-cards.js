@@ -5,10 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const addPlantaButton = document.getElementById('btn-add-planta');
     const addBotiquinButton = document.getElementById('btn-add-botiquin');
     const addAlmacenButton = document.getElementById('btn-add-almacen');
+    const addProductoButton = document.getElementById('btn-add-producto');
+    const addPactoButton = document.getElementById('btn-add-pacto');
+    
     const createHospitalCard = document.getElementById('hospital-card-create');
     const createPlantaCard = document.getElementById('planta-card-create');
     const createBotiquinCard = document.getElementById('botiquin-card-create');
     const createAlmacenCard = document.getElementById('almacen-card-create');
+    const createProductoCard = document.getElementById('producto-card-create');
+    const createPactoCard = document.getElementById('pacto-card-create');
 
     // Log de estados iniciales para verificar
     console.log('Overlay encontrado:', overlay !== null);
@@ -16,10 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Botón agregar planta encontrado:', addPlantaButton !== null);
     console.log('Botón agregar botiquín encontrado:', addBotiquinButton !== null);
     console.log('Botón agregar almacén encontrado:', addAlmacenButton !== null);
+    console.log('Botón agregar producto encontrado:', addProductoButton !== null);
+    console.log('Botón agregar pacto encontrado:', addPactoButton !== null);
     console.log('Card crear hospital encontrada:', createHospitalCard !== null);
     console.log('Card crear planta encontrada:', createPlantaCard !== null);
     console.log('Card crear botiquín encontrada:', createBotiquinCard !== null);
     console.log('Card crear almacén encontrada:', createAlmacenCard !== null);
+    console.log('Card crear producto encontrada:', createProductoCard !== null);
+    console.log('Card crear pacto encontrada:', createPactoCard !== null);
 
     const editHospitalButtons = document.querySelectorAll('.btn-edit-hospital');
     console.log('Botones editar hospital encontrados:', editHospitalButtons.length);
@@ -44,6 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const deleteAlmacenButtons = document.querySelectorAll('.btn-delete-almacen');
     console.log('Botones eliminar almacén encontrados:', deleteAlmacenButtons.length);
+
+    const editPactoButtons = document.querySelectorAll('.btn-edit-pacto');
+    console.log('Botones editar pacto encontrados:', editPactoButtons.length);
+
+    const deletePactoButtons = document.querySelectorAll('.btn-delete-pacto');
+    console.log('Botones eliminar pacto encontrados:', deletePactoButtons.length);
 
     const closeButtons = document.querySelectorAll('.hospital-card__close');
     console.log('Botones cerrar encontrados:', closeButtons.length);
@@ -120,6 +135,24 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Click en botón agregar almacén');
             e.preventDefault();
             showCard(createAlmacenCard);
+        });
+    }
+
+    // Evento para el botón de agregar producto
+    if (addProductoButton) {
+        addProductoButton.addEventListener('click', function(e) {
+            console.log('Click en botón agregar producto');
+            e.preventDefault();
+            showCard(createProductoCard);
+        });
+    }
+
+    // Evento para el botón de agregar pacto
+    if (addPactoButton) {
+        addPactoButton.addEventListener('click', function(e) {
+            console.log('Click en botón agregar pacto');
+            e.preventDefault();
+            showCard(createPactoCard);
         });
     }
 
@@ -231,6 +264,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 showCard(deleteCard);
             } else {
                 console.error(`No se encontró la tarjeta para eliminar almacén con ID: ${almacenId}`);
+            }
+        });
+    });
+
+    // Eventos para los botones de editar pacto
+    editPactoButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón editar pacto');
+            e.preventDefault();
+            const pactoId = this.getAttribute('data-id');
+            const editCard = document.getElementById(`pacto-card-edit-${pactoId}`);
+            if (editCard) {
+                showCard(editCard);
+            } else {
+                console.error(`No se encontró la tarjeta para editar pacto con ID: ${pactoId}`);
+            }
+        });
+    });
+
+    // Eventos para los botones de eliminar pacto
+    deletePactoButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón eliminar pacto');
+            e.preventDefault();
+            const pactoId = this.getAttribute('data-id');
+            const deleteCard = document.getElementById(`pacto-card-delete-${pactoId}`);
+            if (deleteCard) {
+                showCard(deleteCard);
+            } else {
+                console.error(`No se encontró la tarjeta para eliminar pacto con ID: ${pactoId}`);
             }
         });
     });

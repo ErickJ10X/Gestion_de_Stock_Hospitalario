@@ -4,11 +4,11 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
 }
 ?>
 
-    <div class="list-header__actions">
-        <button id="btn-add-hospital" class="list-button list-button--success">
-            <i class="bi bi-plus-circle"></i> Nuevo
-        </button>
-    </div>
+<div class="list-header__actions">
+    <button id="btn-add-planta" class="list-button list-button--success">
+        <i class="bi bi-plus-circle"></i> Nuevo
+    </button>
+</div>
 
 <div class="table-responsive">
     <table class="list-table">
