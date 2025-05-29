@@ -28,6 +28,7 @@ $authGuard->requireHospitalGestor();
 $productos = $productoController->index()['productos'] ?? [];
 $pactos = $pactosController->index()['pactos'] ?? [];
 $plantas = $plantaController->index()['plantas'] ?? [];
+$catalogos = $catalogosController->index()['catalogos'] ?? [];
 
 $pageTitle = "Productos";
 include_once(__DIR__ . '/../templates/header.php');

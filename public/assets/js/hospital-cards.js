@@ -7,28 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const addAlmacenButton = document.getElementById('btn-add-almacen');
     const addProductoButton = document.getElementById('btn-add-producto');
     const addPactoButton = document.getElementById('btn-add-pacto');
-    
+
     const createHospitalCard = document.getElementById('hospital-card-create');
     const createPlantaCard = document.getElementById('planta-card-create');
     const createBotiquinCard = document.getElementById('botiquin-card-create');
     const createAlmacenCard = document.getElementById('almacen-card-create');
     const createProductoCard = document.getElementById('producto-card-create');
     const createPactoCard = document.getElementById('pacto-card-create');
-
-    // Log de estados iniciales para verificar
-    console.log('Overlay encontrado:', overlay !== null);
-    console.log('Botón agregar hospital encontrado:', addHospitalButton !== null);
-    console.log('Botón agregar planta encontrado:', addPlantaButton !== null);
-    console.log('Botón agregar botiquín encontrado:', addBotiquinButton !== null);
-    console.log('Botón agregar almacén encontrado:', addAlmacenButton !== null);
-    console.log('Botón agregar producto encontrado:', addProductoButton !== null);
-    console.log('Botón agregar pacto encontrado:', addPactoButton !== null);
-    console.log('Card crear hospital encontrada:', createHospitalCard !== null);
-    console.log('Card crear planta encontrada:', createPlantaCard !== null);
-    console.log('Card crear botiquín encontrada:', createBotiquinCard !== null);
-    console.log('Card crear almacén encontrada:', createAlmacenCard !== null);
-    console.log('Card crear producto encontrada:', createProductoCard !== null);
-    console.log('Card crear pacto encontrada:', createPactoCard !== null);
 
     const editHospitalButtons = document.querySelectorAll('.btn-edit-hospital');
     console.log('Botones editar hospital encontrados:', editHospitalButtons.length);
@@ -53,6 +38,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const deleteAlmacenButtons = document.querySelectorAll('.btn-delete-almacen');
     console.log('Botones eliminar almacén encontrados:', deleteAlmacenButtons.length);
+
+    const editProductoButtons = document.querySelectorAll('.btn-edit-producto');
+    console.log('Botones editar producto encontrados:', editProductoButtons.length);
+
+    const deleteProductoButtons = document.querySelectorAll('.btn-delete-producto');
+    console.log('Botones eliminar producto encontrados:', deleteProductoButtons.length);
 
     const editPactoButtons = document.querySelectorAll('.btn-edit-pacto');
     console.log('Botones editar pacto encontrados:', editPactoButtons.length);
@@ -264,6 +255,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 showCard(deleteCard);
             } else {
                 console.error(`No se encontró la tarjeta para eliminar almacén con ID: ${almacenId}`);
+            }
+        });
+    });
+
+    // Eventos para los botones de editar producto
+    editProductoButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón editar producto');
+            e.preventDefault();
+            const productoId = this.getAttribute('data-id');
+            const editCard = document.getElementById(`producto-card-edit-${productoId}`);
+            if (editCard) {
+                showCard(editCard);
+            } else {
+                console.error(`No se encontró la tarjeta para editar producto con ID: ${productoId}`);
+            }
+        });
+    });
+
+    // Eventos para los botones de eliminar producto
+    deleteProductoButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón eliminar producto');
+            e.preventDefault();
+            const productoId = this.getAttribute('data-id');
+            const deleteCard = document.getElementById(`producto-card-delete-${productoId}`);
+            if (deleteCard) {
+                showCard(deleteCard);
+            } else {
+                console.error(`No se encontró la tarjeta para eliminar producto con ID: ${productoId}`);
             }
         });
     });
