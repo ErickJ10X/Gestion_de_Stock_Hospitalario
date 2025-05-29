@@ -1,23 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('hospital-cards.js cargado correctamente');
-
     // Elementos DOM
     const overlay = document.querySelector('.hospital-overlay');
     const addHospitalButton = document.getElementById('btn-add-hospital');
     const addPlantaButton = document.getElementById('btn-add-planta');
     const addBotiquinButton = document.getElementById('btn-add-botiquin');
+    const addAlmacenButton = document.getElementById('btn-add-almacen');
     const createHospitalCard = document.getElementById('hospital-card-create');
     const createPlantaCard = document.getElementById('planta-card-create');
     const createBotiquinCard = document.getElementById('botiquin-card-create');
+    const createAlmacenCard = document.getElementById('almacen-card-create');
 
     // Log de estados iniciales para verificar
     console.log('Overlay encontrado:', overlay !== null);
     console.log('Botón agregar hospital encontrado:', addHospitalButton !== null);
     console.log('Botón agregar planta encontrado:', addPlantaButton !== null);
     console.log('Botón agregar botiquín encontrado:', addBotiquinButton !== null);
+    console.log('Botón agregar almacén encontrado:', addAlmacenButton !== null);
     console.log('Card crear hospital encontrada:', createHospitalCard !== null);
     console.log('Card crear planta encontrada:', createPlantaCard !== null);
     console.log('Card crear botiquín encontrada:', createBotiquinCard !== null);
+    console.log('Card crear almacén encontrada:', createAlmacenCard !== null);
 
     const editHospitalButtons = document.querySelectorAll('.btn-edit-hospital');
     console.log('Botones editar hospital encontrados:', editHospitalButtons.length);
@@ -37,6 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteBotiquinButtons = document.querySelectorAll('.btn-delete-botiquin');
     console.log('Botones eliminar botiquín encontrados:', deleteBotiquinButtons.length);
 
+    const editAlmacenButtons = document.querySelectorAll('.btn-edit-almacen');
+    console.log('Botones editar almacén encontrados:', editAlmacenButtons.length);
+
+    const deleteAlmacenButtons = document.querySelectorAll('.btn-delete-almacen');
+    console.log('Botones eliminar almacén encontrados:', deleteAlmacenButtons.length);
+
     const closeButtons = document.querySelectorAll('.hospital-card__close');
     console.log('Botones cerrar encontrados:', closeButtons.length);
 
@@ -54,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         console.log('Mostrando card:', card.id);
-        overlay.classList.add('hospital-overlay--active');
-        card.classList.add('hospital-card--active');
+        overlay.classList.add('hospital-overlay--active'); // Usamos la clase del CSS
+        card.classList.add('hospital-card--active'); // Usamos la clase del CSS
         card.classList.add('hospital-card--animate');
         document.body.style.overflow = 'hidden';
     }
@@ -103,6 +111,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Click en botón agregar botiquín');
             e.preventDefault();
             showCard(createBotiquinCard);
+        });
+    }
+
+    // Evento para el botón de agregar almacén
+    if (addAlmacenButton) {
+        addAlmacenButton.addEventListener('click', function(e) {
+            console.log('Click en botón agregar almacén');
+            e.preventDefault();
+            showCard(createAlmacenCard);
         });
     }
 
@@ -188,6 +205,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Eventos para los botones de editar almacén
+    editAlmacenButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón editar almacén');
+            e.preventDefault();
+            const almacenId = this.getAttribute('data-id');
+            const editCard = document.getElementById(`almacen-card-edit-${almacenId}`);
+            if (editCard) {
+                showCard(editCard);
+            } else {
+                console.error(`No se encontró la tarjeta para editar almacén con ID: ${almacenId}`);
+            }
+        });
+    });
+
+    // Eventos para los botones de eliminar almacén
+    deleteAlmacenButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Click en botón eliminar almacén');
+            e.preventDefault();
+            const almacenId = this.getAttribute('data-id');
+            const deleteCard = document.getElementById(`almacen-card-delete-${almacenId}`);
+            if (deleteCard) {
+                showCard(deleteCard);
+            } else {
+                console.error(`No se encontró la tarjeta para eliminar almacén con ID: ${almacenId}`);
+            }
+        });
+    });
+
     // Eventos para los botones de cerrar
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -222,20 +269,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hideCards();
         }
     });
-
-    // Añadir efecto de fadeOut
-    if (!document.querySelector('style#card-animations')) {
-        console.log('Añadiendo estilos de animación');
-        const styleEl = document.createElement('style');
-        styleEl.id = 'card-animations';
-        styleEl.innerHTML = `
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(styleEl);
-    }
 
     console.log('Inicialización de hospital-cards.js completada');
 });

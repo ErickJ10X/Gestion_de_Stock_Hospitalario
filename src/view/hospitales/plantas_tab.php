@@ -4,6 +4,12 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
 }
 ?>
 
+<div class="list-header__actions">
+    <button id="btn-add-planta" class="list-button list-button--primary">
+        <i class="bi bi-building"></i> Nueva Planta
+    </button>
+</div>
+
 <div class="table-responsive">
     <table class="list-table">
         <thead>

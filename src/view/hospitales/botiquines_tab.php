@@ -4,6 +4,12 @@ if (!isset($hospitales) || !isset($plantas) || !isset($botiquines) || !isset($se
 }
 ?>
 
+<div class="list-header__actions">
+    <button id="btn-add-botiquin" class="list-button list-button--success">
+        <i class="bi bi-plus-circle"></i> Nuevo Botiquín
+    </button>
+</div>
+
 <div class="table-responsive">
     <table class="list-table">
         <thead>

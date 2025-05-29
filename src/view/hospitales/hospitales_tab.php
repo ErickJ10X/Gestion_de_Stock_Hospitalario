@@ -4,6 +4,12 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
 }
 ?>
 
+<div class="list-header__actions">
+    <button id="btn-add-hospital" class="list-button list-button--success">
+        <i class="bi bi-hospital"></i> Nuevo Hospital
+    </button>
+</div>
+
 <div class="table-responsive">
     <table class="list-table">
         <thead>
@@ -47,8 +53,6 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
         </tbody>
     </table>
 </div>
-
-<div class="hospital-overlay"></div>
 
 <div id="hospital-card-create" class="hospital-card">
     <div class="hospital-card__header hospital-card__header--create">

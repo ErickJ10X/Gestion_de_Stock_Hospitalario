@@ -75,6 +75,7 @@
   background: rgba(0, 0, 0, 0.6);
   z-index: 999;
   display: none;
+  backdrop-filter: blur(2px);
 }
 
 .hospital-overlay[style*="display: block"] {

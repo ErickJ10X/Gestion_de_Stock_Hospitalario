@@ -41,7 +41,7 @@ class AlmacenesRepository
         $sql = "SELECT * FROM almacenes";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
-        return $this->mapToAlmacenesArray($stmt->fetchAll(PDO::FETCH_ASSOC));
+        return $this->mapToAlmacenesArray($stmt->fetchAll());
     }
 
     public function findById($id): ?Almacenes

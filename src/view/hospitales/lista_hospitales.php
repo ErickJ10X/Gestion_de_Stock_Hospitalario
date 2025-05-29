@@ -3,9 +3,11 @@ session_start();
 require_once(__DIR__ . '/../../controller/HospitalController.php');
 require_once(__DIR__ . '/../../controller/PlantaController.php');
 require_once(__DIR__ . '/../../controller/BotiquinController.php');
+require_once(__DIR__ . '/../../controller/AlmacenesController.php');
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
 
+use controller\AlmacenesController;
 use controller\HospitalController;
 use controller\PlantaController;
 use controller\BotiquinController;
@@ -15,16 +17,16 @@ use util\AuthGuard;
 $hospitalController = new HospitalController();
 $plantaController = new PlantaController();
 $botiquinController = new BotiquinController();
+$almacenesController = new AlmacenesController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
 $authGuard->requireHospitalGestor();
 
 $hospitales = $hospitalController->index()['hospitales'] ?? [];
-// Descomentar para cargar las plantas
 $plantas = $plantaController->index()['plantas'] ?? [];
-// Descomentar para cargar los botiquines
 $botiquines = $botiquinController->index()['botiquines'] ?? [];
+$almacenes = $almacenesController->index();
 
 $pageTitle = "Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
@@ -35,19 +37,6 @@ include_once(__DIR__ . '/../templates/header.php');
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
 
 <div class="list-container">
-    <div class="list-header">
-        <div class="list-header__actions">
-            <button id="btn-add-hospital" class="list-button list-button--success">
-                <i class="bi bi-hospital"></i> Nuevo Hospital
-            </button>
-            <button id="btn-add-planta" class="list-button list-button--primary">
-                <i class="bi bi-building"></i> Nueva Planta
-            </button>
-            <button id="btn-add-botiquin" class="list-button list-button--info">
-                <i class="bi bi-box"></i> Nuevo Botiquín
-            </button>
-        </div>
-    </div>
 
     <?php if ($session->hasMessage('success')): ?>
         <div class="list-alert list-alert--success">
@@ -65,34 +54,34 @@ include_once(__DIR__ . '/../templates/header.php');
         <?php $session->clearMessage('error'); ?>
     <?php endif; ?>
 
-    <!-- Implementamos el sistema de pestañas -->
     <div class="tabs-container">
         <div class="tabs-nav">
             <button class="tab-btn" data-tab="tab-hospitales">Hospitales</button>
             <button class="tab-btn" data-tab="tab-plantas">Plantas</button>
             <button class="tab-btn active" data-tab="tab-botiquines">Botiquines</button>
+            <button class="tab-btn" data-tab="tab-almacenes">Almacenes</button>
         </div>
 
         <div class="tab-content">
-            <!-- Pestaña Hospitales -->
             <div id="tab-hospitales" class="tab-pane">
                 <?php include_once(__DIR__ . '/hospitales_tab.php'); ?>
             </div>
 
-            <!-- Pestaña Plantas -->
             <div id="tab-plantas" class="tab-pane">
                 <?php include_once(__DIR__ . '/plantas_tab.php'); ?>
             </div>
 
-            <!-- Pestaña Botiquines -->
-            <div id="tab-botiquines" class="tab-pane active">
+            <div id="tab-botiquines" class="tab-pane">
                 <?php include_once(__DIR__ . '/botiquines_tab.php'); ?>
+            </div>
+
+            <div id="tab-almacenes" class="tab-pane">
+                <?php include_once(__DIR__ . '/almacenes_tab.php'); ?>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Overlay para ventanas modales -->
 <div class="hospital-overlay"></div>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>

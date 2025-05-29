@@ -18,7 +18,7 @@ use model\enum\RolEnum;
 <header class="header">
     <div class="container header__container">
         <?php if (!isset($_SESSION['id'])): ?>
-            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Gestor Hospitalario</a>
+            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Pegasus Medical</a>
         <?php else: ?>
             <div class="header__spacer"></div>
         <?php endif; ?>
@@ -33,22 +33,14 @@ use model\enum\RolEnum;
                         <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Inicio</a>
                     </li>
                 <?php else: ?>
-                    <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/admin/dashboard.php">Dashboard</a>
-                    </li>
-                    
                     <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === RolEnum::ADMINISTRADOR)): ?>
                         <li class="nav__item">
                             <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php">Usuarios</a>
                         </li>
                     <?php endif; ?>
-                    
+
                     <li class="nav__item">
                         <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/lista_hospitales.php">Hospitales</a>
-                    </li>
-                    
-                    <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/lista_almacenes.php">Almacenes</a>
                     </li>
 
                     <li class="nav__item">
