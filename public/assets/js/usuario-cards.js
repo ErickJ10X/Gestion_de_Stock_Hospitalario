@@ -1,197 +1,139 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Botones para abrir modales
+    const modalOpenButtons = document.querySelectorAll('.usuario-card-open');
+    modalOpenButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const target = this.getAttribute('data-target');
+            const modal = document.getElementById(target);
+            if (modal) {
+                modal.style.display = 'block';
+                const overlay = document.querySelector('.usuario-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                }
+                
+                // Transferir atributos data al formulario para modales de ubicación
+                if (target === 'editar-ubicacion-modal') {
+                    const idUsuario = this.getAttribute('data-id-usuario');
+                    const tipoUbicacion = this.getAttribute('data-tipo-ubicacion');
+                    const idUbicacion = this.getAttribute('data-id-ubicacion');
+                    
+                    if (idUsuario && tipoUbicacion && idUbicacion) {
+                        const editUsuarioId = document.getElementById('edit_usuario_id');
+                        const editTipoUbicacionOriginal = document.getElementById('edit_tipo_ubicacion_original');
+                        const editUbicacionIdOriginal = document.getElementById('edit_ubicacion_id_original');
+                        const editTipoUbicacion = document.getElementById('edit_tipo_ubicacion');
+                        const editUbicacionId = document.getElementById('edit_ubicacion_id');
+                        
+                        if (editUsuarioId) editUsuarioId.value = idUsuario;
+                        if (editTipoUbicacionOriginal) editTipoUbicacionOriginal.value = tipoUbicacion;
+                        if (editUbicacionIdOriginal) editUbicacionIdOriginal.value = idUbicacion;
+                        if (editTipoUbicacion) editTipoUbicacion.value = tipoUbicacion;
+                        if (editUbicacionId) editUbicacionId.value = idUbicacion;
+                    }
+                }
+                else if (target === 'eliminar-ubicacion-modal') {
+                    const idUsuario = this.getAttribute('data-id-usuario');
+                    const tipoUbicacion = this.getAttribute('data-tipo-ubicacion');
+                    const idUbicacion = this.getAttribute('data-id-ubicacion');
+                    const nombreUsuario = this.getAttribute('data-nombre-usuario');
+                    
+                    if (idUsuario && tipoUbicacion && idUbicacion) {
+                        const deleteUsuarioNombre = document.getElementById('delete-usuario-nombre');
+                        const deleteTipoUbicacionTexto = document.getElementById('delete-tipo-ubicacion-texto');
+                        const deleteUbicacionId = document.getElementById('delete-ubicacion-id');
+                        const deleteUsuarioId = document.getElementById('delete_usuario_id');
+                        const deleteTipoUbicacion = document.getElementById('delete_tipo_ubicacion');
+                        const deleteUbicacionId2 = document.getElementById('delete_ubicacion_id');
+                        
+                        if (deleteUsuarioNombre) deleteUsuarioNombre.textContent = nombreUsuario;
+                        if (deleteTipoUbicacionTexto) deleteTipoUbicacionTexto.textContent = getTipoUbicacionLabel(tipoUbicacion);
+                        if (deleteUbicacionId) deleteUbicacionId.textContent = idUbicacion;
+                        if (deleteUsuarioId) deleteUsuarioId.value = idUsuario;
+                        if (deleteTipoUbicacion) deleteTipoUbicacion.value = tipoUbicacion;
+                        if (deleteUbicacionId2) deleteUbicacionId2.value = idUbicacion;
+                    }
+                }
+            }
+        });
+    });
+
+    // Botones para cerrar modales
+    const modalCloseButtons = document.querySelectorAll('.usuario-card__close, .usuario-form__button--cancel');
+    modalCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.usuario-card');
+            if (modal) {
+                modal.style.display = 'none';
+                const overlay = document.querySelector('.usuario-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    // Cerrar modal al hacer clic en el overlay
     const overlay = document.querySelector('.usuario-overlay');
-    const addButton = document.getElementById('btn-add-usuario');
-    const createCard = document.getElementById('usuario-card-create');
-    const editButtons = document.querySelectorAll('.btn-edit-usuario');
-    const deleteButtons = document.querySelectorAll('.btn-delete-usuario');
-    const viewUbicacionesButtons = document.querySelectorAll('.btn-view-ubicaciones');
-    const asignUbicacionButtons = document.querySelectorAll('.btn-asign-ubicacion');
-    const closeButtons = document.querySelectorAll('.usuario-card__close');
-    const cancelButtons = document.querySelectorAll('.usuario-form__button--cancel');
-    const alertCloseButtons = document.querySelectorAll('.list-alert__close');
-    
-    // Función para mostrar una tarjeta modal con animación
-    function showCard(card) {
-        overlay.classList.add('usuario-overlay--active');
-        card.classList.add('usuario-card--active');
-        card.classList.add('usuario-card--animate');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    // Función para ocultar todas las tarjetas modales
-    function hideCards() {
-        const activeCards = document.querySelectorAll('.usuario-card--active');
-        overlay.classList.remove('usuario-overlay--active');
-        activeCards.forEach(card => {
-            card.classList.remove('usuario-card--active');
-        });
-        document.body.style.overflow = '';
-    }
-    
-    // Evento para el botón de agregar usuario
-    if (addButton) {
-        addButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            showCard(createCard);
-        });
-    }
-    
-    // Eventos para los botones de editar usuario
-    editButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const usuarioId = this.getAttribute('data-id');
-            const editCard = document.getElementById(`usuario-card-edit-${usuarioId}`);
-            if (editCard) {
-                showCard(editCard);
-            }
-        });
-    });
-    
-    // Eventos para los botones de eliminar usuario
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const usuarioId = this.getAttribute('data-id');
-            const deleteCard = document.getElementById(`usuario-card-delete-${usuarioId}`);
-            if (deleteCard) {
-                showCard(deleteCard);
-            }
-        });
-    });
-    
-    // Eventos para los botones de ver ubicaciones
-    viewUbicacionesButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const usuarioId = this.getAttribute('data-id');
-            const ubicacionesCard = document.getElementById(`ubicaciones-card-${usuarioId}`);
-            if (ubicacionesCard) {
-                showCard(ubicacionesCard);
-            }
-        });
-    });
-    
-    // Eventos para los botones de asignar ubicaciones
-    asignUbicacionButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const usuarioId = this.getAttribute('data-id');
-            window.location.href = `/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/asignar-ubicaciones.php?id=${usuarioId}`;
-        });
-    });
-    
-    // Eventos para los botones de cerrar
-    closeButtons.forEach(button => {
-        button.addEventListener('click', hideCards);
-    });
-    
-    // Eventos para los botones de cancelar
-    cancelButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            hideCards();
-        });
-    });
-    
-    // Cerrar al hacer clic en el overlay (solo si se hace clic directamente sobre él)
     if (overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                hideCards();
-            }
+        overlay.addEventListener('click', function() {
+            document.querySelectorAll('.usuario-card').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            this.style.display = 'none';
         });
     }
     
-    // Cerrar al presionar ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            hideCards();
-        }
-    });
-    
-    // Validar formulario de creación
-    const formCrearUsuario = document.getElementById('form-crear-usuario');
-    if (formCrearUsuario) {
-        formCrearUsuario.addEventListener('submit', function(e) {
-            const password = document.getElementById('contrasena-create').value;
-            const confirmPassword = document.getElementById('confirmar_contrasena-create').value;
-            
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Las contraseñas no coinciden');
-                return false;
-            }
-            
-            if (password.length < 8) {
-                e.preventDefault();
-                alert('La contraseña debe tener al menos 8 caracteres');
-                return false;
-            }
-        });
-    }
-    
-    // Validar formularios de edición
-    const editForms = document.querySelectorAll('[id^="form-editar-usuario-"]');
-    editForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const userId = form.querySelector('input[name="id"]').value;
-            const passwordField = document.getElementById(`contrasena-edit-${userId}`);
-            const confirmPasswordField = document.getElementById(`confirmar_contrasena-edit-${userId}`);
-            
-            if (passwordField && confirmPasswordField) {
-                const password = passwordField.value;
-                const confirmPassword = confirmPasswordField.value;
-                
-                if (password !== '' && password !== confirmPassword) {
-                    e.preventDefault();
-                    alert('Las contraseñas no coinciden');
-                    return false;
-                }
-                
-                if (password !== '' && password.length < 8) {
-                    e.preventDefault();
-                    alert('La contraseña debe tener al menos 8 caracteres');
-                    return false;
-                }
-            }
-        });
-    });
-    
-    // Cerrar alertas manualmente
+    // Cerrar alertas al hacer clic en el botón de cierre
+    const alertCloseButtons = document.querySelectorAll('.list-alert__close');
     alertCloseButtons.forEach(button => {
         button.addEventListener('click', function() {
             const alert = this.closest('.list-alert');
             if (alert) {
-                alert.style.animation = 'fadeOut 0.3s forwards';
-                setTimeout(function() {
-                    alert.style.display = 'none';
-                }, 300);
+                alert.style.display = 'none';
             }
         });
     });
     
-    // Auto-cerrar alertas después de 5 segundos
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.list-alert');
-        alerts.forEach(function(alert) {
-            alert.style.animation = 'fadeOut 0.3s forwards';
-            setTimeout(function() {
-                alert.style.display = 'none';
-            }, 300);
-        });
-    }, 5000);
-    
-    // Añadir efecto de fadeOut
-    if (!document.querySelector('style#card-animations')) {
-        const styleEl = document.createElement('style');
-        styleEl.id = 'card-animations';
-        styleEl.innerHTML = `
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
+    // Validar formulario de usuarios
+    const formCrearUsuario = document.getElementById('form-crear-usuario');
+    if (formCrearUsuario) {
+        formCrearUsuario.addEventListener('submit', function(event) {
+            const contrasena = document.getElementById('contrasena-create').value;
+            const confirmarContrasena = document.getElementById('confirmar_contrasena-create').value;
+            
+            if (contrasena !== confirmarContrasena) {
+                event.preventDefault();
+                alert('Las contraseñas no coinciden');
             }
-        `;
-        document.head.appendChild(styleEl);
+        });
+    }
+    
+    // Validación de formularios de edición
+    document.querySelectorAll('[id^="form-editar-usuario-"]').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            const idUsuario = this.querySelector('[name="id"]').value;
+            const contrasena = document.getElementById(`contrasena-edit-${idUsuario}`).value;
+            const confirmarContrasena = document.getElementById(`confirmar_contrasena-edit-${idUsuario}`).value;
+            
+            if (contrasena !== '' && contrasena !== confirmarContrasena) {
+                event.preventDefault();
+                alert('Las contraseñas no coinciden');
+            }
+        });
+    });
+    
+    // Función auxiliar para obtener etiqueta de tipo de ubicación
+    function getTipoUbicacionLabel(tipo) {
+        switch (tipo) {
+            case 'hospital':
+                return 'Hospital';
+            case 'planta':
+                return 'Planta';
+            case 'botiquin':
+                return 'Botiquín';
+            default:
+                return tipo;
+        }
     }
 });
