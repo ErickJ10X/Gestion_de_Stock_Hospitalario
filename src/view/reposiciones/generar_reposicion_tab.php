@@ -1,6 +1,7 @@
 <?php
-// Esta pestaña permite al usuario generar nuevas órdenes de reposición
-// utilizando los datos de productos, almacenes y botiquines
+if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) || !isset($botiquines)) {
+    die('No se puede acceder directamente a este archivo.');
+}
 ?>
 
 <div class="tab-header">

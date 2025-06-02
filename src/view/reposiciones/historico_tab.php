@@ -2,7 +2,7 @@
 // Esta pestaña muestra el histórico de reposiciones realizadas
 
 if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) || !isset($botiquines)) {
-    die('No se puede acceder directamente a este archivo.');;
+    die('No se puede acceder directamente a este archivo.');
 }
 // Obtener todas las reposiciones y ordenarlas por fecha (más reciente primero)
 $historialReposiciones = $reposicionesController->index()['reposiciones'] ?? [];
