@@ -60,6 +60,7 @@ include_once(__DIR__ . '/../templates/header.php');
         <div class="tabs-nav">
             <button class="tab-btn active" data-tab="tab-productos">Productos</button>
             <button class="tab-btn" data-tab="tab-pactos">Pactos</button>
+            <button class="tab-btn" data-tab="tab-catalogos">Catálogos por Planta</button>
         </div>
 
         <div class="tab-content">
@@ -69,6 +70,10 @@ include_once(__DIR__ . '/../templates/header.php');
 
             <div id="tab-pactos" class="tab-pane">
                 <?php include_once(__DIR__ . '/pactos_tab.php'); ?>
+            </div>
+            
+            <div id="tab-catalogos" class="tab-pane">
+                <?php include_once(__DIR__ . '/catalogos_productos_tab.php'); ?>
             </div>
         </div>
     </div>
