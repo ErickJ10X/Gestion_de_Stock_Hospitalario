@@ -1,3 +1,9 @@
+<?php
+if (!isset($botiquines) || !isset($botiquinController) || !isset($productoController) || !isset($lecturas)) {
+    echo '<p>Error: Datos necesarios no disponibles.</p>';
+    exit;
+}
+?>
 <div class="card-container">
     <div class="card-form">
         <h2>Histórico de Lecturas de Stock</h2>
