@@ -231,7 +231,8 @@ class UsuarioController
         return 'unknown';
     }
 
-    public function getUserById($id) {
+    public function getUserById($id): ?\model\entity\Usuario
+    {
         try {
             $usuario = $this->userService->getUserById($id);
             if ($usuario) {

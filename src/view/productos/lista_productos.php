@@ -81,7 +81,7 @@ include_once(__DIR__ . '/../templates/header.php');
 
 <div class="hospital-overlay"></div>
 
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>
+<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/productos.js"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>

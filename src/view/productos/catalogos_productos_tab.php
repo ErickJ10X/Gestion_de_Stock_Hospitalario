@@ -66,8 +66,8 @@ if (!isset($plantas)) {
             productosTable.style.display = 'none';
             errorMessage.style.display = 'none';
 
-            // Realizar la petición AJAX
-            fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/api/catalogos_productos.php?planta_id=${plantaId}`)
+            // Realizar la petición AJAX - Actualizando la URL para usar el nuevo archivo
+            fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/api/catalogo_producto-actions.php?planta_id=${plantaId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
@@ -137,7 +137,8 @@ if (!isset($plantas)) {
         });
 
         function eliminarProductoCatalogo(catalogoId, plantaId) {
-            fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/api/catalogos_productos.php', {
+            // Actualizando la URL para usar el nuevo archivo
+            fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/api/catalogo_producto-actions.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

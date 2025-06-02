@@ -48,7 +48,7 @@ use model\enum\RolEnum;
                     </li>
                     
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/stock/gestion_stock.php">Stock</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/lecturaStock/lista_lectura_stock.php">Stock</a>
                     </li>
                     
                     <li class="nav__item">
