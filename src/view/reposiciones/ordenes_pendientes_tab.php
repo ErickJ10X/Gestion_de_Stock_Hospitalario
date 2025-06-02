@@ -1,5 +1,7 @@
 <?php
-// Obtener todas las reposiciones disponibles
+if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) || !isset($botiquines)) {
+    die("Error: Variables no definidas. Asegúrese de que el controlador y los datos necesarios estén correctamente inicializados.");
+}
 $reposiciones = $reposicionesController->index()['reposiciones'] ?? [];
 ?>
 
