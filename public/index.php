@@ -1,9 +1,9 @@
 <?php
 session_start();
 include('../src/view/templates/header.php');
-require_once('../src/model/enum/RolEnum.php');
+require_once('../src/enum/RolEnum.php');
 
-use src\enum\RolEnum;
+use models\enum\RolEnum;
 
 ?>
 

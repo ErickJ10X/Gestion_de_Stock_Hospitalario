@@ -2,10 +2,30 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require_once(__DIR__ . '/../../model/enum/RolEnum.php');
+require_once(__DIR__ . '/../../enum/RolEnum.php');
+require_once(__DIR__ . '/../../util/Session.php');
 
-use src\enum\RolEnum;
+use models\enum\RolEnum;
+use util\Session;
 
+// Usar la clase Session para manejar los datos del usuario de forma más segura
+$session = new Session();
+$isLoggedIn = $session->isLoggedIn();
+$userName = '';
+$userRole = '';
+
+if ($isLoggedIn) {
+    // Mantener compatibilidad con el código existente
+    if (!isset($_SESSION['id']) && $session->getUserData('id')) {
+        $_SESSION['id'] = $session->getUserData('id');
+        $_SESSION['nombre'] = $session->getUserData('nombre');
+        $_SESSION['email'] = $session->getUserData('email');
+        $_SESSION['rol'] = $session->getUserData('rol');
+    }
+    
+    $userName = htmlspecialchars($_SESSION['nombre'] ?? $session->getUserData('nombre') ?? 'Usuario');
+    $userRole = $_SESSION['rol'] ?? $session->getUserData('rol') ?? '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -13,14 +33,20 @@ use src\enum\RolEnum;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Hospitalario</title>
+    <!-- Incorporar todos los archivos CSS disponibles -->
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/header.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/catalogo-productos.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/usuarios.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
 <header class="header">
     <div class="container header__container">
-        <?php if (!isset($_SESSION['id'])): ?>
-            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Pegasus Medical</a>
+        <?php if (!$isLoggedIn): ?>
+            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/index.php">Pegasus Medical</a>
         <?php else: ?>
             <div class="header__spacer"></div>
         <?php endif; ?>
@@ -30,12 +56,12 @@ use src\enum\RolEnum;
         
         <nav class="nav" id="mainNav">
             <ul class="nav__list">
-                <?php if (!isset($_SESSION['id'])): ?>
+                <?php if (!$isLoggedIn): ?>
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/index.php">Inicio</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/index.php">Inicio</a>
                     </li>
                 <?php else: ?>
-                    <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === RolEnum::ADMINISTRADOR)): ?>
+                    <?php if ($userRole === RolEnum::ADMINISTRADOR): ?>
                         <li class="nav__item">
                             <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php">Usuarios</a>
                         </li>
@@ -72,10 +98,10 @@ use src\enum\RolEnum;
             </ul>
 
             <ul class="nav__list nav__user-list">
-                <?php if (isset($_SESSION['id'])): ?>
+                <?php if ($isLoggedIn): ?>
                     <li class="nav__item nav__dropdown">
                         <a class="nav__link nav__dropdown-toggle" href="#" id="userDropdown">
-                            <i class="bi bi-person-circle"></i> <?= isset($_SESSION['nombre']) ? htmlspecialchars($_SESSION['nombre']) : 'Usuario' ?>
+                            <i class="bi bi-person-circle"></i> <?= $userName ?>
                         </a>
                         <div class="nav__dropdown-menu">
                             <a class="nav__dropdown-item" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/user/profile.php">Perfil</a>
@@ -113,3 +139,25 @@ use src\enum\RolEnum;
 </header>
 
 <main class="main container">
+
+<script>
+// Toggle para el menú móvil
+document.addEventListener('DOMContentLoaded', function() {
+    const navToggle = document.getElementById('navToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (navToggle) {
+        navToggle.addEventListener('click', function() {
+            mainNav.classList.toggle('nav--active');
+        });
+    }
+    
+    // Cerrar alertas
+    const alertCloseButtons = document.querySelectorAll('.alert__close');
+    alertCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.parentElement.style.display = 'none';
+        });
+    });
+});
+</script>

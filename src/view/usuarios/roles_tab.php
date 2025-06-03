@@ -1,8 +1,8 @@
 <?php
 
-use src\enum\RolEnum;
+use models\enum\RolEnum;
 
-if (!isset($usuarios) || !method_exists('src\enum\RolEnum', 'getValues')) {
+if (!isset($usuarios) || !method_exists('models\enum\RolEnum', 'getValues')) {
     die("Error: No se han proporcionado las variables o clases requeridas.");
 }
 ?>

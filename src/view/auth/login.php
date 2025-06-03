@@ -22,25 +22,25 @@ include('../templates/header.php');
         <div>
             <div>
                 <h2>Iniciar Sesión</h2>
-                
+
                 <?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'; ?>
                     </div>
                 <?php endif; ?>
-                
+
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Operación completada con éxito.'; ?>
                     </div>
                 <?php endif; ?>
-                
+
                 <?php if (isset($_GET['warning'])): ?>
                     <div class="alert alert-warning">
                         <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Atención: se requiere acción.'; ?>
                     </div>
                 <?php endif; ?>
-                
+
                 <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php" method="post" class="main__form">
                     <div>
                         <label for="email">Email</label>

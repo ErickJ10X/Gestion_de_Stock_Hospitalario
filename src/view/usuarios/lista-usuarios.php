@@ -8,7 +8,7 @@ require_once(__DIR__ . '/../../controller/Usuario_UbicacionesController.php');
 
 use controller\Usuario_UbicacionesController;
 use controller\UsuarioController;
-use src\enum\RolEnum;
+use models\enum\RolEnum;
 use util\AuthGuard;
 use util\Session;
 

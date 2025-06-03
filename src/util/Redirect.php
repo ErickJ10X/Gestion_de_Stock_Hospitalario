@@ -33,4 +33,11 @@ class Redirect
         $session->setMessage('success', $message);
         self::to($url);
     }
+
+    public static function withWarning(string $string, string $string1)
+    {
+        $session = new Session();
+        $session->setMessage('warning', $string1);
+        self::to($string);
+    }
 }
