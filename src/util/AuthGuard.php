@@ -6,7 +6,7 @@ require_once __DIR__ . '/../model/enum/RolEnum.php';
 require_once __DIR__ . '/Redirect.php';
 require_once __DIR__ . '/Session.php';
 
-use model\enum\RolEnum;
+use src\enum\RolEnum;
 
 class AuthGuard
 {

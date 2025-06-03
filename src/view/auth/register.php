@@ -2,7 +2,6 @@
 
 use controller\AuthController;
 use util\AuthGuard;
-use model\enum\RolEnum;
 
 session_start();
 require_once(__DIR__ . '/../../controller/AuthController.php');
