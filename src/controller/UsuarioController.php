@@ -292,6 +292,24 @@ class UsuarioController
     }
 
     /**
+     * Prepara todos los datos necesarios para la vista de usuarios
+     * @return array Datos para la vista
+     */
+    public function prepareDataForView(): array
+    {
+        $viewData = [];
+
+        try {
+            $viewData['usuarios'] = $this->userService->getAllUsuarios();
+            $viewData['ubicaciones'] = $this->userUbicacionService->getAllUsuarioUbicaciones();
+            return $viewData;
+        } catch (Exception $e) {
+            $this->session->setMessage('error', "Error al cargar datos: " . $e->getMessage());
+            return $viewData;
+        }
+    }
+
+    /**
      * Maneja las acciones del formulario de usuarios
      */
     public function handleAction(string $action = null): void
@@ -299,11 +317,11 @@ class UsuarioController
         if (!$action && isset($_POST['action'])) {
             $action = $_POST['action'];
         }
-        
+
         if (!$action) {
             $this->redirectToList('error', 'Acción no especificada');
         }
-        
+
         switch ($action) {
             case 'crear':
                 $this->handleCreateUser();
@@ -330,15 +348,15 @@ class UsuarioController
         $contrasena = isset($_POST['contrasena']) ? $_POST['contrasena'] : '';
         $confirmarContrasena = isset($_POST['confirmar_contrasena']) ? $_POST['confirmar_contrasena'] : '';
         $rol = isset($_POST['rol']) ? $_POST['rol'] : '';
-        
+
         if (empty($nombre) || empty($email) || empty($contrasena) || empty($confirmarContrasena) || empty($rol)) {
             $this->redirectToList('modal_error', 'Todos los campos son obligatorios');
         }
-        
+
         if ($contrasena !== $confirmarContrasena) {
             $this->redirectToList('modal_error', 'Las contraseñas no coinciden');
         }
-        
+
         try {
             $this->register($nombre, $email, $contrasena, $rol);
             $this->redirectToList('success', 'Usuario creado correctamente');
@@ -359,21 +377,21 @@ class UsuarioController
         $confirmarContrasena = isset($_POST['confirmar_contrasena']) ? $_POST['confirmar_contrasena'] : '';
         $rol = isset($_POST['rol']) ? $_POST['rol'] : '';
         $activo = isset($_POST['activo']) ? (int)$_POST['activo'] : 1;
-        
+
         if ($id <= 0 || empty($nombre) || empty($email) || empty($rol)) {
             $this->redirectToList('modal_error_edit_' . $id, 'El ID, nombre, email y rol son obligatorios');
         }
-        
+
         if (!empty($contrasena) && $contrasena !== $confirmarContrasena) {
             $this->redirectToList('modal_error_edit_' . $id, 'Las contraseñas no coinciden');
         }
-        
+
         try {
             $usuario = $this->getUserById($id);
             if (!$usuario) {
                 throw new \Exception("Usuario no encontrado");
             }
-            
+
             $this->updateProfile(
                 $id,
                 $nombre,
@@ -382,11 +400,11 @@ class UsuarioController
                 $rol,
                 null
             );
-            
+
             if ($usuario->getActivo() != $activo) {
                 $this->userService->updateActivo($id, $activo);
             }
-            
+
             $this->redirectToList('success', 'Usuario actualizado correctamente');
         } catch (\Exception $e) {
             $this->redirectToList('modal_error_edit_' . $id, $e->getMessage());
@@ -399,11 +417,11 @@ class UsuarioController
     public function handleDeleteUser(): void
     {
         $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-        
+
         if ($id <= 0) {
             $this->redirectToList('error', 'ID de usuario no válido');
         }
-        
+
         try {
             $this->deleteUser($id);
             $this->redirectToList('success', 'Usuario eliminado correctamente');
@@ -411,14 +429,14 @@ class UsuarioController
             $this->redirectToList('error', $e->getMessage());
         }
     }
-    
+
     /**
      * Redirecciona a la lista de usuarios con un mensaje
      */
     private function redirectToList(string $messageType, string $message): void
     {
         $this->session->setMessage($messageType, $message);
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php');
+        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/');
         exit;
     }
 }

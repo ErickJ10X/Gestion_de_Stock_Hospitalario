@@ -1,26 +1,28 @@
 <?php
 session_start();
 require_once(__DIR__ . '/../../controller/UsuarioController.php');
+require_once(__DIR__ . '/../../controller/Usuario_UbicacionesController.php');
 require_once(__DIR__ . '/../../model/enum/RolEnum.php');
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
-require_once(__DIR__ . '/../../controller/Usuario_UbicacionesController.php');
 
-use controller\Usuario_UbicacionesController;
 use controller\UsuarioController;
 use model\enum\RolEnum;
 use util\Session;
 use util\AuthGuard;
 
+// Inicializar controladores y utilidades
 $usuarioController = new UsuarioController();
-$usuarioUbicacionController = new Usuario_UbicacionesController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
+// Verificar permisos
 $authGuard->requireAdministrador();
 
-$usuarios = $usuarioController->getAllUsers();
-$ubicaciones = $usuarioUbicacionController->getAllUsuarioUbicaciones();
+// Obtener datos para la vista desde el controlador
+$viewData = $usuarioController->prepareDataForView();
+$usuarios = $viewData['usuarios'] ?? [];
+$ubicaciones = $viewData['ubicaciones'] ?? [];
 
 $pageTitle = "Usuarios";
 include_once(__DIR__ . '/../templates/header.php');
@@ -58,62 +60,26 @@ include_once(__DIR__ . '/../templates/header.php');
     <div class="tabs-container">
         <div class="tabs-nav">
             <button class="tab-btn active" data-tab="tab-usuarios">Usuarios</button>
-            <button class="tab-btn" data-tab="tab-ubicaciones">Ubicaciones</button>
-            <button class="tab-btn" data-tab="tab-roles">Roles</button>
+            <button class="tab-btn" data-tab="tab-crear-editar">Crear/Editar</button>
+            <button class="tab-btn" data-tab="tab-ubicaciones">Asignar Ubicaciones</button>
         </div>
 
         <div class="tab-content">
             <div id="tab-usuarios" class="tab-pane active">
-                <?php include_once(__DIR__ . '/usuarios_tab.php'); ?>
+                <?php include_once(__DIR__ . '/listUsers_tab.php'); ?>
+            </div>
+
+            <div id="tab-crear-editar" class="tab-pane">
+                <?php include_once(__DIR__ . '/crearEditar_tab.php'); ?>
             </div>
 
             <div id="tab-ubicaciones" class="tab-pane">
-                <?php include_once(__DIR__ . '/ubicaciones_tab.php'); ?>
-            </div>
-
-            <div id="tab-roles" class="tab-pane">
-                <?php include_once(__DIR__ . '/roles_tab.php'); ?>
+                <?php include_once(__DIR__ . '/asignarUbicaciones_tab.php'); ?>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Overlay para ventanas modales -->
-<div class="usuario-overlay"></div>
-
-<?php
-function getBadgeColorForRole($role)
-{
-    switch ($role) {
-        case RolEnum::ADMINISTRADOR:
-            return 'danger';
-        case RolEnum::GESTOR_GENERAL:
-            return 'primary';
-        case RolEnum::GESTOR_HOSPITAL:
-            return 'success';
-        case RolEnum::GESTOR_PLANTA:
-            return 'info';
-        case RolEnum::USUARIO_BOTIQUIN:
-            return 'secondary';
-        default:
-            return 'dark';
-    }
-}
-
-function getTipoUbicacion($tipo)
-{
-    switch ($tipo) {
-        case 'hospital':
-            return 'Hospital';
-        case 'planta':
-            return 'Planta';
-        case 'botiquin':
-            return 'Botiquín';
-        default:
-            return ucfirst($tipo);
-    }
-}
-?>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario-cards.js?v=<?= time() ?>"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js?v=<?= time() ?>"></script>

@@ -25,56 +25,31 @@ class AlmacenesController
         }
     }
 
+    public function getByPlanta($plantaId): array
+    {
+        try {
+            if (!is_numeric($plantaId) || $plantaId <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            }
+            
+            return $this->almacenesService->getAlmacenesByPlanta($plantaId);
+        } catch (Exception $e) {
+            return ['error' => true, 'mensaje' => $e->getMessage()];
+        }
+    }
+
     public function show($id): array
     {
         try {
+            if (!is_numeric($id) || $id <= 0) {
+                return ['error' => true, 'mensaje' => 'ID de almacén inválido'];
+            }
+            
             $almacen = $this->almacenesService->getAlmacenById($id);
             if ($almacen) {
                 return ['error' => false, 'almacen' => $almacen];
             } else {
                 return ['error' => true, 'mensaje' => 'Almacén no encontrado'];
-            }
-        } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
-        }
-    }
-
-    public function store($planta_id, $tipo, $id_hospital): array
-    {
-        try {
-            $resultado = $this->almacenesService->createAlmacen($planta_id, $tipo, $id_hospital);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén creado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo crear el almacén'];
-            }
-        } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
-        }
-    }
-
-    public function update($id, $planta_id, $tipo, $id_hospital): array
-    {
-        try {
-            $resultado = $this->almacenesService->updateAlmacen($id, $planta_id, $tipo, $id_hospital);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén actualizado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo actualizar el almacén'];
-            }
-        } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
-        }
-    }
-
-    public function destroy($id): array
-    {
-        try {
-            $resultado = $this->almacenesService->deleteAlmacen($id);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén eliminado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo eliminar el almacén'];
             }
         } catch (Exception $e) {
             return ['error' => true, 'mensaje' => $e->getMessage()];

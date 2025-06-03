@@ -35,7 +35,7 @@ use model\enum\RolEnum;
                 <?php else: ?>
                     <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === RolEnum::ADMINISTRADOR)): ?>
                         <li class="nav__item">
-                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/lista-usuarios.php">Usuarios</a>
+                            <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios">Usuarios</a>
                         </li>
                     <?php endif; ?>
 
@@ -60,12 +60,9 @@ use model\enum\RolEnum;
                     </li>
                     
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/informes/panel_informes.php">Informes</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/informes">Informes</a>
                     </li>
-                    
-                    <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/configuracion/ajustes.php">Configuración</a>
-                    </li>
+
                 <?php endif; ?>
             </ul>
 

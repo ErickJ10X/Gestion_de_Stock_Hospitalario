@@ -2,79 +2,83 @@
 
 namespace model\service;
 
-require_once __DIR__ . '/../repository/PlantasRepository.php';
-require_once __DIR__ . '/../entity/Plantas.php';
-
-use model\repository\PlantasRepository;
-use model\entity\Plantas;
 use Exception;
+use PDO;
+use PDOException;
+use model\entity\Plantas;
+require_once(__DIR__ . '/../../../config/database.php');
+require_once(__DIR__ . '/../entity/Plantas.php');
 
 class PlantaService
 {
-    private PlantasRepository $plantasRepository;
+    private PDO $conexion;
 
     public function __construct()
     {
-        $this->plantasRepository = new PlantasRepository();
+        $this->conexion = getConnection();
     }
 
     public function getAllPlantas(): array
     {
         try {
-            return $this->plantasRepository->findAll();
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getAllPlantas: " . $e->getMessage());
-            throw new Exception("Error al obtener las plantas: " . $e->getMessage());
+            $stmt = $this->conexion->query("SELECT * FROM plantas ORDER BY nombre");
+            $plantas = [];
+            
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $plantas[] = new Plantas(
+                    $row['id_planta'],
+                    $row['nombre'],
+                    $row['id_hospital']
+                );
+            }
+            
+            return $plantas;
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener todas las plantas: " . $e->getMessage());
+        }
+    }
+
+    public function getPlantasByHospital($hospitalId): array
+    {
+        try {
+            $stmt = $this->conexion->prepare("SELECT * FROM plantas WHERE id_hospital = :hospital_id ORDER BY nombre");
+            $stmt->bindParam(':hospital_id', $hospitalId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $plantas = [];
+            
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $plantas[] = new Plantas(
+                    $row['id_planta'],
+                    $row['nombre'],
+                    $row['id_hospital']
+                );
+            }
+            
+            return $plantas;
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener plantas por hospital: " . $e->getMessage());
         }
     }
 
     public function getPlantaById($id): ?Plantas
     {
         try {
-            return $this->plantasRepository->findById($id);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getPlantaById: " . $e->getMessage());
+            $stmt = $this->conexion->prepare("SELECT * FROM plantas WHERE id_planta = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return new Plantas(
+                    $row['id_planta'],
+                    $row['nombre'],
+                    $row['id_hospital']
+                );
+            }
+            
             return null;
-        }
-    }
-
-    public function getPlantasByHospitalId($hospitalId): array
-    {
-        try {
-            return $this->plantasRepository->findByHospitalId($hospitalId);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getPlantasByHospitalId: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function savePlanta(Plantas $planta): bool
-    {
-        try {
-            return $this->plantasRepository->save($planta);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::savePlanta: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function updatePlanta(Plantas $planta): bool
-    {
-        try {
-            return $this->plantasRepository->update($planta);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::updatePlanta: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function deletePlanta($id): bool
-    {
-        try {
-            return $this->plantasRepository->delete($id);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::deletePlanta: " . $e->getMessage());
-            return false;
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener planta por ID: " . $e->getMessage());
         }
     }
 }
