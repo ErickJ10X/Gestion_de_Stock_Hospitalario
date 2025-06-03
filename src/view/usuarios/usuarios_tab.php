@@ -1,6 +1,6 @@
 <?php
 
-use models\enum\RolEnum;
+use model\enum\RolEnum;
 
 if (!isset($usuarios) || !isset($usuarioController) || !isset($session) || !isset($usuarioUbicacionController)) {
     die("Error: No se han proporcionado las variables requeridas.");

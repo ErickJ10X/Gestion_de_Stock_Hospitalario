@@ -62,7 +62,8 @@ class UsuarioRepository {
         
         // Cargar las ubicaciones asociadas al usuario
         $stmtUbicaciones = $this->conexion->prepare("SELECT * FROM usuario_ubicacion WHERE id_usuario = :id_usuario");
-        $stmtUbicaciones->bindParam(':id_usuario', $usuario->getIdUsuario());
+        $idUsuario = $usuario->getIdUsuario();
+        $stmtUbicaciones->bindParam(':id_usuario', $idUsuario);
         $stmtUbicaciones->execute();
         
         $ubicaciones = [];
