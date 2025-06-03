@@ -62,11 +62,11 @@ function procesarCrear() {
     $nombre = $_POST['nombre'] ?? '';
     $idHospital = $_POST['id_hospital'] ?? 0;
     
-    // Verificar que PlantaController tenga el método create
+    // Verificar que PlantaController tenga el méto do create
     if (method_exists($plantaController, 'create')) {
         $resultado = $plantaController->create($nombre, $idHospital);
     } else {
-        // Alternativa si no existe el método create
+        // Alternativa si no existe el méto do create
         try {
             if (empty(trim($nombre))) {
                 throw new Exception("El nombre de la planta es obligatorio");
@@ -113,11 +113,11 @@ function procesarEditar() {
     $nombre = $_POST['nombre'] ?? '';
     $idHospital = $_POST['id_hospital'] ?? 0;
     
-    // Verificar que PlantaController tenga el método update
+    // Verificar que PlantaController tenga el méto do update
     if (method_exists($plantaController, 'update')) {
         $resultado = $plantaController->update($id, $nombre, $idHospital);
     } else {
-        // Alternativa si no existe el método update
+        // Alternativa si no existe el méto do update
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("ID de planta inválido");
@@ -166,11 +166,11 @@ function procesarEliminar() {
     
     $id = $_POST['id'] ?? 0;
     
-    // Verificar que PlantaController tenga el método delete
+    // Verificar que PlantaController tenga el méto do delete
     if (method_exists($plantaController, 'delete')) {
         $resultado = $plantaController->delete($id);
     } else {
-        // Alternativa si no existe el método delete
+        // Alternativa si no existe el méto do delete
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("ID de planta inválido");
