@@ -52,7 +52,11 @@ use model\enum\RolEnum;
                     </li>
 
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/productos/lista_productos.php">Productos</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/productos">Productos</a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/pactos">Pactos</a>
                     </li>
                     
                     <li class="nav__item">
