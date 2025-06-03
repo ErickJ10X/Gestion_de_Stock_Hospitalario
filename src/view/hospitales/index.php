@@ -16,8 +16,6 @@ use util\AuthGuard;
 
 $hospitalController = new HospitalController();
 $plantaController = new PlantaController();
-$botiquinController = new BotiquinController();
-$almacenesController = new AlmacenesController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
@@ -25,8 +23,6 @@ $authGuard->requireHospitalGestor();
 
 $hospitales = $hospitalController->index()['hospitales'] ?? [];
 $plantas = $plantaController->index()['plantas'] ?? [];
-$botiquines = $botiquinController->index()['botiquines'] ?? [];
-$almacenes = $almacenesController->index();
 
 $pageTitle = "Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
@@ -56,27 +52,22 @@ include_once(__DIR__ . '/../templates/header.php');
 
     <div class="tabs-container">
         <div class="tabs-nav">
-            <button class="tab-btn" data-tab="tab-hospitales">Hospitales</button>
+            <button class="tab-btn active" data-tab="tab-hospitales">Hospitales</button>
             <button class="tab-btn" data-tab="tab-plantas">Plantas</button>
-            <button class="tab-btn active" data-tab="tab-botiquines">Botiquines</button>
-            <button class="tab-btn" data-tab="tab-almacenes">Almacenes</button>
+            <button class="tab-btn" data-tab="tab-agregar-editar">Agregar/Editar</button>
         </div>
 
         <div class="tab-content">
-            <div id="tab-hospitales" class="tab-pane">
+            <div id="tab-hospitales" class="tab-pane active">
                 <?php include_once(__DIR__ . '/hospitales_tab.php'); ?>
             </div>
 
             <div id="tab-plantas" class="tab-pane">
                 <?php include_once(__DIR__ . '/plantas_tab.php'); ?>
             </div>
-
-            <div id="tab-botiquines" class="tab-pane">
-                <?php include_once(__DIR__ . '/botiquines_tab.php'); ?>
-            </div>
-
-            <div id="tab-almacenes" class="tab-pane">
-                <?php include_once(__DIR__ . '/almacenes_tab.php'); ?>
+            
+            <div id="tab-agregar-editar" class="tab-pane">
+                <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
             </div>
         </div>
     </div>

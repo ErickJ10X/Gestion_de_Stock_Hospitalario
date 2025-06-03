@@ -4,12 +4,6 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
 }
 ?>
 
-<div class="list-header__actions">
-    <button id="btn-add-hospital" class="list-button list-button--success">
-        <i class="bi bi-plus-circle"></i> Nuevo
-    </button>
-</div>
-
 <div class="table-responsive">
     <table class="list-table">
         <thead>
@@ -53,79 +47,3 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($session)) {
         </tbody>
     </table>
 </div>
-
-<!-- Formulario para crear hospital -->
-<div id="hospital-card-create" class="hospital-card">
-    <div class="hospital-card__header hospital-card__header--create">
-        <h3 class="hospital-card__title">Nuevo Hospital</h3>
-        <button type="button" class="hospital-card__close">&times;</button>
-    </div>
-    <div class="hospital-card__body">
-        <?php if ($session->hasMessage('modal_error_hospital')): ?>
-            <div class="hospital-form__error">
-                <p><?= $session->getMessage('modal_error_hospital') ?></p>
-            </div>
-            <?php $session->clearMessage('modal_error_hospital'); ?>
-        <?php endif; ?>
-        <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/hospital-actions.php" method="post" class="hospital-form" id="form-crear-hospital">
-            <input type="hidden" name="action" value="crear">
-            <div class="hospital-form__group">
-                <label for="nombre-hospital-create" class="hospital-form__label">Nombre:</label>
-                <input type="text" id="nombre-hospital-create" name="nombre" class="hospital-form__input" required>
-            </div>
-            <div class="hospital-card__footer">
-                <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-hospital">Cancelar</button>
-                <button type="submit" class="hospital-form__button hospital-form__button--primary" id="btn-submit-hospital">Registrar Hospital</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Formularios para editar y eliminar hospitales -->
-<?php foreach ($hospitales as $hospital): ?>
-    <div id="hospital-card-edit-<?= $hospital->getIdHospital() ?>" class="hospital-card">
-        <div class="hospital-card__header hospital-card__header--edit">
-            <h3 class="hospital-card__title">Editar Hospital</h3>
-            <button type="button" class="hospital-card__close">&times;</button>
-        </div>
-        <div class="hospital-card__body">
-            <?php if ($session->hasMessage('modal_error_hospital_' . $hospital->getIdHospital())): ?>
-                <div class="hospital-form__error">
-                    <p><?= $session->getMessage('modal_error_hospital_' . $hospital->getIdHospital()) ?></p>
-                </div>
-                <?php $session->clearMessage('modal_error_hospital_' . $hospital->getIdHospital()); ?>
-            <?php endif; ?>
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/hospital-actions.php" method="post" class="hospital-form" id="form-editar-hospital-<?= $hospital->getIdHospital() ?>">
-                <input type="hidden" name="action" value="editar">
-                <input type="hidden" name="id" value="<?= $hospital->getIdHospital() ?>">
-                <div class="hospital-form__group">
-                    <label for="nombre-hospital-edit-<?= $hospital->getIdHospital() ?>" class="hospital-form__label">Nombre:</label>
-                    <input type="text" id="nombre-hospital-edit-<?= $hospital->getIdHospital() ?>" name="nombre" value="<?= htmlspecialchars($hospital->getNombre()) ?>" class="hospital-form__input" required>
-                </div>
-                <div class="hospital-card__footer">
-                    <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-edit-hospital-<?= $hospital->getIdHospital() ?>">Cancelar</button>
-                    <button type="submit" class="hospital-form__button hospital-form__button--primary" id="btn-submit-edit-hospital-<?= $hospital->getIdHospital() ?>">Actualizar Hospital</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <div id="hospital-card-delete-<?= $hospital->getIdHospital() ?>" class="hospital-card">
-        <div class="hospital-card__header hospital-card__header--delete">
-            <h3 class="hospital-card__title">Eliminar Hospital</h3>
-            <button type="button" class="hospital-card__close">&times;</button>
-        </div>
-        <div class="hospital-card__body">
-            <h4>¿Estás seguro de que deseas eliminar este hospital?</h4>
-            <p class="text-danger">Esta acción no se puede deshacer.</p>
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/hospital-actions.php" method="post" id="form-eliminar-hospital-<?= $hospital->getIdHospital() ?>">
-                <input type="hidden" name="action" value="eliminar">
-                <input type="hidden" name="id" value="<?= $hospital->getIdHospital() ?>">
-                <div class="hospital-card__footer">
-                    <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-delete-hospital-<?= $hospital->getIdHospital() ?>">Cancelar</button>
-                    <button type="submit" class="hospital-form__button hospital-form__button--danger" id="btn-submit-delete-hospital-<?= $hospital->getIdHospital() ?>">Confirmar Eliminación</button>
-                </div>
-            </form>
-        </div>
-    </div>
-<?php endforeach; ?>

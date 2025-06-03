@@ -40,7 +40,15 @@ use model\enum\RolEnum;
                     <?php endif; ?>
 
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/lista_hospitales.php">Hospitales</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales">Hospitales</a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes">Almacenes</a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquines">Botiquines</a>
                     </li>
 
                     <li class="nav__item">
