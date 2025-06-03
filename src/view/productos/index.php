@@ -1,23 +1,16 @@
 <?php
 session_start();
 require_once(__DIR__ . '/../../controller/ProductoController.php');
-require_once(__DIR__ . '/../../controller/PactosController.php');
-require_once(__DIR__ . '/../../controller/PlantaController.php');
 require_once(__DIR__ . '/../../controller/CatalogosController.php');
-
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
 
 use controller\CatalogosController;
-use controller\PactosController;
-use controller\PlantaController;
 use controller\ProductoController;
 use util\Session;
 use util\AuthGuard;
 
 $productoController = new ProductoController();
-$pactosController = new PactosController();
-$plantaController = new PlantaController();
 $catalogosController = new CatalogosController();
 
 $session = new Session();
@@ -26,11 +19,9 @@ $authGuard = new AuthGuard();
 $authGuard->requireHospitalGestor();
 
 $productos = $productoController->index()['productos'] ?? [];
-$pactos = $pactosController->index()['pactos'] ?? [];
-$plantas = $plantaController->index()['plantas'] ?? [];
 $catalogos = $catalogosController->index()['catalogos'] ?? [];
 
-$pageTitle = "Productos";
+$pageTitle = "Gestión de Productos";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
@@ -58,22 +49,17 @@ include_once(__DIR__ . '/../templates/header.php');
 
     <div class="tabs-container">
         <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="tab-productos">Productos</button>
-            <button class="tab-btn" data-tab="tab-pactos">Pactos</button>
-            <button class="tab-btn" data-tab="tab-catalogos">Catálogos por Planta</button>
+            <button class="tab-btn active" data-tab="tab-productos">Catálogo de Productos</button>
+            <button class="tab-btn" data-tab="tab-agregar-editar">Agregar/Editar</button>
         </div>
 
         <div class="tab-content">
             <div id="tab-productos" class="tab-pane active">
                 <?php include_once(__DIR__ . '/productos_tab.php'); ?>
             </div>
-
-            <div id="tab-pactos" class="tab-pane">
-                <?php include_once(__DIR__ . '/pactos_tab.php'); ?>
-            </div>
             
-            <div id="tab-catalogos" class="tab-pane">
-                <?php include_once(__DIR__ . '/catalogos_productos_tab.php'); ?>
+            <div id="tab-agregar-editar" class="tab-pane">
+                <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
             </div>
         </div>
     </div>
