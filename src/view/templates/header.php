@@ -64,11 +64,11 @@ use model\enum\RolEnum;
                     </li>
                     
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/reposiciones/lista_reposiciones.php">Reposiciones</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/reposiciones">Reposiciones</a>
                     </li>
                     
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/etiquetas/generar_etiquetas.php">Etiquetas</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/etiquetas">Etiquetas</a>
                     </li>
                     
                     <li class="nav__item">

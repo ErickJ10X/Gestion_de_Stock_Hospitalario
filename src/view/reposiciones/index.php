@@ -37,6 +37,14 @@ include_once(__DIR__ . '/../templates/header.php');
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/reposiciones.css">
 
+<!-- jQuery y DataTables primero para evitar problemas de carga -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Bootstrap JS para modales -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <div class="list-container">
 
     <?php if ($session->hasMessage('success')): ?>
@@ -57,20 +65,20 @@ include_once(__DIR__ . '/../templates/header.php');
 
     <div class="tabs-container">
         <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="tab-ordenes-pendientes">Órdenes Pendientes</button>
+            <button class="tab-btn active" data-tab="tab-ver-estado">Ver Estado</button>
             <button class="tab-btn" data-tab="tab-generar-reposicion">Generar Reposición</button>
-            <button class="tab-btn" data-tab="tab-historico">Histórico</button>
+            <button class="tab-btn" data-tab="tab-marcar-entregado">Marcar como Entregado</button>
         </div>
 
         <div class="tab-content">
-            <div id="tab-ordenes-pendientes" class="tab-pane active">
-                <?php include_once(__DIR__ . '/ordenes_pendientes_tab.php'); ?>
+            <div id="tab-ver-estado" class="tab-pane active">
+                <?php include_once(__DIR__ . '/ver_estado_tab.php'); ?>
             </div>
             <div id="tab-generar-reposicion" class="tab-pane">
                 <?php include_once(__DIR__ . '/generar_reposicion_tab.php'); ?>
             </div>
-            <div id="tab-historico" class="tab-pane">
-                <?php include_once(__DIR__ . '/historico_tab.php'); ?>
+            <div id="tab-marcar-entregado" class="tab-pane">
+                <?php include_once(__DIR__ . '/marcar_entregado_tab.php'); ?>
             </div>
         </div>
     </div>
