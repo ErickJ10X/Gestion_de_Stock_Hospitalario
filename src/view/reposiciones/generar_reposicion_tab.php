@@ -9,7 +9,7 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
 </div>
 
 <div class="card-form generar-reposicion-form">
-    <form id="nueva-reposicion-form" method="post" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/api/reposiciones_create.php">
+    <form id="nueva-reposicion-form" method="post" action="">
         <div class="form-group">
             <label for="id_producto">Producto a Reponer *</label>
             <select id="id_producto" name="id_producto" class="form-control" required>
@@ -36,11 +36,11 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
             </div>
             
             <div class="form-group form-group--half">
-                <label for="hasta_botiquin">Hasta Botiquín *</label>
-                <select id="hasta_botiquin" name="hasta_botiquin" class="form-control" required>
+                <label for="hacia_botiquin">Hasta Botiquín *</label>
+                <select id="hacia_botiquin" name="hacia_botiquin" class="form-control" required>
                     <option value="">Seleccione un botiquín</option>
                     <?php foreach ($botiquines as $botiquin): ?>
-                        <option value="<?= $botiquin->getIdBotiquines() ?>">
+                        <option value="<?= $botiquin->getIdBotiquin() ?>">
                             <?= $botiquin->getNombre() ?>
                         </option>
                     <?php endforeach; ?>
@@ -89,10 +89,6 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
                     <div class="product-detail">
                         <span class="detail-label">Nombre:</span>
                         <span class="detail-value" id="producto-nombre"></span>
-                    </div>
-                    <div class="product-detail">
-                        <span class="detail-label">Descripción:</span>
-                        <span class="detail-value" id="producto-descripcion"></span>
                     </div>
                     <div class="product-detail">
                         <span class="detail-label">Unidad de Medida:</span>

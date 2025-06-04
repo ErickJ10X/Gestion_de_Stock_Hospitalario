@@ -58,7 +58,7 @@ class BotiquinController
     {
         try {
             return $this->botiquinService->getBotiquinesByPlanta($plantaId);
-        } catch (Exception $e) {
+        } catch (Exception ) {
             return [];
         }
     }

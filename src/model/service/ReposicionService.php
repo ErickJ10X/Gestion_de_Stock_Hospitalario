@@ -2,6 +2,12 @@
 
 namespace model\service;
 
+require_once __DIR__ . '/../repository/botiquinRepository.php';
+require_once __DIR__ . '/../repository/almacenRepository.php';
+require_once __DIR__ . '/../repository/etiquetaRepository.php';
+require_once __DIR__ . '/../repository/productoRepository.php';
+require_once __DIR__ . '/../repository/reposicionRepository.php';
+
 use model\entity\Reposicion;
 use model\repository\ReposicionRepository;
 use model\repository\ProductoRepository;
@@ -18,18 +24,12 @@ class ReposicionService {
     private ?BotiquinRepository $botiquinRepository;
     private ?EtiquetaRepository $etiquetaRepository;
 
-    public function __construct(
-        ReposicionRepository $reposicionRepository = null,
-        ProductoRepository $productoRepository = null,
-        AlmacenRepository $almacenRepository = null,
-        BotiquinRepository $botiquinRepository = null,
-        EtiquetaRepository $etiquetaRepository = null
-    ) {
-        $this->reposicionRepository = $reposicionRepository ?? new ReposicionRepository();
-        $this->productoRepository = $productoRepository ?? new ProductoRepository();
-        $this->almacenRepository = $almacenRepository ?? new AlmacenRepository();
-        $this->botiquinRepository = $botiquinRepository ?? new BotiquinRepository();
-        $this->etiquetaRepository = $etiquetaRepository ?? new EtiquetaRepository();
+    public function __construct() {
+        $this->reposicionRepository = new ReposicionRepository();
+        $this->productoRepository = new ProductoRepository();
+        $this->almacenRepository = new AlmacenRepository();
+        $this->botiquinRepository = new BotiquinRepository();
+        $this->etiquetaRepository = new EtiquetaRepository();
     }
 
     public function getReposicionById(int $id): ?Reposicion {

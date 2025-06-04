@@ -21,7 +21,7 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
                 <select id="filtro-botiquin" class="form-select">
                     <option value="todos">Todos los botiquines</option>
                     <?php foreach ($botiquines as $botiquin): ?>
-                        <option value="<?= $botiquin->getIdBotiquines() ?>"><?= htmlspecialchars($botiquin->getNombre()) ?></option>
+                        <option value="<?= $botiquin->getIdBotiquin() ?>"><?= htmlspecialchars($botiquin->getNombre()) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -75,7 +75,7 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
                     // Buscar nombre del botiquín
                     $nombreBotiquin = "Botiquín no encontrado";
                     foreach ($botiquines as $botiquin) {
-                        if ($botiquin->getIdBotiquines() == $reposicion->getHastaBotiquin()) {
+                        if ($botiquin->getIdBotiquines() == $reposicion->getHaciaBotiquin()) {
                             $nombreBotiquin = $botiquin->getNombre();
                             break;
                         }
@@ -85,16 +85,16 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
                     $estado = "Pendiente"; // Por defecto, todas están pendientes
                     
                     // Determinar la clase de urgencia
-                    $urgenciaClass = $reposicion->getUrgente() ? "badge bg-danger" : "badge bg-primary";
-                    $urgenciaText = $reposicion->getUrgente() ? "URGENTE" : "Normal";
+                    $urgenciaClass = $reposicion->isUrgente() ? "badge bg-danger" : "badge bg-primary";
+                    $urgenciaText = $reposicion->isUrgente() ? "URGENTE" : "Normal";
                 ?>
                     <tr class="list-table__body-row">
-                        <td class="list-table__body-cell"><?= $reposicion->getIdReposicion() ?></td>
+                        <td class="list-table__body-cell"><?= $reposicion->getId() ?></td>
                         <td class="list-table__body-cell"><?= htmlspecialchars($nombreProducto) ?></td>
                         <td class="list-table__body-cell"><?= htmlspecialchars($nombreAlmacen) ?></td>
                         <td class="list-table__body-cell"><?= htmlspecialchars($nombreBotiquin) ?></td>
                         <td class="list-table__body-cell"><?= $reposicion->getCantidadRepuesta() ?></td>
-                        <td class="list-table__body-cell"><?= date('d/m/Y H:i', strtotime($reposicion->getFecha())) ?></td>
+                        <td class="list-table__body-cell"><?= $reposicion->getFecha()->format('d/m/Y H:i') ?></td>
                         <td class="list-table__body-cell">
                             <span class="badge bg-warning"><?= $estado ?></span>
                         </td>
@@ -107,44 +107,6 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
         </tbody>
     </table>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar DataTable
-    if (typeof $.fn.DataTable !== 'undefined') {
-        const tabla = $('#tablaReposiciones').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json'
-            },
-            order: [[5, 'desc']], // Ordenar por fecha por defecto
-            responsive: true
-        });
-        
-        // Manejar filtros adicionales
-        document.getElementById('aplicar-filtros').addEventListener('click', function() {
-            const filtroUrgencia = document.getElementById('filtro-urgencia').value;
-            const filtroBotiquin = document.getElementById('filtro-botiquin').value;
-            
-            tabla.columns(7).search(filtroUrgencia === 'urgente' ? 'URGENTE' : 
-                                    filtroUrgencia === 'normal' ? 'Normal' : '').draw();
-            
-            if (filtroBotiquin !== 'todos') {
-                // Aquí tendríamos que implementar una búsqueda más compleja
-                // ya que DataTables no busca por atributos data-*
-                tabla.column(3).search(filtroBotiquin).draw();
-            }
-        });
-        
-        document.getElementById('limpiar-filtros').addEventListener('click', function() {
-            document.getElementById('filtro-urgencia').value = 'todos';
-            document.getElementById('filtro-botiquin').value = 'todos';
-            tabla.search('').columns().search('').draw();
-        });
-    } else {
-        console.warn('DataTables no está disponible');
-    }
-});
-</script>
 
 <style>
 .tab-header {

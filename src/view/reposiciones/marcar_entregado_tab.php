@@ -23,7 +23,7 @@ if(!isset($reposicionesController) || !isset($almacenes) || !isset($productos) |
                             <select id="filtro-botiquin-entrega" class="form-select">
                                 <option value="">Todos los botiquines</option>
                                 <?php foreach ($botiquines as $botiquin): ?>
-                                    <option value="<?= $botiquin->getIdBotiquines() ?>"><?= htmlspecialchars($botiquin->getNombre()) ?></option>
+                                    <option value="<?= $botiquin->getIdBotiquin() ?>"><?= htmlspecialchars($botiquin->getNombre()) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
