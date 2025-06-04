@@ -89,7 +89,7 @@ class AlmacenesController
      */
     public function crear(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorGeneral();
         
         try {
             $tipo = $_POST['tipo'] ?? '';
@@ -128,7 +128,7 @@ class AlmacenesController
      */
     public function editar(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorGeneral();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -171,7 +171,7 @@ class AlmacenesController
      */
     public function eliminar(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorGeneral  ();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;

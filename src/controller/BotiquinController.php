@@ -34,7 +34,7 @@ class BotiquinController
      */
     public function index(): array
     {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorGeneral();
         
         $viewData = [
             'botiquines' => []
@@ -96,7 +96,7 @@ class BotiquinController
      */
     public function crear(): void
     {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorPlanta();
         
         try {
             $plantaId = isset($_POST['planta_id']) ? (int)$_POST['planta_id'] : 0;
@@ -133,7 +133,7 @@ class BotiquinController
      */
     public function editar(): void
     {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorPlanta();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -174,7 +174,7 @@ class BotiquinController
      */
     public function eliminar(): void
     {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorPlanta();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -208,7 +208,7 @@ class BotiquinController
      */
     public function desactivar(): void
     {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorPlanta();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;

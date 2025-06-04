@@ -16,7 +16,7 @@ if (!isset($usuarios)) {
                     Crear Usuario
                 </div>
                 <div class="card-body">
-                    <form id="formCrearUsuario" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioHandler.php" method="POST" class="card-form">
+                    <form id="formCrearUsuario" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php" method="POST" class="card-form">
                         <input type="hidden" name="action" value="crear">
                         
                         <div class="form-group mb-3">
@@ -96,7 +96,7 @@ if (!isset($usuarios)) {
                         </div>
                         
                         <div id="formEditarContainer" style="display: none;">
-                            <form id="formEditarUsuario" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioHandler.php" method="POST" class="card-form">
+                            <form id="formEditarUsuario" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php" method="POST" class="card-form">
                                 <input type="hidden" name="action" value="editar">
                                 <input type="hidden" id="editId" name="id" value="">
                                 

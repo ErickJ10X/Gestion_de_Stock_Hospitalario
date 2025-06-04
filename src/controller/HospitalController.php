@@ -109,7 +109,7 @@ class HospitalController {
      * Crea un nuevo hospital
      */
     public function crear(): void {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorGeneral();
         
         try {
             // Validar datos
@@ -139,7 +139,7 @@ class HospitalController {
      * Actualiza un hospital existente
      */
     public function editar(): void {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorGeneral();
         
         try {
             // Validar datos
@@ -173,7 +173,7 @@ class HospitalController {
      * Elimina un hospital
      */
     public function eliminar(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorGeneral();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -211,7 +211,7 @@ class HospitalController {
         header('Content-Type: application/json');
         
         try {
-            $this->authGuard->requireHospitalGestor();
+            $this->authGuard->requireGestorHospital();
             
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $action = $_GET['action'] ?? '';

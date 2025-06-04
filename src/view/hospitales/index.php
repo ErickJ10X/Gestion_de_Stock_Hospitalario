@@ -15,11 +15,19 @@ $plantaController = new PlantaController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireGestorHospital();
+$authGuard->requireGestorPlanta();
 
-$hospitales = $hospitalController->index()['hospitales'] ?? [];
-$plantas = $plantaController->index()['plantas'] ?? [];
-
+if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Gestor general') {
+    $hospitales = $hospitalController->index()['hospitales'] ?? [];
+    $plantas = $plantaController->index()['plantas'] ?? [];
+}
+if ($_SESSION['rol'] === 'Gestor hospital') {
+    $hospitales = $hospitalController->getByUsuario() ['hospitales'];
+    $plantas = $plantaController->getByHospital($hospitales->getIdHospital())['plantas'];
+}
+if ($_SESSION['rol'] === 'Gestor planta') {
+    $plantas = $plantaController->getByUsuario()['plantas'];
+}
 $pageTitle = "Hospitales";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
@@ -54,17 +62,22 @@ include_once(__DIR__ . '/../templates/header.php');
         </div>
 
         <div class="tab-content">
-            <div id="tab-hospitales" class="tab-pane active">
-                <?php include_once(__DIR__ . '/hospitales_tab.php'); ?>
-            </div>
+            <?php if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Gestor general' || $_SESSION['rol'] === 'Gestor hospital'): ?>
+                <div id="tab-hospitales" class="tab-pane active">
+                    <?php include_once(__DIR__ . '/hospitales_tab.php'); ?>
+                </div>
+                <?php endif; ?>
+            <?php if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Gestor general' || $_SESSION['rol'] === 'Gestor hospital' || $_SESSION['rol'] === 'Gestor planta'): ?>
+                <div id="tab-plantas" class="tab-pane">
+                    <?php include_once(__DIR__ . '/plantas_tab.php'); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Gestor general'): ?>
+                <div id="tab-agregar-editar" class="tab-pane">
+                    <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
+                </div>
+            <?php endif; ?>
 
-            <div id="tab-plantas" class="tab-pane">
-                <?php include_once(__DIR__ . '/plantas_tab.php'); ?>
-            </div>
-            
-            <div id="tab-agregar-editar" class="tab-pane">
-                <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
-            </div>
         </div>
     </div>
 </div>

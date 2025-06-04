@@ -18,11 +18,23 @@ $almacenesController = new AlmacenesController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireGestorHospital();
+$authGuard->requireGestorPlanta();
 
-$hospitales = $hospitalController->index()['hospitales'] ?? [];
-$plantas = $plantaController->index()['plantas'] ?? [];
-$almacenes = $almacenesController->index();
+if ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Gestor general') {
+    $hospitales = $hospitalController->index()['hospitales'] ?? [];
+    $plantas = $plantaController->index()['plantas'] ?? [];
+    $almacenes = $almacenesController->index();
+}
+if ($_SESSION['rol'] === 'Gestor de hospital') {
+    $hospitales = $hospitalController->getByHospital()['hospitales'] ?? [];
+    $plantas = $plantaController->getByHospital($_SESSION['idHospital'])['plantas'] ?? [];
+    $almacenes = $almacenesController->getByHospital($_SESSION['idHospital']);
+}
+if ($_SESSION['rol'] === 'Gestor de planta') {
+    $hospitales = $hospitalController->getByPlanta($_SESSION['idPlanta'])['hospitales'] ?? [];
+    $plantas = $plantaController->getById($_SESSION['idPlanta'])['planta'] ?? [];
+    $almacenes = $almacenesController->getByPlanta($_SESSION['idPlanta']);
+}
 
 $pageTitle = "Gestión de Almacenes";
 include_once(__DIR__ . '/../templates/header.php');
@@ -60,11 +72,11 @@ include_once(__DIR__ . '/../templates/header.php');
             <div id="tab-almacenes" class="tab-pane active">
                 <?php include_once(__DIR__ . '/almacenes_tab.php'); ?>
             </div>
-            
             <div id="tab-agregar-editar" class="tab-pane">
                 <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
             </div>
         </div>
+
     </div>
 </div>
 

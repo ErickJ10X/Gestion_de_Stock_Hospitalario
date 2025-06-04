@@ -34,7 +34,7 @@ class PlantaController {
      * Método principal para obtener los datos utilizados en la vista index
      */
     public function index(): array {
-        $this->authGuard->requireGestorHospital();
+        $this->authGuard->requireGestorGeneral();
         
         $viewData = [
             'plantas' => []
@@ -182,7 +182,7 @@ class PlantaController {
      * Elimina una planta
      */
     public function eliminar(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -216,7 +216,7 @@ class PlantaController {
         header('Content-Type: application/json');
         
         try {
-            $this->authGuard->requireHospitalGestor();
+            $this->authGuard->requireGestorHospital();
             
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $action = $_GET['action'] ?? '';

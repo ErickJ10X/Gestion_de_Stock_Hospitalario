@@ -60,20 +60,20 @@ include_once(__DIR__ . '/../templates/header.php');
     <div class="tabs-container">
         <div class="tabs-nav">
             <button class="tab-btn active" data-tab="tab-usuarios">Usuarios</button>
-            <button class="tab-btn" data-tab="tab-crear-editar">Crear/Editar</button>
+            <button class="tab-btn" data-tab="tab-crear-editar">Agregar/Editar</button>
             <button class="tab-btn" data-tab="tab-ubicaciones">Asignar Ubicaciones</button>
         </div>
 
         <div class="tab-content">
-            <div id="tab-usuarios" class="tab-pane ">
-                <?php include_once(__DIR__ . '/listUsers_tab.php'); ?>
+            <div id="tab-usuarios" class="tab-pane active">
+                <?php include_once(__DIR__ . '/usuarios_tab.php'); ?>
             </div>
 
             <div id="tab-crear-editar" class="tab-pane">
-                <?php include_once(__DIR__ . '/crearEditar_tab.php'); ?>
+                <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
             </div>
 
-            <div id="tab-ubicaciones" class="tab-pane active">
+            <div id="tab-ubicaciones" class="tab-pane">
                 <?php include_once(__DIR__ . '/asignarUbicaciones_tab.php'); ?>
             </div>
         </div>

@@ -6,22 +6,28 @@ if (!isset($usuarios)) {
 
 // Importar controladores y repositorios necesarios
 require_once(__DIR__ . '/../../controller/AlmacenesController.php');
+require_once(__DIR__ . '/../../controller/PlantaController.php');
 require_once(__DIR__ . '/../../controller/BotiquinController.php');
+require_once(__DIR__ . '/../../model/entity/UsuarioUbicacion.php');
 
-use controller\AlmacenController;
 use controller\AlmacenesController;
+use controller\PlantaController;
 use controller\BotiquinController;
+use model\entity\UsuarioUbicacion;
 
 // Instanciar controladores
 $almacenController = new AlmacenesController();
+$plantaController = new PlantaController();
 $botiquinController = new BotiquinController();
 
-// Obtener los almacenes y botiquines
+// Obtener los almacenes, plantas y botiquines
 try {
     $almacenes = $almacenController->index()['data'] ?? [];
+    $plantas = $plantaController->index()['plantas'] ?? [];
     $botiquines = $botiquinController->index()['data'] ?? [];
 } catch (Exception $e) {
     $almacenes = [];
+    $plantas = [];
     $botiquines = [];
     echo "<div class='alert alert-danger'>Error al cargar ubicaciones: " . $e->getMessage() . "</div>";
 }
@@ -52,8 +58,9 @@ try {
                     <label for="ubicacion_tipo" class="form-label">Tipo de ubicación <span class="text-danger">*</span></label>
                     <select id="ubicacion_tipo" name="ubicacion_tipo" class="form-select" required>
                         <option value="">Seleccionar tipo</option>
-                        <option value="almacen">Almacén</option>
-                        <option value="botiquin">Botiquín</option>
+                        <option value="<?= UsuarioUbicacion::TIPO_HOSPITAL ?>">Hospital/Almacén</option>
+                        <option value="<?= UsuarioUbicacion::TIPO_PLANTA ?>">Planta</option>
+                        <option value="<?= UsuarioUbicacion::TIPO_BOTIQUIN ?>">Botiquín</option>
                     </select>
                     <div class="form-text">Seleccione el tipo de ubicación que desea asignar</div>
                 </div>
@@ -140,9 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const eliminarUbicacionNombre = document.getElementById('eliminarUbicacionNombre');
     const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
     
-    // Almacenes y botiquines disponibles
-    const almacenes = <?= json_encode(array_map(function($a) { return ['id' => $a->getId(), 'nombre' => $a->getNombre()]; }, $almacenes)) ?>;
+    // Almacenes, plantas y botiquines disponibles
+    const almacenes = <?= json_encode(array_map(function($a) { return ['id' => $a->getId(), 'nombre' => $a->getTipo()]; }, $almacenes)) ?>;
+    const plantas = <?= json_encode(array_map(function($p) { return ['id' => $p->getIdPlanta(), 'nombre' => $p->getNombre()]; }, $plantas)) ?>;
     const botiquines = <?= json_encode(array_map(function($b) { return ['id' => $b->getId(), 'nombre' => $b->getNombre()]; }, $botiquines)) ?>;
+    
+    // Constantes de tipos de ubicación
+    const TIPO_HOSPITAL = '<?= UsuarioUbicacion::TIPO_HOSPITAL ?>';
+    const TIPO_PLANTA = '<?= UsuarioUbicacion::TIPO_PLANTA ?>';
+    const TIPO_BOTIQUIN = '<?= UsuarioUbicacion::TIPO_BOTIQUIN ?>';
     
     // Datos temporales para eliminar ubicación
     let tempDeleteData = null;
@@ -154,8 +167,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (tipo) {
             ubicacionSelect.disabled = false;
-            const ubicaciones = tipo === 'almacen' ? almacenes : botiquines;
+            let ubicaciones = [];
             
+            // Determinar qué lista de ubicaciones usar según el tipo seleccionado
+            switch (tipo) {
+                case TIPO_HOSPITAL:
+                    ubicaciones = almacenes;
+                    break;
+                case TIPO_PLANTA:
+                    ubicaciones = plantas;
+                    break;
+                case TIPO_BOTIQUIN:
+                    ubicaciones = botiquines;
+                    break;
+            }
+            
+            // Añadir opciones al select de ubicaciones
             ubicaciones.forEach(ubicacion => {
                 const option = document.createElement('option');
                 option.value = ubicacion.id;
@@ -194,15 +221,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Llamar a la API para asignar ubicación
+        // Llamar a la API para asignar ubicación (usando el controlador existente)
         const formData = new FormData();
         formData.append('action', 'asignar');
         formData.append('usuario_id', usuarioId);
         formData.append('tipo_ubicacion', tipoUbicacion);
         formData.append('ubicacion_id', ubicacionId);
         
-        fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/Usuario_UbicacionesApi.php', {
+        fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
         .then(response => response.json())
@@ -223,66 +253,102 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cargar ubicaciones de un usuario
     function cargarUbicacionesUsuario(usuarioId) {
-        fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/Usuario_UbicacionesApi.php?action=getByUsuario&id=${usuarioId}`)
-            .then(response => response.json())
-            .then(resultado => {
-                if (resultado && resultado.success) {
-                    const ubicaciones = resultado.data;
-                    
-                    if (ubicaciones.length === 0) {
-                        sinUbicacionesMsg.textContent = "Este usuario no tiene ubicaciones asignadas";
-                        sinUbicacionesMsg.style.display = "block";
-                        tablaUbicacionesContainer.style.display = "none";
-                    } else {
-                        sinUbicacionesMsg.style.display = "none";
-                        tablaUbicacionesContainer.style.display = "block";
-                        
-                        const tbody = tablaUbicaciones.querySelector('tbody');
-                        tbody.innerHTML = '';
-                        
-                        ubicaciones.forEach(ubicacion => {
-                            const tr = document.createElement('tr');
-                            
-                            // Tipo de ubicación con badge
-                            const tdTipo = document.createElement('td');
-                            const badgeClass = ubicacion.tipo_ubicacion === 'almacen' ? 'bg-primary' : 'bg-success';
-                            tdTipo.innerHTML = `<span class="badge ${badgeClass}">${ubicacion.tipo_ubicacion.toUpperCase()}</span>`;
-                            
-                            // Nombre de ubicación (buscamos el nombre según el tipo e ID)
-                            const tdNombre = document.createElement('td');
-                            const lista = ubicacion.tipo_ubicacion === 'almacen' ? almacenes : botiquines;
-                            const objUbicacion = lista.find(item => item.id == ubicacion.id_ubicacion);
-                            tdNombre.textContent = objUbicacion ? objUbicacion.nombre : `ID: ${ubicacion.id_ubicacion}`;
-                            
-                            // Acciones
-                            const tdAcciones = document.createElement('td');
-                            tdAcciones.innerHTML = `
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar-ubicacion" 
-                                    data-usuario-id="${usuarioId}"
-                                    data-tipo="${ubicacion.tipo_ubicacion}"
-                                    data-id="${ubicacion.id_ubicacion}"
-                                    data-nombre="${tdNombre.textContent}">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </button>
-                            `;
-                            
-                            tr.appendChild(tdTipo);
-                            tr.appendChild(tdNombre);
-                            tr.appendChild(tdAcciones);
-                            tbody.appendChild(tr);
-                        });
-                        
-                        // Agregar eventos a los botones de eliminar
-                        configurarBotonesEliminar();
-                    }
+        fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php?action=getByUsuario&id=${usuarioId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(resultado => {
+            if (resultado && resultado.success) {
+                const ubicaciones = resultado.data;
+                
+                if (ubicaciones.length === 0) {
+                    sinUbicacionesMsg.textContent = "Este usuario no tiene ubicaciones asignadas";
+                    sinUbicacionesMsg.style.display = "block";
+                    tablaUbicacionesContainer.style.display = "none";
                 } else {
-                    mostrarMensaje('error', 'Error al cargar ubicaciones: ' + 
-                        (resultado ? resultado.message : 'Respuesta vacía'));
+                    sinUbicacionesMsg.style.display = "none";
+                    tablaUbicacionesContainer.style.display = "block";
+                    
+                    const tbody = tablaUbicaciones.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    
+                    ubicaciones.forEach(ubicacion => {
+                        const tr = document.createElement('tr');
+                        
+                        // Tipo de ubicación con badge
+                        const tdTipo = document.createElement('td');
+                        let badgeClass = 'bg-secondary';
+                        let tipoTexto = ubicacion.tipo_ubicacion;
+                        
+                        switch (ubicacion.tipo_ubicacion) {
+                            case TIPO_HOSPITAL:
+                                badgeClass = 'bg-primary';
+                                tipoTexto = 'HOSPITAL/ALMACÉN';
+                                break;
+                            case TIPO_PLANTA:
+                                badgeClass = 'bg-success';
+                                tipoTexto = 'PLANTA';
+                                break;
+                            case TIPO_BOTIQUIN:
+                                badgeClass = 'bg-info';
+                                tipoTexto = 'BOTIQUÍN';
+                                break;
+                        }
+                        
+                        tdTipo.innerHTML = `<span class="badge ${badgeClass}">${tipoTexto}</span>`;
+                        
+                        // Nombre de ubicación (buscamos el nombre según el tipo e ID)
+                        const tdNombre = document.createElement('td');
+                        let nombreUbicacion = `ID: ${ubicacion.id_ubicacion}`;
+                        
+                        switch (ubicacion.tipo_ubicacion) {
+                            case TIPO_HOSPITAL:
+                                const almacen = almacenes.find(a => a.id == ubicacion.id_ubicacion);
+                                if (almacen) nombreUbicacion = almacen.nombre;
+                                break;
+                            case TIPO_PLANTA:
+                                const planta = plantas.find(p => p.id == ubicacion.id_ubicacion);
+                                if (planta) nombreUbicacion = planta.nombre;
+                                break;
+                            case TIPO_BOTIQUIN:
+                                const botiquin = botiquines.find(b => b.id == ubicacion.id_ubicacion);
+                                if (botiquin) nombreUbicacion = botiquin.nombre;
+                                break;
+                        }
+                        
+                        tdNombre.textContent = nombreUbicacion;
+                        
+                        // Acciones
+                        const tdAcciones = document.createElement('td');
+                        tdAcciones.innerHTML = `
+                            <button class="btn btn-sm btn-outline-danger btn-eliminar-ubicacion" 
+                                data-usuario-id="${usuarioId}"
+                                data-tipo="${ubicacion.tipo_ubicacion}"
+                                data-id="${ubicacion.id_ubicacion}"
+                                data-nombre="${tdNombre.textContent}">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        `;
+                        
+                        tr.appendChild(tdTipo);
+                        tr.appendChild(tdNombre);
+                        tr.appendChild(tdAcciones);
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // Agregar eventos a los botones de eliminar
+                    configurarBotonesEliminar();
                 }
-            })
-            .catch(error => {
-                mostrarMensaje('error', 'Error en la solicitud: ' + error);
-            });
+            } else {
+                mostrarMensaje('error', 'Error al cargar ubicaciones: ' + 
+                    (resultado ? resultado.message : 'Respuesta vacía'));
+            }
+        })
+        .catch(error => {
+            mostrarMensaje('error', 'Error en la solicitud: ' + error);
+        });
     }
     
     // Configurar los botones de eliminar ubicación
@@ -300,10 +366,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 tempDeleteData = { usuarioId, tipo, id };
                 
                 // Mostrar modal de confirmación
-                eliminarUbicacionNombre.textContent = `${tipo.toUpperCase()}: ${nombre}`;
+                eliminarUbicacionNombre.textContent = `${getTipoTexto(tipo)}: ${nombre}`;
                 eliminarUbicacionModal.show();
             });
         });
+    }
+    
+    // Convertir tipo de ubicación a texto legible
+    function getTipoTexto(tipo) {
+        switch (tipo) {
+            case TIPO_HOSPITAL: return 'HOSPITAL/ALMACÉN';
+            case TIPO_PLANTA: return 'PLANTA';
+            case TIPO_BOTIQUIN: return 'BOTIQUÍN';
+            default: return tipo;
+        }
     }
     
     // Configurar el botón de confirmar eliminación
@@ -319,8 +395,11 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('tipo_ubicacion', tipo);
         formData.append('ubicacion_id', id);
         
-        fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/Usuario_UbicacionesApi.php', {
+        fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
         .then(response => response.json())
