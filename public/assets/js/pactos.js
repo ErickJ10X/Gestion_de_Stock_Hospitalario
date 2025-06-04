@@ -1,60 +1,76 @@
+/**
+ * JavaScript específico para la gestión de pactos
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Cerrar alertas
+    // Cerrar alertas al hacer clic en el botón de cerrar
     const alertCloseButtons = document.querySelectorAll('.list-alert__close');
     alertCloseButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const alert = this.closest('.list-alert');
+            const alert = this.parentElement;
             alert.style.display = 'none';
         });
     });
 
-    // Cerrar modal al hacer clic fuera
-    const overlay = document.querySelector('.hospital-overlay');
-    if (overlay) {
-        overlay.addEventListener('click', function() {
-            const cards = document.querySelectorAll('.hospital-card');
-            cards.forEach(card => {
-                card.classList.remove('hospital-card--visible');
-            });
-            this.classList.remove('hospital-overlay--visible');
-        });
-    }
+    // Inicializar cualquier otro comportamiento específico de pactos
+    initializePactosForms();
 });
 
 /**
- * Muestra un mensaje de alerta
- * @param {string} tipo - Tipo de alerta (success, error)
- * @param {string} mensaje - Mensaje a mostrar
+ * Inicializa comportamientos específicos de los formularios de pactos
  */
-function mostrarAlerta(tipo, mensaje) {
-    const alertClass = tipo === 'success' ? 'list-alert--success' : 'list-alert--error';
-    const container = document.querySelector('.list-container');
+function initializePactosForms() {
+    // Aquí puedes agregar comportamientos específicos adicionales para formularios de pactos
+    // Por ejemplo, validaciones personalizadas, comportamientos de UI, etc.
     
-    // Crear alerta
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `list-alert ${alertClass}`;
-    
-    // Crear mensaje
-    const messageP = document.createElement('p');
-    messageP.className = 'list-alert__message';
-    messageP.textContent = mensaje;
-    alertDiv.appendChild(messageP);
-    
-    // Crear botón de cierre
-    const closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.className = 'list-alert__close';
-    closeBtn.innerHTML = '&times;';
-    closeBtn.addEventListener('click', function() {
-        alertDiv.style.display = 'none';
+    // Ejemplo: Validación de cantidad pactada positiva
+    const cantidadInputs = document.querySelectorAll('input[name="cantidad_pactada"]');
+    cantidadInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value <= 0) {
+                this.setCustomValidity('La cantidad debe ser mayor que cero');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
     });
-    alertDiv.appendChild(closeBtn);
+}
+
+/**
+ * Carga los destinos en un select según el tipo de ubicación seleccionado
+ * @param {HTMLSelectElement} tipoSelect - Select del tipo de ubicación
+ * @param {HTMLSelectElement} destinoSelect - Select del destino a poblar
+ * @param {Array} plantas - Array de plantas disponibles
+ * @param {Array} botiquines - Array de botiquines disponibles
+ * @param {Number|null} selectedId - ID del destino a seleccionar (opcional)
+ */
+function cargarDestinosPacto(tipoSelect, destinoSelect, plantas, botiquines, selectedId = null) {
+    const tipoSeleccionado = tipoSelect.value;
+    destinoSelect.innerHTML = '<option value="">Seleccione un destino</option>';
     
-    // Insertar alerta al inicio del contenedor
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    // Auto eliminar después de 5 segundos
-    setTimeout(function() {
-        alertDiv.style.display = 'none';
-    }, 5000);
+    if (tipoSeleccionado) {
+        destinoSelect.disabled = false;
+        let destinos = [];
+        
+        if (tipoSeleccionado === 'Planta') {
+            destinos = plantas;
+        } else if (tipoSeleccionado === 'Botiquin') {
+            destinos = botiquines;
+        }
+        
+        destinos.forEach(destino => {
+            const option = document.createElement('option');
+            option.value = destino.id;
+            option.textContent = destino.nombre;
+            
+            if (selectedId && destino.id == selectedId) {
+                option.selected = true;
+            }
+            
+            destinoSelect.appendChild(option);
+        });
+    } else {
+        destinoSelect.disabled = true;
+    }
 }

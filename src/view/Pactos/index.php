@@ -16,7 +16,7 @@ $productoController = new ProductoController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireHospitalGestor();
+$authGuard->requireGestorHospital();
 
 $pactos = $pactosController->index()['pactos'] ?? [];
 $productos = $productoController->index()['productos'] ?? [];

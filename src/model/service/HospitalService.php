@@ -2,15 +2,18 @@
 
 namespace model\service;
 
+require_once(__DIR__ . '/../../model/entity/Hospital.php');
+require_once(__DIR__ . '/../../model/repository/HospitalRepository.php');
+
 use model\entity\Hospital;
-use model\repository\HospitalRepository;
 use InvalidArgumentException;
+use model\repository\HospitalRepository;
 
 class HospitalService {
     private HospitalRepository $hospitalRepository;
 
-    public function __construct(HospitalRepository $hospitalRepository = null) {
-        $this->hospitalRepository = $hospitalRepository ?? new HospitalRepository();
+    public function __construct() {
+        $this->hospitalRepository = new HospitalRepository();
     }
 
     public function getHospitalById(int $id): ?Hospital {
