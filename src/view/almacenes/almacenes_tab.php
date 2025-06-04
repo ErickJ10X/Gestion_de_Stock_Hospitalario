@@ -1,5 +1,5 @@
 <?php
-if (!isset($almacenes) || !isset($session)) {
+if (!isset($almacenes) || !isset($session) || !isset($plantas) || !isset($hospitales)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
 
