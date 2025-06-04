@@ -8,7 +8,7 @@ if(!isset($botiquines) || empty($botiquines)) {
     <div class="card-form">
         <h2>Registrar nueva lectura de stock</h2>
         
-        <form id="formRegistrarLectura" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/routes/lecturasStock.routes.php" method="POST">
+        <form id="formRegistrarLectura" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/LecturasStockController.php" method="POST">
             <input type="hidden" name="action" value="store">
             <input type="hidden" name="registrado_por" value="<?= $_SESSION['user_id'] ?? 0 ?>">
             
@@ -18,7 +18,7 @@ if(!isset($botiquines) || empty($botiquines)) {
                     <option value="">Seleccione un botiquín</option>
                     <?php if(isset($botiquines) && !empty($botiquines)): ?>
                         <?php foreach ($botiquines as $botiquin): ?>
-                            <option value="<?= $botiquin->getIdBotiquines() ?>">
+                            <option value="<?= $botiquin->getIdBotiquin() ?>">
                                 <?= htmlspecialchars($botiquin->getNombre()) ?>
                             </option>
                         <?php endforeach; ?>
@@ -78,42 +78,42 @@ document.addEventListener('DOMContentLoaded', function() {
         productoLoading.style.display = 'block';
         productoError.style.display = 'none';
         
-        // Cargar productos asociados al botiquín seleccionado
-        fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/routes/botiquin.routes.php?action=getProductos&id=${botiquinId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.json();
-            })
-            .then(data => {
-                productoLoading.style.display = 'none';
-                
-                if (data.error) {
-                    productoError.textContent = data.mensaje || 'Error al cargar los productos';
-                    productoError.style.display = 'block';
-                    return;
-                }
-                
-                if (data.productos && data.productos.length > 0) {
-                    data.productos.forEach(producto => {
-                        const option = document.createElement('option');
-                        option.value = producto.id;
-                        option.textContent = `${producto.codigo} - ${producto.nombre}`;
-                        productoSelect.appendChild(option);
-                    });
-                    productoSelect.disabled = false;
-                } else {
-                    productoError.textContent = 'No hay productos asociados a este botiquín';
-                    productoError.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando productos:', error);
-                productoLoading.style.display = 'none';
-                productoError.textContent = 'Error al comunicarse con el servidor';
+        // Cargar productos asociados al botiquín
+        fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/LecturasStockController.php?action=getProductosByBotiquin&botiquin_id=${botiquinId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            productoLoading.style.display = 'none';
+            
+            if (data.error) {
+                productoError.textContent = data.mensaje || 'Error al cargar los productos';
                 productoError.style.display = 'block';
-            });
+                return;
+            }
+            
+            if (data.productos && data.productos.length > 0) {
+                data.productos.forEach(producto => {
+                    const option = document.createElement('option');
+                    option.value = producto.id_producto;
+                    option.textContent = `${producto.codigo} - ${producto.nombre}`;
+                    productoSelect.appendChild(option);
+                });
+                productoSelect.disabled = false;
+            } else {
+                productoError.textContent = 'No hay productos asociados a este botiquín';
+                productoError.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando productos:', error);
+            productoLoading.style.display = 'none';
+            productoError.textContent = 'Error al comunicarse con el servidor';
+            productoError.style.display = 'block';
+        });
     });
     
     // Validación del formulario antes de enviar

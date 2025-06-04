@@ -1,5 +1,5 @@
 <?php
-if (!isset($botiquines) || !isset($botiquinController) || !isset($productoController)) {
+if (!isset($botiquines)) {
     echo '<p>Error: Datos necesarios no disponibles.</p>';
     exit;
 }
@@ -16,7 +16,7 @@ if (!isset($botiquines) || !isset($botiquinController) || !isset($productoContro
                     <select id="filtro-botiquin-proximas" class="filtro-select">
                         <option value="">Todos los botiquines</option>
                         <?php foreach ($botiquines as $botiquin): ?>
-                            <option value="<?= $botiquin->getIdBotiquines() ?>">
+                            <option value="<?= $botiquin->getIdBotiquin() ?>">
                                 <?= htmlspecialchars($botiquin->getNombre()) ?>
                             </option>
                         <?php endforeach; ?>
@@ -80,84 +80,89 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.innerHTML = '<tr><td colspan="7" class="loading-message">Cargando datos de próximas lecturas...</td></tr>';
         
         // Construir URL con parámetro de filtro si existe
-        let url = '/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/routes/lecturasStock.routes.php?action=getProximasLecturas';
+        let url = '/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/LecturasStockController.php?action=getProximasLecturas';
         if (botiquinId) {
             url += `&botiquin_id=${botiquinId}`;
         }
         
         // Realizar la petición fetch
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="error-message">${data.mensaje}</td></tr>`;
-                } else if (!data.lecturas || data.lecturas.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-results">No hay próximas lecturas programadas</td></tr>';
-                } else {
-                    // Limpiar la tabla
-                    tbody.innerHTML = '';
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="7" class="error-message">${data.mensaje}</td></tr>`;
+            } else if (!data.lecturas || data.lecturas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-results">No hay próximas lecturas programadas</td></tr>';
+            } else {
+                // Limpiar la tabla
+                tbody.innerHTML = '';
+                
+                // Llenar con los datos recibidos
+                data.lecturas.forEach(lectura => {
+                    // Calcular el estado basado en la fecha próxima
+                    let estado = '';
+                    let estadoClass = '';
                     
-                    // Llenar con los datos recibidos
-                    data.lecturas.forEach(lectura => {
-                        // Calcular el estado basado en la fecha próxima
-                        let estado = '';
-                        let estadoClass = '';
+                    const hoy = new Date();
+                    const fechaProxima = new Date(lectura.fecha_proxima_lectura);
+                    
+                    if (fechaProxima < hoy) {
+                        estado = 'Atrasada';
+                        estadoClass = 'estado-atrasada';
+                    } else {
+                        // Calcular días de diferencia
+                        const diffDays = Math.ceil((fechaProxima - hoy) / (1000 * 60 * 60 * 24));
                         
-                        const hoy = new Date();
-                        const fechaProxima = new Date(lectura.fecha_proxima_lectura);
-                        
-                        if (fechaProxima < hoy) {
-                            estado = 'Atrasada';
-                            estadoClass = 'estado-atrasada';
+                        if (diffDays <= 2) {
+                            estado = 'Urgente';
+                            estadoClass = 'estado-urgente';
+                        } else if (diffDays <= 7) {
+                            estado = 'Próxima';
+                            estadoClass = 'estado-proxima';
                         } else {
-                            // Calcular días de diferencia
-                            const diffDays = Math.ceil((fechaProxima - hoy) / (1000 * 60 * 60 * 24));
-                            
-                            if (diffDays <= 2) {
-                                estado = 'Urgente';
-                                estadoClass = 'estado-urgente';
-                            } else if (diffDays <= 7) {
-                                estado = 'Próxima';
-                                estadoClass = 'estado-proxima';
-                            } else {
-                                estado = 'Programada';
-                                estadoClass = 'estado-programada';
-                            }
+                            estado = 'Programada';
+                            estadoClass = 'estado-programada';
                         }
-                        
-                        // Formatear fechas
-                        const fechaUltimaLectura = new Date(lectura.ultima_fecha_lectura);
-                        const fechaUltimaFormateada = fechaUltimaLectura.toLocaleDateString('es-ES');
-                        
-                        const fechaProximaFormateada = fechaProxima.toLocaleDateString('es-ES');
-                        
-                        // Crear fila
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td data-botiquin-id="${lectura.id_botiquin}">${lectura.nombre_botiquin}</td>
-                            <td>${lectura.codigo_producto} - ${lectura.nombre_producto}</td>
-                            <td>${fechaUltimaFormateada}</td>
-                            <td>${lectura.cantidad_disponible}</td>
-                            <td>${fechaProximaFormateada}</td>
-                            <td><span class="estado-badge ${estadoClass}">${estado}</span></td>
-                            <td class="actions-cell">
-                                <button class="btn-primary btn-registrar-lectura" 
-                                        data-botiquin-id="${lectura.id_botiquin}"
-                                        data-producto-id="${lectura.id_producto}"
-                                        onclick="registrarNuevaLectura(${lectura.id_botiquin}, ${lectura.id_producto})">
-                                    Registrar lectura
-                                </button>
-                            </td>
-                        `;
-                        
-                        tbody.appendChild(tr);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="error-message">Error al cargar los datos</td></tr>';
-            });
+                    }
+                    
+                    // Formatear fechas
+                    const fechaUltimaLectura = new Date(lectura.ultima_fecha_lectura);
+                    const fechaUltimaFormateada = fechaUltimaLectura.toLocaleDateString('es-ES');
+                    
+                    const fechaProximaFormateada = fechaProxima.toLocaleDateString('es-ES');
+                    
+                    // Crear fila
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-botiquin-id="${lectura.id_botiquin}">${lectura.nombre_botiquin}</td>
+                        <td>${lectura.codigo_producto} - ${lectura.nombre_producto}</td>
+                        <td>${fechaUltimaFormateada}</td>
+                        <td>${lectura.cantidad_disponible}</td>
+                        <td>${fechaProximaFormateada}</td>
+                        <td><span class="estado-badge ${estadoClass}">${estado}</span></td>
+                        <td class="actions-cell">
+                            <button class="btn-primary btn-registrar-lectura" 
+                                    data-botiquin-id="${lectura.id_botiquin}"
+                                    data-producto-id="${lectura.id_producto}"
+                                    onclick="registrarNuevaLectura(${lectura.id_botiquin}, ${lectura.id_producto})">
+                                Registrar lectura
+                            </button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            tbody.innerHTML = '<tr><td colspan="7" class="error-message">Error al cargar los datos</td></tr>';
+        });
     }
 });
 

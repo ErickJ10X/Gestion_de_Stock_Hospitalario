@@ -18,9 +18,10 @@ $productoController = new ProductoController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireHospitalGestor();
+$authGuard->requireGestorHospital();
 
 $botiquines = $botiquinController->index()['botiquines'] ?? [];
+$productos = $productoController->index()['productos'] ?? [];
 $resultadoLecturas = $lecturasStockController->index();
 $lecturas = $resultadoLecturas['error'] ? [] : $resultadoLecturas['lecturas'];
 

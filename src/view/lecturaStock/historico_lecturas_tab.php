@@ -1,5 +1,5 @@
 <?php
-if (!isset($botiquines) || !isset($botiquinController) || !isset($productoController) || !isset($lecturas)) {
+if (!isset($botiquines) || !isset($lecturas)) {
     echo '<p>Error: Datos necesarios no disponibles.</p>';
     exit;
 }
@@ -15,7 +15,7 @@ if (!isset($botiquines) || !isset($botiquinController) || !isset($productoContro
                     <select id="filtro-botiquin" class="filtro-select">
                         <option value="">Todos los botiquines</option>
                         <?php foreach ($botiquines as $botiquin): ?>
-                            <option value="<?= $botiquin->getIdBotiquines() ?>">
+                            <option value="<?= $botiquin->getIdBotiquin() ?>">
                                 <?= htmlspecialchars($botiquin->getNombre()) ?>
                             </option>
                         <?php endforeach; ?>
@@ -46,24 +46,19 @@ if (!isset($botiquines) || !isset($botiquinController) || !isset($productoContro
                     <?php if (!empty($lecturas)): ?>
                         <?php foreach ($lecturas as $lectura): ?>
                             <?php
-                                // Obtenemos el botiquín correspondiente
-                                $botiquinResult = $botiquinController->show($lectura->getIdBotiquin());
-                                $nombreBotiquin = !$botiquinResult['error'] && isset($botiquinResult['botiquin']) 
-                                    ? $botiquinResult['botiquin']->getNombre() 
-                                    : 'Desconocido';
+                                // Intentar obtener el botiquín y producto de las relaciones
+                                $botiquin = $lectura->getBotiquin();
+                                $producto = $lectura->getProducto();
                                 
-                                // Obtenemos el producto correspondiente
-                                $productoResult = $productoController->show($lectura->getIdProducto());
-                                $nombreProducto = !$productoResult['error'] && isset($productoResult['producto']) 
-                                    ? $productoResult['producto']->getCodigo() . ' - ' . $productoResult['producto']->getNombre() 
-                                    : 'Desconocido';
+                                $nombreBotiquin = $botiquin ? $botiquin->getNombre() : 'Desconocido';
+                                $nombreProducto = $producto ? $producto->getCodigo() . ' - ' . $producto->getNombre() : 'Desconocido';
                             ?>
                             <tr data-botiquin="<?= $lectura->getIdBotiquin() ?>">
                                 <td><?= $lectura->getIdLectura() ?></td>
                                 <td><?= htmlspecialchars($nombreBotiquin) ?></td>
                                 <td><?= htmlspecialchars($nombreProducto) ?></td>
                                 <td><?= $lectura->getCantidadDisponible() ?></td>
-                                <td><?= date('d/m/Y H:i', strtotime($lectura->getFechaLectura())) ?></td>
+                                <td><?= $lectura->getFechaLectura()->format('d/m/Y H:i') ?></td>
                                 <td><?= $lectura->getRegistradoPor() ?></td>
                                 <td class="actions-cell">
                                     <a href="javascript:void(0)" class="btn-view btn-icon" title="Ver detalle"
@@ -145,40 +140,45 @@ function verDetalleLectura(lecturaId) {
     const detalleContent = document.getElementById('detalle-lectura-content');
     
     // Fetch para obtener los detalles de la lectura
-    fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/routes/lecturasStock.routes.php?action=show&id=${lecturaId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                detalleContent.innerHTML = `<p class="error">${data.mensaje}</p>`;
-            } else {
-                const lectura = data.lectura;
-                
-                // Formato de la fecha
-                const fechaObj = new Date(lectura.fecha_lectura);
-                const fechaFormateada = fechaObj.toLocaleDateString('es-ES') + ' ' + fechaObj.toLocaleTimeString('es-ES');
-                
-                let html = `
-                    <div class="detalle-lectura">
-                        <p><strong>ID Lectura:</strong> ${lectura.id_lectura}</p>
-                        <p><strong>Botiquín:</strong> ${lectura.nombre_botiquin}</p>
-                        <p><strong>Producto:</strong> ${lectura.codigo_producto} - ${lectura.nombre_producto}</p>
-                        <p><strong>Cantidad disponible:</strong> ${lectura.cantidad_disponible}</p>
-                        <p><strong>Fecha de lectura:</strong> ${fechaFormateada}</p>
-                        <p><strong>Registrado por:</strong> ${lectura.nombre_usuario || lectura.registrado_por}</p>
-                        <p><strong>Unidad de medida:</strong> ${lectura.unidad_medida}</p>
-                    </div>
-                `;
-                
-                detalleContent.innerHTML = html;
-            }
+    fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/LecturasStockController.php?action=show&id=${lecturaId}`, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            detalleContent.innerHTML = `<p class="error">${data.mensaje}</p>`;
+        } else {
+            const lectura = data.lectura;
             
-            modal.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            detalleContent.innerHTML = `<p class="error">Error al cargar los detalles de la lectura</p>`;
-            modal.style.display = 'block';
-        });
+            // Formato de la fecha
+            const fechaObj = new Date(lectura.fecha_lectura);
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES') + ' ' + fechaObj.toLocaleTimeString('es-ES');
+            
+            let html = `
+                <div class="detalle-lectura">
+                    <p><strong>ID Lectura:</strong> ${lectura.id_lectura}</p>
+                    <p><strong>Botiquín:</strong> ${lectura.nombre_botiquin || 'Desconocido'}</p>
+                    <p><strong>Producto:</strong> ${lectura.codigo_producto || ''} - ${lectura.nombre_producto || 'Desconocido'}</p>
+                    <p><strong>Cantidad disponible:</strong> ${lectura.cantidad_disponible}</p>
+                    <p><strong>Fecha de lectura:</strong> ${fechaFormateada}</p>
+                    <p><strong>Registrado por:</strong> ${lectura.nombre_usuario || lectura.registrado_por}</p>
+                    <p><strong>Unidad de medida:</strong> ${lectura.unidad_medida || 'No especificada'}</p>
+                </div>
+            `;
+            
+            detalleContent.innerHTML = html;
+        }
+        
+        modal.style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        detalleContent.innerHTML = `<p class="error">Error al cargar los detalles de la lectura</p>`;
+        modal.style.display = 'block';
+    });
 }
 </script>
 
