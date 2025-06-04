@@ -1,3 +1,8 @@
+<?php
+if (!isset($almacenes) || !isset($plantas) || !isset($productos)) {
+    die('No se han cargado los datos necesarios para la exportación.');
+}
+?>
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="card-title">Exportar Datos a CSV/Excel</h5>

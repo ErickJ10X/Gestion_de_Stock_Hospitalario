@@ -1,3 +1,8 @@
+<?php
+if (!isset($productos)){
+    die('No se han cargado los productos necesarios para el informe.');
+}
+?>
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="card-title">Filtros de Informe por Producto</h5>
