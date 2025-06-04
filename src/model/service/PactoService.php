@@ -2,6 +2,9 @@
 
 namespace model\service;
 
+require_once(__DIR__ . '/../../model\repository\PactoRepository.php');
+require_once(__DIR__ . '/../../model/entity/Pacto.php');
+
 use model\entity\Pacto;
 use model\repository\PactoRepository;
 use InvalidArgumentException;
@@ -9,8 +12,8 @@ use InvalidArgumentException;
 class PactoService {
     private PactoRepository $pactoRepository;
 
-    public function __construct(PactoRepository $pactoRepository = null) {
-        $this->pactoRepository = $pactoRepository ?? new PactoRepository();
+    public function __construct() {
+        $this->pactoRepository = new PactoRepository();
     }
 
     public function getPactoById(int $id): ?Pacto {

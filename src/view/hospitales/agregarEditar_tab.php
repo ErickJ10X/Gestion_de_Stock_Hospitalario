@@ -13,7 +13,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
                 <i class="fas fa-hospital-alt me-2"></i> Crear Hospital
             </div>
             <div class="card-body">
-                <form id="formCrearHospital" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/HospitalHandler.php" method="POST" class="card-form">
+                <form id="formCrearHospital" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/HospitalController.php" method="POST" class="card-form">
                     <input type="hidden" name="action" value="crear">
                     
                     <div class="mb-3">
@@ -97,7 +97,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
                 <i class="fas fa-layer-group me-2"></i> Crear Planta
             </div>
             <div class="card-body">
-                <form id="formCrearPlanta" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/PlantaHandler.php" method="POST" class="card-form">
+                <form id="formCrearPlanta" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/PlantaController.php" method="POST" class="card-form">
                     <input type="hidden" name="action" value="crear">
                     
                     <div class="mb-3">

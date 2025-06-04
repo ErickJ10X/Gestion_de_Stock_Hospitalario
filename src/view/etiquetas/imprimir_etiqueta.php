@@ -138,13 +138,13 @@ if ($idEtiqueta) {
             
             <div class="btn-container no-print">
                 <button onclick="window.print()" class="btn">Imprimir Etiqueta</button>
-                <a href="listar_etiquetas.php" class="btn">Volver a la lista</a>
+                <a href="index.php" class="btn">Volver a la lista</a>
             </div>
         <?php else: ?>
             <div class="no-print">
                 <p>No se encontró la etiqueta especificada</p>
                 <div class="btn-container">
-                    <a href="listar_etiquetas.php" class="btn">Volver a la lista</a>
+                    <a href="index.php" class="btn">Volver a la lista</a>
                 </div>
             </div>
         <?php endif; ?>

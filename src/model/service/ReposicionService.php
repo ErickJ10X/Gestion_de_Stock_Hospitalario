@@ -2,34 +2,19 @@
 
 namespace model\service;
 
-require_once __DIR__ . '/../repository/botiquinRepository.php';
-require_once __DIR__ . '/../repository/almacenRepository.php';
-require_once __DIR__ . '/../repository/etiquetaRepository.php';
-require_once __DIR__ . '/../repository/productoRepository.php';
-require_once __DIR__ . '/../repository/reposicionRepository.php';
+require_once(__DIR__ . '/../../model/entity/Reposicion.php');
+require_once(__DIR__ . '/../../model/repository/ReposicionRepository.php');
 
 use model\entity\Reposicion;
 use model\repository\ReposicionRepository;
-use model\repository\ProductoRepository;
-use model\repository\AlmacenRepository;
-use model\repository\BotiquinRepository;
-use model\repository\EtiquetaRepository;
 use DateTime;
 use InvalidArgumentException;
 
 class ReposicionService {
     private ReposicionRepository $reposicionRepository;
-    private ?ProductoRepository $productoRepository;
-    private ?AlmacenRepository $almacenRepository;
-    private ?BotiquinRepository $botiquinRepository;
-    private ?EtiquetaRepository $etiquetaRepository;
 
-    public function __construct() {
-        $this->reposicionRepository = new ReposicionRepository();
-        $this->productoRepository = new ProductoRepository();
-        $this->almacenRepository = new AlmacenRepository();
-        $this->botiquinRepository = new BotiquinRepository();
-        $this->etiquetaRepository = new EtiquetaRepository();
+    public function __construct(ReposicionRepository $reposicionRepository = null) {
+        $this->reposicionRepository = $reposicionRepository ?? new ReposicionRepository();
     }
 
     public function getReposicionById(int $id): ?Reposicion {
@@ -40,16 +25,23 @@ class ReposicionService {
         return $this->reposicionRepository->findAll();
     }
 
-    public function getReposicionesByProducto(int $idProducto): array {
-        return $this->reposicionRepository->findByProducto($idProducto);
-    }
-
-    public function getReposicionesByBotiquin(int $idBotiquin): array {
-        return $this->reposicionRepository->findByBotiquin($idBotiquin);
+    /**
+     * Obtiene las reposiciones dentro de un rango de fechas
+     * 
+     * @param DateTime $fechaDesde Fecha inicial
+     * @param DateTime $fechaHasta Fecha final
+     * @return array Lista de reposiciones
+     */
+    public function getReposicionesByFechas(DateTime $fechaDesde, DateTime $fechaHasta): array {
+        return $this->reposicionRepository->findByFechas($fechaDesde, $fechaHasta);
     }
 
     public function getReposicionesByAlmacen(int $idAlmacen): array {
         return $this->reposicionRepository->findByAlmacen($idAlmacen);
+    }
+
+    public function getReposicionesByBotiquin(int $idBotiquin): array {
+        return $this->reposicionRepository->findByBotiquin($idBotiquin);
     }
 
     public function getReposicionesUrgentes(): array {
@@ -57,35 +49,27 @@ class ReposicionService {
     }
 
     public function crearReposicion(array $data): Reposicion {
-        $this->validateReposicionData($data);
+        $this->validarReposicionData($data);
         
-        $fecha = isset($data['fecha']) 
-            ? (is_string($data['fecha']) ? new DateTime($data['fecha']) : $data['fecha']) 
-            : new DateTime();
-
         $reposicion = new Reposicion(
+            null,
             $data['id_producto'],
             $data['desde_almacen'],
             $data['hacia_botiquin'],
             $data['cantidad_repuesta'],
-            $fecha,
-            $data['urgente'] ?? false
+            $data['fecha'] ?? new DateTime(),
+            $data['urgente'] ?? false,
+            $data['notas'] ?? ''
         );
         
-        $reposicion = $this->reposicionRepository->save($reposicion);
-        
-        // Si hay un servicio de etiquetas disponible, se podrían generar las etiquetas automáticamente
-        if ($this->etiquetaRepository && isset($data['generar_etiquetas']) && $data['generar_etiquetas']) {
-            // Implementación para generar etiquetas
-        }
-        
-        return $reposicion;
+        return $this->reposicionRepository->save($reposicion);
     }
 
     public function actualizarReposicion(int $id, array $data): Reposicion {
         $reposicion = $this->reposicionRepository->findById($id);
+        
         if (!$reposicion) {
-            throw new InvalidArgumentException('Reposición no encontrada');
+            throw new InvalidArgumentException("Reposición no encontrada");
         }
         
         if (isset($data['id_producto'])) {
@@ -105,50 +89,39 @@ class ReposicionService {
         }
         
         if (isset($data['fecha'])) {
-            $fecha = is_string($data['fecha']) ? new DateTime($data['fecha']) : $data['fecha'];
-            $reposicion->setFecha($fecha);
+            $reposicion->setFecha($data['fecha']);
         }
         
         if (isset($data['urgente'])) {
             $reposicion->setUrgente($data['urgente']);
         }
         
+        if (isset($data['notas'])) {
+            $reposicion->setNotas($data['notas']);
+        }
+        
         return $this->reposicionRepository->save($reposicion);
     }
 
     public function eliminarReposicion(int $id): bool {
-        // Se podrían agregar validaciones adicionales antes de eliminar
         return $this->reposicionRepository->delete($id);
     }
 
-    private function validateReposicionData(array $data): void {
-        if (!isset($data['id_producto'])) {
-            throw new InvalidArgumentException('El producto es obligatorio');
+    private function validarReposicionData(array $data): void {
+        if (!isset($data['id_producto']) || empty($data['id_producto'])) {
+            throw new InvalidArgumentException("El producto es obligatorio");
         }
         
-        if (!isset($data['desde_almacen'])) {
-            throw new InvalidArgumentException('El almacén origen es obligatorio');
+        if (!isset($data['desde_almacen']) || empty($data['desde_almacen'])) {
+            throw new InvalidArgumentException("El almacén de origen es obligatorio");
         }
         
-        if (!isset($data['hacia_botiquin'])) {
-            throw new InvalidArgumentException('El botiquín destino es obligatorio');
+        if (!isset($data['hacia_botiquin']) || empty($data['hacia_botiquin'])) {
+            throw new InvalidArgumentException("El botiquín de destino es obligatorio");
         }
         
         if (!isset($data['cantidad_repuesta']) || $data['cantidad_repuesta'] <= 0) {
-            throw new InvalidArgumentException('La cantidad repuesta debe ser mayor que cero');
-        }
-        
-        // Validaciones adicionales si hay repositorios disponibles
-        if ($this->productoRepository && !$this->productoRepository->findById($data['id_producto'])) {
-            throw new InvalidArgumentException('El producto especificado no existe');
-        }
-        
-        if ($this->almacenRepository && !$this->almacenRepository->findById($data['desde_almacen'])) {
-            throw new InvalidArgumentException('El almacén especificado no existe');
-        }
-        
-        if ($this->botiquinRepository && !$this->botiquinRepository->findById($data['hacia_botiquin'])) {
-            throw new InvalidArgumentException('El botiquín especificado no existe');
+            throw new InvalidArgumentException("La cantidad debe ser mayor que cero");
         }
     }
 }

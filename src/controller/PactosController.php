@@ -23,7 +23,7 @@ class PactosController
 
     public function __construct()
     {
-        $this->pactoService = new PactoService(new PactoRepository());
+        $this->pactoService = new PactoService();
         $this->session = new Session();
         $this->authGuard = new AuthGuard();
     }
@@ -135,7 +135,7 @@ class PactosController
      */
     public function crear(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $idProducto = isset($_POST['id_producto']) ? (int)$_POST['id_producto'] : 0;

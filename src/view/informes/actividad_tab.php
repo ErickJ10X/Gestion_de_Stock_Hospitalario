@@ -1,5 +1,5 @@
 <?php
-if(!isset($almacenes) || !isset($plantas) || !isset($reposiciones)) {
+if(!isset($almacenes) || !isset($plantas) || !isset($informesController)) {
     die('No se puede acceder directamente a este archivo.');
 }
 ?>
@@ -130,39 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
         pageLength: 10
     });
     
-    // Función para cargar datos de actividad
-    function cargarDatosActividad() {
-        const fechaDesde = document.getElementById('filtro-fecha-desde').value;
-        const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
-        const idAlmacen = document.getElementById('filtro-almacen').value;
-        const idPlanta = document.getElementById('filtro-planta').value;
-        
-        // URL para la API que obtendría los datos
-        let url = '/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/api/informes_api.php?accion=actividad';
-        url += `&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`;
-        
-        if (idAlmacen) {
-            url += `&id_almacen=${idAlmacen}`;
-        }
-        
-        if (idPlanta) {
-            url += `&id_planta=${idPlanta}`;
-        }
-        
-        // Mostrar mensaje de carga
-        document.getElementById('tabla-actividad-body').innerHTML = '<tr><td colspan="6" class="text-center">Cargando datos...</td></tr>';
-        
-        // En una implementación real, aquí se haría la petición a la API
-        // Por ahora, simulamos datos
-        const datosSimulados = generarDatosSimulados();
-        setTimeout(() => {
-            actualizarTabla(datosSimulados);
-            actualizarGraficos(datosSimulados);
-        }, 500);
-    }
-    
     // Función para actualizar la tabla con los datos
-    function actualizarTabla(datos) {
+    function actualizarTablaActividad(datos) {
         tablaActividad.clear();
         
         if (datos.length === 0) {
@@ -174,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.almacen,
                     item.planta,
                     item.producto,
-                    item.cantidad,
+                    item.cantidad_entrada > 0 ? item.cantidad_entrada : item.cantidad_salida,
                     `<span class="badge bg-${item.tipo === 'Entrada' ? 'success' : 'warning'}">${item.tipo}</span>`
                 ]).draw(false);
             });
@@ -184,60 +153,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Función para actualizar los gráficos
-    function actualizarGraficos(datos) {
-        // Procesar datos para gráfico por almacén
-        const datosAlmacen = procesarDatosParaGraficoAlmacen(datos);
+    function actualizarGraficosActividad(datosAlmacen, datosPlanta) {
         actualizarGraficoAlmacen(datosAlmacen);
-        
-        // Procesar datos para gráfico por planta
-        const datosPlanta = procesarDatosParaGraficoPlanta(datos);
         actualizarGraficoPlanta(datosPlanta);
-    }
-    
-    // Función para procesar datos para el gráfico de almacén
-    function procesarDatosParaGraficoAlmacen(datos) {
-        const almacenes = {};
-        
-        datos.forEach(item => {
-            if (!almacenes[item.almacen]) {
-                almacenes[item.almacen] = { entrada: 0, salida: 0 };
-            }
-            
-            if (item.tipo === 'Entrada') {
-                almacenes[item.almacen].entrada += parseInt(item.cantidad);
-            } else {
-                almacenes[item.almacen].salida += parseInt(item.cantidad);
-            }
-        });
-        
-        return almacenes;
-    }
-    
-    // Función para procesar datos para el gráfico de planta
-    function procesarDatosParaGraficoPlanta(datos) {
-        const plantas = {};
-        
-        datos.forEach(item => {
-            if (!plantas[item.planta]) {
-                plantas[item.planta] = { entrada: 0, salida: 0 };
-            }
-            
-            if (item.tipo === 'Entrada') {
-                plantas[item.planta].entrada += parseInt(item.cantidad);
-            } else {
-                plantas[item.planta].salida += parseInt(item.cantidad);
-            }
-        });
-        
-        return plantas;
     }
     
     // Función para actualizar el gráfico de almacén
     function actualizarGraficoAlmacen(datos) {
         const ctx = document.getElementById('grafico-actividad-almacen').getContext('2d');
         const labels = Object.keys(datos);
-        const datosEntrada = labels.map(almacen => datos[almacen].entrada);
-        const datosSalida = labels.map(almacen => datos[almacen].salida);
+        const datosEntrada = labels.map(almacen => datos[almacen].entradas);
+        const datosSalida = labels.map(almacen => datos[almacen].salidas);
         
         if (graficoPorAlmacen) {
             graficoPorAlmacen.destroy();
@@ -291,8 +217,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function actualizarGraficoPlanta(datos) {
         const ctx = document.getElementById('grafico-actividad-planta').getContext('2d');
         const labels = Object.keys(datos);
-        const datosEntrada = labels.map(planta => datos[planta].entrada);
-        const datosSalida = labels.map(planta => datos[planta].salida);
+        const datosEntrada = labels.map(planta => datos[planta].entradas);
+        const datosSalida = labels.map(planta => datos[planta].salidas);
         
         if (graficoPorPlanta) {
             graficoPorPlanta.destroy();
@@ -342,40 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Función para formatear fecha en formato DD/MM/YYYY
-    function formatearFecha(fecha) {
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES');
-    }
-    
-    // Función para generar datos simulados (solo para demostración)
-    function generarDatosSimulados() {
-        const almacenes = ['Almacén Central', 'Almacén Planta 1', 'Almacén Urgencias'];
-        const plantas = ['Planta 1', 'Planta 2', 'Urgencias', 'UCI'];
-        const productos = ['Guantes', 'Mascarillas', 'Vendas', 'Jeringas', 'Gasas'];
-        const tipos = ['Entrada', 'Salida'];
-        const datos = [];
-        
-        // Generar entre 10 y 20 registros aleatorios
-        const numRegistros = Math.floor(Math.random() * 11) + 10;
-        
-        for (let i = 0; i < numRegistros; i++) {
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 30)); // Fecha aleatoria en los últimos 30 días
-            
-            datos.push({
-                fecha: fecha.toISOString().split('T')[0],
-                almacen: almacenes[Math.floor(Math.random() * almacenes.length)],
-                planta: plantas[Math.floor(Math.random() * plantas.length)],
-                producto: productos[Math.floor(Math.random() * productos.length)],
-                cantidad: Math.floor(Math.random() * 100) + 1,
-                tipo: tipos[Math.floor(Math.random() * tipos.length)]
-            });
-        }
-        
-        return datos;
-    }
-    
     // Manejar el botón de aplicar filtros
     document.getElementById('btn-aplicar-filtro-actividad').addEventListener('click', function() {
         cargarDatosActividad();
@@ -383,8 +275,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Manejar el botón de exportar
     document.getElementById('btn-exportar-actividad').addEventListener('click', function() {
-        // Aquí iría la lógica para exportar a Excel
-        alert('Función de exportación a Excel (pendiente de implementar)');
+        const fechaDesde = document.getElementById('filtro-fecha-desde').value;
+        const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
+        const idAlmacen = document.getElementById('filtro-almacen').value;
+        const idPlanta = document.getElementById('filtro-planta').value;
+        
+        let url = '?export=actividad';
+        url += `&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`;
+        
+        if (idAlmacen) {
+            url += `&id_almacen=${idAlmacen}`;
+        }
+        
+        if (idPlanta) {
+            url += `&id_planta=${idPlanta}`;
+        }
+        
+        window.location.href = url;
     });
     
     // Cargar datos iniciales

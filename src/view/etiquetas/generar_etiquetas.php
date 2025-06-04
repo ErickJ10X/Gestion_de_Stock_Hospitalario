@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-print"></i> Generar Etiqueta
                             </button>
-                            <a href="listar_etiquetas.php" class="btn btn-secondary">
+                            <a href="index.php" class="btn btn-secondary">
                                 <i class="fas fa-list"></i> Ver Etiquetas
                             </a>
                         </div>

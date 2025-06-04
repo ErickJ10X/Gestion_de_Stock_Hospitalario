@@ -2,159 +2,112 @@
 
 namespace model\repository;
 
-require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../entity/Reposicion.php';
+require_once __DIR__ . '/../../../config/Database.php';
 
 use model\entity\Reposicion;
-use model\entity\Producto;
-use model\entity\Almacen;
-use model\entity\Botiquin;
+use config\Database;
 use DateTime;
 use PDO;
+use PDOException;
 
 class ReposicionRepository {
-    private PDO $conexion;
+    private PDO $conn;
 
-    public function __construct(PDO $conexion = null) {
-        if ($conexion === null) {
-            $this->conexion = getConnection();
-        } else {
-            $this->conexion = $conexion;
-        }
+    public function __construct() {
+        $this->conn = getConnection();
     }
 
     public function findById(int $id): ?Reposicion {
-        $stmt = $this->conexion->prepare("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            WHERE r.id_reposicion = :id
-        ");
+        $sql = "SELECT * FROM reposiciones WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$data) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$row) {
             return null;
         }
         
-        return $this->createReposicionFromData($data);
+        return $this->createReposicionFromRow($row);
     }
 
     public function findAll(): array {
-        $stmt = $this->conexion->query("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            ORDER BY r.fecha DESC
-        ");
-        
-        $reposiciones = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reposiciones[] = $this->createReposicionFromData($data);
-        }
-        
-        return $reposiciones;
-    }
-    
-    public function findByProducto(int $idProducto): array {
-        $stmt = $this->conexion->prepare("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            WHERE r.id_producto = :id_producto
-            ORDER BY r.fecha DESC
-        ");
-        $stmt->bindParam(':id_producto', $idProducto);
+        $sql = "SELECT * FROM reposiciones ORDER BY fecha DESC";
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         
         $reposiciones = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reposiciones[] = $this->createReposicionFromData($data);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reposiciones[] = $this->createReposicionFromRow($row);
         }
         
         return $reposiciones;
     }
-    
-    public function findByBotiquin(int $idBotiquin): array {
-        $stmt = $this->conexion->prepare("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            WHERE r.hacia_botiquin = :id_botiquin
-            ORDER BY r.fecha DESC
-        ");
-        $stmt->bindParam(':id_botiquin', $idBotiquin);
+
+    /**
+     * Busca reposiciones dentro de un rango de fechas
+     * 
+     * @param DateTime $fechaDesde Fecha inicial
+     * @param DateTime $fechaHasta Fecha final
+     * @return array Lista de reposiciones
+     */
+    public function findByFechas(DateTime $fechaDesde, DateTime $fechaHasta): array {
+        $sql = "SELECT * FROM reposiciones WHERE fecha >= :fecha_desde AND fecha <= :fecha_hasta ORDER BY fecha DESC";
+        $stmt = $this->conn->prepare($sql);
+        
+        $fechaDesdeStr = $fechaDesde->format('Y-m-d 00:00:00');
+        $fechaHastaStr = $fechaHasta->format('Y-m-d 23:59:59');
+        
+        $stmt->bindParam(':fecha_desde', $fechaDesdeStr);
+        $stmt->bindParam(':fecha_hasta', $fechaHastaStr);
         $stmt->execute();
         
         $reposiciones = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reposiciones[] = $this->createReposicionFromData($data);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reposiciones[] = $this->createReposicionFromRow($row);
         }
         
         return $reposiciones;
     }
-    
+
     public function findByAlmacen(int $idAlmacen): array {
-        $stmt = $this->conexion->prepare("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            WHERE r.desde_almacen = :id_almacen
-            ORDER BY r.fecha DESC
-        ");
+        $sql = "SELECT * FROM reposiciones WHERE desde_almacen = :id_almacen ORDER BY fecha DESC";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id_almacen', $idAlmacen);
         $stmt->execute();
         
         $reposiciones = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reposiciones[] = $this->createReposicionFromData($data);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reposiciones[] = $this->createReposicionFromRow($row);
+        }
+        
+        return $reposiciones;
+    }
+
+    public function findByBotiquin(int $idBotiquin): array {
+        $sql = "SELECT * FROM reposiciones WHERE hacia_botiquin = :id_botiquin ORDER BY fecha DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id_botiquin', $idBotiquin);
+        $stmt->execute();
+        
+        $reposiciones = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reposiciones[] = $this->createReposicionFromRow($row);
         }
         
         return $reposiciones;
     }
 
     public function findUrgentes(): array {
-        $stmt = $this->conexion->query("
-            SELECT r.*, 
-                   p.nombre as producto_nombre, p.codigo as producto_codigo,
-                   a.tipo as almacen_tipo,
-                   b.nombre as botiquin_nombre 
-            FROM reposiciones r
-            LEFT JOIN productos p ON r.id_producto = p.id_producto
-            LEFT JOIN almacenes a ON r.desde_almacen = a.id_almacen
-            LEFT JOIN botiquines b ON r.hacia_botiquin = b.id_botiquin
-            WHERE r.urgente = 1
-            ORDER BY r.fecha DESC
-        ");
+        $sql = "SELECT * FROM reposiciones WHERE urgente = TRUE ORDER BY fecha DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
         
         $reposiciones = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $reposiciones[] = $this->createReposicionFromData($data);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $reposiciones[] = $this->createReposicionFromRow($row);
         }
         
         return $reposiciones;
@@ -169,47 +122,65 @@ class ReposicionRepository {
     }
 
     private function insert(Reposicion $reposicion): Reposicion {
-        $stmt = $this->conexion->prepare("
-            INSERT INTO reposiciones (id_producto, desde_almacen, hacia_botiquin, cantidad_repuesta, fecha, urgente)
-            VALUES (:id_producto, :desde_almacen, :hacia_botiquin, :cantidad_repuesta, :fecha, :urgente)
-        ");
+        $sql = "INSERT INTO reposiciones (id_producto, desde_almacen, hacia_botiquin, cantidad_repuesta, fecha, urgente, notas)
+                VALUES (:id_producto, :desde_almacen, :hacia_botiquin, :cantidad_repuesta, :fecha, :urgente, :notas)";
         
-        $fechaFormato = $reposicion->getFecha()->format('Y-m-d H:i:s');
+        $stmt = $this->conn->prepare($sql);
         
-        $stmt->bindValue(':id_producto', $reposicion->getIdProducto());
-        $stmt->bindValue(':desde_almacen', $reposicion->getDesdeAlmacen());
-        $stmt->bindValue(':hacia_botiquin', $reposicion->getHaciaBotiquin());
-        $stmt->bindValue(':cantidad_repuesta', $reposicion->getCantidadRepuesta());
-        $stmt->bindValue(':fecha', $fechaFormato);
-        $stmt->bindValue(':urgente', $reposicion->isUrgente(), PDO::PARAM_BOOL);
+        $idProducto = $reposicion->getIdProducto();
+        $desdeAlmacen = $reposicion->getDesdeAlmacen();
+        $haciaBotiquin = $reposicion->getHaciaBotiquin();
+        $cantidadRepuesta = $reposicion->getCantidadRepuesta();
+        $fecha = $reposicion->getFecha()->format('Y-m-d H:i:s');
+        $urgente = $reposicion->isUrgente() ? 1 : 0;
+        $notas = $reposicion->getNotas();
+        
+        $stmt->bindParam(':id_producto', $idProducto);
+        $stmt->bindParam(':desde_almacen', $desdeAlmacen);
+        $stmt->bindParam(':hacia_botiquin', $haciaBotiquin);
+        $stmt->bindParam(':cantidad_repuesta', $cantidadRepuesta);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':urgente', $urgente);
+        $stmt->bindParam(':notas', $notas);
         
         $stmt->execute();
-        $reposicion->setId($this->conexion->lastInsertId());
+        
+        $id = $this->conn->lastInsertId();
+        $reposicion->setId($id);
         
         return $reposicion;
     }
 
     private function update(Reposicion $reposicion): Reposicion {
-        $stmt = $this->conexion->prepare("
-            UPDATE reposiciones
-            SET id_producto = :id_producto,
-                desde_almacen = :desde_almacen,
-                hacia_botiquin = :hacia_botiquin,
-                cantidad_repuesta = :cantidad_repuesta,
-                fecha = :fecha,
-                urgente = :urgente
-            WHERE id_reposicion = :id_reposicion
-        ");
+        $sql = "UPDATE reposiciones 
+                SET id_producto = :id_producto, 
+                    desde_almacen = :desde_almacen,
+                    hacia_botiquin = :hacia_botiquin,
+                    cantidad_repuesta = :cantidad_repuesta,
+                    fecha = :fecha,
+                    urgente = :urgente,
+                    notas = :notas
+                WHERE id = :id";
         
-        $fechaFormato = $reposicion->getFecha()->format('Y-m-d H:i:s');
+        $stmt = $this->conn->prepare($sql);
         
-        $stmt->bindValue(':id_producto', $reposicion->getIdProducto());
-        $stmt->bindValue(':desde_almacen', $reposicion->getDesdeAlmacen());
-        $stmt->bindValue(':hacia_botiquin', $reposicion->getHaciaBotiquin());
-        $stmt->bindValue(':cantidad_repuesta', $reposicion->getCantidadRepuesta());
-        $stmt->bindValue(':fecha', $fechaFormato);
-        $stmt->bindValue(':urgente', $reposicion->isUrgente(), PDO::PARAM_BOOL);
-        $stmt->bindValue(':id_reposicion', $reposicion->getId());
+        $id = $reposicion->getId();
+        $idProducto = $reposicion->getIdProducto();
+        $desdeAlmacen = $reposicion->getDesdeAlmacen();
+        $haciaBotiquin = $reposicion->getHaciaBotiquin();
+        $cantidadRepuesta = $reposicion->getCantidadRepuesta();
+        $fecha = $reposicion->getFecha()->format('Y-m-d H:i:s');
+        $urgente = $reposicion->isUrgente() ? 1 : 0;
+        $notas = $reposicion->getNotas();
+        
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':id_producto', $idProducto);
+        $stmt->bindParam(':desde_almacen', $desdeAlmacen);
+        $stmt->bindParam(':hacia_botiquin', $haciaBotiquin);
+        $stmt->bindParam(':cantidad_repuesta', $cantidadRepuesta);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':urgente', $urgente);
+        $stmt->bindParam(':notas', $notas);
         
         $stmt->execute();
         
@@ -217,25 +188,23 @@ class ReposicionRepository {
     }
 
     public function delete(int $id): bool {
-        $stmt = $this->conexion->prepare("DELETE FROM reposiciones WHERE id_reposicion = :id");
+        $sql = "DELETE FROM reposiciones WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
+        
         return $stmt->execute();
     }
-    
-    private function createReposicionFromData(array $data): Reposicion {
-        $reposicion = new Reposicion(
-            $data['id_producto'],
-            $data['desde_almacen'],
-            $data['hacia_botiquin'],
-            $data['cantidad_repuesta'],
-            new DateTime($data['fecha']),
-            (bool)$data['urgente']
+
+    private function createReposicionFromRow(array $row): Reposicion {
+        return new Reposicion(
+            (int)$row['id'],
+            (int)$row['id_producto'],
+            (int)$row['desde_almacen'],
+            (int)$row['hacia_botiquin'],
+            (float)$row['cantidad_repuesta'],
+            new DateTime($row['fecha']),
+            (bool)$row['urgente'],
+            $row['notas'] ?? ''
         );
-        
-        $reposicion->setId($data['id_reposicion']);
-        
-        // Aquí se podrían añadir más datos relacionados si fuera necesario
-        
-        return $reposicion;
     }
 }

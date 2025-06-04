@@ -5,6 +5,7 @@ namespace controller;
 use model\service\PlantaService;
 use model\service\HospitalService;
 use model\entity\Planta;
+use util\Redirect;
 use util\Session;
 use util\AuthGuard;
 use Exception;
@@ -98,7 +99,7 @@ class PlantaController {
      * Crea una nueva planta
      */
     public function crear(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             // Validar datos
@@ -126,7 +127,7 @@ class PlantaController {
             ]);
             
             $this->session->setMessage('success', "Planta creada correctamente");
-            $this->redirect('../hospitales/index.php');
+            Redirect::toHospitales();
         } catch (Exception $e) {
             $this->session->setMessage('error', $e->getMessage());
             $this->redirect('../hospitales/index.php?tab=agregar-editar');
@@ -137,7 +138,7 @@ class PlantaController {
      * Actualiza una planta existente
      */
     public function editar(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             // Validar datos

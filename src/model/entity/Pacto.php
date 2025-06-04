@@ -19,6 +19,7 @@ class Pacto
     public function __construct()
     {
         $this->activo = true;
+        $this->id_pacto = 0;
     }
 
     public function getIdPacto(): int

@@ -1,5 +1,5 @@
 <?php
-if(!isset($reposiciones) || !isset($productos) || !isset($almacenes)) {
+if(!isset($reposiciones) || !isset($productos) || !isset($almacenes) || !isset($informesController)) {
     die('No se puede acceder directamente a este archivo.');
 }
 ?>
@@ -109,37 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         pageLength: 10
     });
     
-    // Función para cargar datos de reposiciones
-    function cargarDatosReposiciones() {
-        const fechaDesde = document.getElementById('filtro-fecha-desde-repo').value;
-        const fechaHasta = document.getElementById('filtro-fecha-hasta-repo').value;
-        const idProducto = document.getElementById('filtro-producto').value;
-        const urgencia = document.getElementById('filtro-urgencia').value;
-        
-        // URL para la API que obtendría los datos
-        let url = '/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/api/informes_api.php?accion=reposiciones';
-        url += `&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`;
-        
-        if (idProducto) {
-            url += `&id_producto=${idProducto}`;
-        }
-        
-        if (urgencia !== '') {
-            url += `&urgente=${urgencia}`;
-        }
-        
-        // Mostrar mensaje de carga
-        document.getElementById('tabla-reposiciones-body').innerHTML = '<tr><td colspan="7" class="text-center">Cargando datos...</td></tr>';
-        
-        // En una implementación real, aquí se haría la petición a la API
-        // Por ahora, simulamos datos
-        const datosSimulados = generarDatosReposicionesSimulados();
-        setTimeout(() => {
-            actualizarTablaReposiciones(datosSimulados);
-            actualizarGraficoReposiciones(datosSimulados);
-        }, 500);
-    }
-    
     // Función para actualizar la tabla con los datos
     function actualizarTablaReposiciones(datos) {
         tablaReposiciones.clear();
@@ -165,16 +134,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para actualizar el gráfico de reposiciones
     function actualizarGraficoReposiciones(datos) {
-        // Agrupar datos por mes o por día según el rango de fechas
-        const datosProcesados = procesarDatosParaGraficoReposiciones(datos);
-        
         const ctx = document.getElementById('grafico-reposiciones-periodo').getContext('2d');
         
         if (graficoReposiciones) {
             graficoReposiciones.destroy();
         }
         
-        if (datosProcesados.labels.length === 0) {
+        if (!datos || datos.periodos.length === 0) {
             document.getElementById('sin-datos-repo').style.display = 'block';
             return;
         } else {
@@ -184,11 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
         graficoReposiciones = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: datosProcesados.labels,
+                labels: datos.periodos,
                 datasets: [
                     {
-                        label: 'Cantidad reposiciones',
-                        data: datosProcesados.valores,
+                        label: 'Total reposiciones',
+                        data: datos.totales,
                         borderColor: 'rgba(54, 162, 235, 1)',
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderWidth: 2,
@@ -197,9 +163,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         label: 'Urgentes',
-                        data: datosProcesados.urgentes,
+                        data: datos.urgentes,
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    },
+                    {
+                        label: 'Normales',
+                        data: datos.normales,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderWidth: 2,
                         tension: 0.1,
                         fill: true
@@ -222,92 +197,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Función para procesar datos para el gráfico de reposiciones
-    function procesarDatosParaGraficoReposiciones(datos) {
-        const fechas = {};
-        
-        datos.forEach(item => {
-            const fecha = item.fecha.substring(0, 7); // Formato YYYY-MM para agrupar por mes
-            
-            if (!fechas[fecha]) {
-                fechas[fecha] = { total: 0, urgentes: 0 };
-            }
-            
-            fechas[fecha].total++;
-            if (item.urgente) {
-                fechas[fecha].urgentes++;
-            }
-        });
-        
-        // Convertir a arrays para el gráfico
-        const labels = Object.keys(fechas).sort();
-        const valores = labels.map(fecha => fechas[fecha].total);
-        const urgentes = labels.map(fecha => fechas[fecha].urgentes);
-        
-        // Formatear las etiquetas de fecha a formato legible
-        const labelsFormateados = labels.map(fecha => {
-            const [year, month] = fecha.split('-');
-            const nombresMes = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            return nombresMes[parseInt(month) - 1] + ' ' + year;
-        });
-        
-        return {
-            labels: labelsFormateados,
-            valores: valores,
-            urgentes: urgentes
-        };
-    }
-    
-    // Función para formatear fecha en formato DD/MM/YYYY
-    function formatearFecha(fecha) {
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES');
-    }
-    
-    // Función para generar datos simulados de reposiciones (solo para demostración)
-    function generarDatosReposicionesSimulados() {
-        const productos = ['Guantes', 'Mascarillas', 'Vendas', 'Jeringas', 'Gasas'];
-        const almacenes = ['Almacén Central', 'Almacén Planta 1', 'Almacén Urgencias'];
-        const botiquines = ['Botiquín Planta 1', 'Botiquín Planta 2', 'Botiquín Urgencias', 'Botiquín UCI'];
-        const datos = [];
-        
-        // Generar entre 20 y 40 registros aleatorios
-        const numRegistros = Math.floor(Math.random() * 21) + 20;
-        
-        for (let i = 0; i < numRegistros; i++) {
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 90)); // Fecha aleatoria en los últimos 90 días
-            
-            datos.push({
-                id: i + 1,
-                fecha: fecha.toISOString().split('T')[0],
-                producto: productos[Math.floor(Math.random() * productos.length)],
-                desde_almacen: almacenes[Math.floor(Math.random() * almacenes.length)],
-                hasta_botiquin: botiquines[Math.floor(Math.random() * botiquines.length)],
-                cantidad: Math.floor(Math.random() * 100) + 1,
-                urgente: Math.random() > 0.7 // 30% de probabilidad de ser urgente
-            });
-        }
-        
-        // Ordenar por fecha (descendente)
-        datos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        
-        return datos;
-    }
-    
     // Manejar el botón de aplicar filtros
     document.getElementById('btn-aplicar-filtro-repo').addEventListener('click', function() {
-        cargarDatosReposiciones();
+        cargarDatosHistoricoReposiciones();
     });
     
     // Manejar el botón de exportar
     document.getElementById('btn-exportar-repo').addEventListener('click', function() {
-        // Aquí iría la lógica para exportar a Excel
-        alert('Función de exportación a Excel (pendiente de implementar)');
+        const fechaDesde = document.getElementById('filtro-fecha-desde-repo').value;
+        const fechaHasta = document.getElementById('filtro-fecha-hasta-repo').value;
+        const idProducto = document.getElementById('filtro-producto').value;
+        const urgencia = document.getElementById('filtro-urgencia').value;
+        
+        let url = '?export=reposiciones';
+        url += `&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`;
+        
+        if (idProducto) {
+            url += `&id_producto=${idProducto}`;
+        }
+        
+        if (urgencia !== '') {
+            url += `&urgente=${urgencia}`;
+        }
+        
+        window.location.href = url;
     });
     
     // Cargar datos iniciales
-    cargarDatosReposiciones();
+    cargarDatosHistoricoReposiciones();
 });
 </script>
 

@@ -2,10 +2,12 @@
 
 namespace controller;
 
+use JetBrains\PhpStorm\NoReturn;
 use model\service\HospitalService;
 use model\service\PlantaService;
 use model\entity\Hospital;
 use model\entity\Planta;
+use util\Redirect;
 use util\Session;
 use util\AuthGuard;
 use Exception;
@@ -107,7 +109,7 @@ class HospitalController {
      * Crea un nuevo hospital
      */
     public function crear(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             // Validar datos
@@ -125,9 +127,10 @@ class HospitalController {
             ]);
             
             $this->session->setMessage('success', "Hospital creado correctamente");
-            $this->redirect('index.php');
+            Redirect::toHospitales();
         } catch (Exception $e) {
             $this->session->setMessage('error', $e->getMessage());
+            Redirect::toHospitales();
             $this->redirect('index.php?tab=agregar-editar');
         }
     }
@@ -136,7 +139,7 @@ class HospitalController {
      * Actualiza un hospital existente
      */
     public function editar(): void {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             // Validar datos
@@ -265,13 +268,6 @@ class HospitalController {
         // Los mensajes se manejan automáticamente en la vista
     }
 
-    /**
-     * Redirige a una URL relativa al módulo de hospitales
-     */
-    private function redirect(string $path): void {
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/' . $path);
-        exit();
-    }
 
     /**
      * Procesa la solicitud actual
