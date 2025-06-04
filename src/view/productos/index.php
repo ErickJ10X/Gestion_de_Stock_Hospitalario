@@ -16,7 +16,7 @@ $catalogosController = new CatalogosController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireHospitalGestor();
+$authGuard->requireGestorHospital();
 
 $productos = $productoController->index()['productos'] ?? [];
 $catalogos = $catalogosController->index()['catalogos'] ?? [];

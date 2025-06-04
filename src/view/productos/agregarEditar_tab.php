@@ -12,7 +12,7 @@ if (!isset($productos) || !isset($session)) {
                 <i class="fas fa-box-open me-2"></i> Crear Producto
             </div>
             <div class="card-body">
-                <form id="formCrearProducto" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoHandler.php" method="POST" class="card-form">
+                <form id="formCrearProducto" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoController.php" method="POST" class="card-form">
                     <input type="hidden" name="action" value="crear">
                     
                     <div class="mb-3">
@@ -69,7 +69,7 @@ if (!isset($productos) || !isset($session)) {
                 </div>
                 
                 <div id="editar_producto_form_container" style="display: none;">
-                    <form id="formEditarProducto" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoHandler.php" method="POST" class="card-form">
+                    <form id="formEditarProducto" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoController.php" method="POST" class="card-form">
                         <input type="hidden" name="action" value="editar">
                         <input type="hidden" id="editar_producto_id" name="id">
                         

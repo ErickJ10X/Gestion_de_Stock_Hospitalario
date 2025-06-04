@@ -4,6 +4,12 @@ if (!isset($productos) || !isset($session)) {
 }
 ?>
 
+<div class="list-header__actions">
+    <button id="btn-add-producto" class="list-button list-button--success" onclick="document.querySelector('.tab-btn[data-tab=\'tab-agregar-editar\']').click()">
+        <i class="bi bi-plus-circle"></i> Nuevo
+    </button>
+</div>
+
 <div class="table-responsive">
     <table class="list-table" id="tablaProductos">
         <thead>
@@ -65,7 +71,7 @@ if (!isset($productos) || !isset($session)) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoHandler.php" method="POST">
+                <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/ProductoController.php" method="POST">
                     <input type="hidden" name="action" value="eliminar">
                     <input type="hidden" id="id_producto_eliminar" name="id">
                     <button type="submit" class="btn btn-danger">Eliminar</button>
