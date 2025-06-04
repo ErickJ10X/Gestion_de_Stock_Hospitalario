@@ -21,7 +21,7 @@ $almacenesController = new AlmacenesController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireHospitalGestor();
+$authGuard->requireGestorHospital();
 
 $hospitales = $hospitalController->index()['hospitales'] ?? [];
 $plantas = $plantaController->index()['plantas'] ?? [];

@@ -4,6 +4,12 @@ if (!isset($hospitales) || !isset($plantas) || !isset($botiquines) || !isset($se
 }
 ?>
 
+<div class="list-header__actions">
+    <button id="btn-add-botiquin" class="list-button list-button--success" onclick="document.querySelector('.tab-btn[data-tab=\'tab-agregar-editar\']').click()">
+        <i class="bi bi-plus-circle"></i> Nuevo
+    </button>
+</div>
+
 <div class="table-responsive">
     <table class="list-table">
         <thead>
@@ -41,7 +47,7 @@ if (!isset($hospitales) || !isset($plantas) || !isset($botiquines) || !isset($se
                 }
                 ?>
                 <tr class="list-table__body-row">
-                    <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($botiquin->getIdBotiquines()) ?></td>
+                    <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($botiquin->getIdBotiquin()) ?></td>
                     <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($botiquin->getNombre()) ?></td>
                     <td class="list-table__body-cell" data-label="Planta">
                         <?= $plantaBotiquin ? htmlspecialchars($plantaBotiquin->getNombre()) : 'N/A' ?>
@@ -51,11 +57,11 @@ if (!isset($hospitales) || !isset($plantas) || !isset($botiquines) || !isset($se
                     </td>
                     <td class="list-table__body-cell" data-label="Acciones">
                         <div class="list-table__actions">
-                            <a href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquin/?id=<?= $botiquin->getIdBotiquines() ?>" class="list-table__button list-table__button--info">
+                            <a href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/botiquin/?id=<?= $botiquin->getIdBotiquin() ?>" class="list-table__button list-table__button--info">
                                 <i class="bi bi-eye list-table__button-icon"></i> Ver
                             </a>
                             <button class="list-table__button list-table__button--edit" 
-                                    onclick="seleccionarBotiquin(<?= $botiquin->getIdBotiquines() ?>)">
+                                    onclick="seleccionarBotiquin(<?= $botiquin->getIdBotiquin() ?>)">
                                 <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
                             </button>
                         </div>

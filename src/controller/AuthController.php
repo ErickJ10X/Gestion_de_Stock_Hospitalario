@@ -37,12 +37,7 @@ class AuthController {
                 $usuario = $this->usuarioService->login($email, $password);
                 if ($usuario) {
                     // Guardar datos del usuario en sesión
-                    $this->session->setUserData([
-                        'id' => $usuario->getIdUsuario(),
-                        'nombre' => $usuario->getNombre(),
-                        'email' => $usuario->getEmail(),
-                        'rol' => $usuario->getRol()
-                    ]);
+                    $this->session->setUserData($usuario);
                     
                     $ubicaciones = $usuario->getUbicaciones();
                     if (!empty($ubicaciones)) {
@@ -80,9 +75,5 @@ class AuthController {
         $input = trim($input);
         $input = stripslashes($input);
         return htmlspecialchars($input);
-    }
-
-    public function confirmPassword($password, $confirmPassword): bool{
-        return $password === $confirmPassword;
     }
 }

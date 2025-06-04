@@ -1,13 +1,11 @@
 <?php
 session_start();
 require_once(__DIR__ . '/../../controller/UsuarioController.php');
-require_once(__DIR__ . '/../../controller/Usuario_UbicacionesController.php');
 require_once(__DIR__ . '/../../model/enum/RolEnum.php');
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
 
 use controller\UsuarioController;
-use models\enum\RolEnum;
 use util\AuthGuard;
 use util\Session;
 
@@ -22,9 +20,12 @@ $authGuard->requireAdministrador();
 // Obtener datos para la vista desde el controlador
 $viewData = $usuarioController->prepareDataForView();
 $usuarios = $viewData['usuarios'] ?? [];
-$ubicaciones = $viewData['ubicaciones'] ?? [];
+$roles = $viewData['roles'] ?? [];
 
-$pageTitle = "Usuarios";
+// Comprobar si hay un usuario para editar
+$usuarioEditar = $viewData['usuario_editar'] ?? null;
+
+$pageTitle = "Gestión de Usuarios";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
@@ -40,7 +41,6 @@ include_once(__DIR__ . '/../templates/header.php');
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
 
 <div class="list-container">
-
     <?php if ($session->hasMessage('success')): ?>
         <div class="list-alert list-alert--success">
             <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
@@ -65,7 +65,7 @@ include_once(__DIR__ . '/../templates/header.php');
         </div>
 
         <div class="tab-content">
-            <div id="tab-usuarios" class="tab-pane active">
+            <div id="tab-usuarios" class="tab-pane ">
                 <?php include_once(__DIR__ . '/listUsers_tab.php'); ?>
             </div>
 
@@ -73,13 +73,24 @@ include_once(__DIR__ . '/../templates/header.php');
                 <?php include_once(__DIR__ . '/crearEditar_tab.php'); ?>
             </div>
 
-            <div id="tab-ubicaciones" class="tab-pane">
+            <div id="tab-ubicaciones" class="tab-pane active">
                 <?php include_once(__DIR__ . '/asignarUbicaciones_tab.php'); ?>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    // Inicializar variables JavaScript con datos del servidor
+    const usuarioEditar = <?= $usuarioEditar ? json_encode($usuarioEditar->toArray()) : 'null' ?>;
+    
+    // Si hay usuario para editar, activar la pestaña de crear/editar
+    if (usuarioEditar) {
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('[data-tab="tab-crear-editar"]').click();
+        });
+    }
+</script>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario-cards.js?v=<?= time() ?>"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js?v=<?= time() ?>"></script>

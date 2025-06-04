@@ -3,6 +3,7 @@
 namespace model\repository;
 
 require_once __DIR__ . '/../../../config/database.php';
+require_once(__DIR__ . '/../entity/Usuario.php');
 
 use model\entity\Usuario;
 use model\entity\UsuarioUbicacion;

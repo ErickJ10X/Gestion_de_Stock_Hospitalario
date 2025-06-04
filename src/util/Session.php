@@ -2,6 +2,8 @@
 
 namespace util;
 
+use model\entity\Usuario;
+
 class Session
 {
     public function __construct()
@@ -39,9 +41,9 @@ class Session
         return !empty($_SESSION['id']);
     }
 
-    public function setUserData($user)
+    public function setUserData(Usuario $user): void
     {
-        $_SESSION['id'] = $user->getId();
+        $_SESSION['id'] = $user->getIdUsuario();
         $_SESSION['nombre'] = $user->getNombre();
         $_SESSION['email'] = $user->getEmail();
         $_SESSION['rol'] = $user->getRol();

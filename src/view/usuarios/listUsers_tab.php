@@ -27,8 +27,8 @@ if (!isset($usuarios)) {
                 <tbody>
                     <?php
                     foreach ($usuarios as $usuario) {
-                        $badgeClass = $usuario->getActivo() ? 'bg-success' : 'bg-danger';
-                        $badgeText = $usuario->getActivo() ? 'Activo' : 'Inactivo';
+                        $badgeClass = $usuario->isActivo() ? 'bg-success' : 'bg-danger';
+                        $badgeText = $usuario->isActivo() ? 'Activo' : 'Inactivo';
                         $rolBadgeClass = 'primary'; // Color predeterminado para roles
                         ?>
                         <tr class="list-table__body-row">

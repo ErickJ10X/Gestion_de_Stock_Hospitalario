@@ -4,7 +4,7 @@ namespace util;
 
 require_once __DIR__ . '/Session.php';
 require_once __DIR__ . '/Redirect.php';
-require_once __DIR__ . '/../enum/RolEnum.php';
+require_once __DIR__ . '/../model/enum/RolEnum.php';
 
 use model\enum\RolEnum;
 

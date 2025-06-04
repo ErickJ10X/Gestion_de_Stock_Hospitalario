@@ -2,15 +2,11 @@
 session_start();
 require_once(__DIR__ . '/../../controller/HospitalController.php');
 require_once(__DIR__ . '/../../controller/PlantaController.php');
-require_once(__DIR__ . '/../../controller/BotiquinController.php');
-require_once(__DIR__ . '/../../controller/AlmacenesController.php');
 include_once(__DIR__ . '/../../util/Session.php');
 include_once(__DIR__ . '/../../util/AuthGuard.php');
 
-use controller\AlmacenesController;
 use controller\HospitalController;
 use controller\PlantaController;
-use controller\BotiquinController;
 use util\Session;
 use util\AuthGuard;
 
@@ -19,7 +15,7 @@ $plantaController = new PlantaController();
 $session = new Session();
 $authGuard = new AuthGuard();
 
-$authGuard->requireHospitalGestor();
+$authGuard->requireGestorHospital();
 
 $hospitales = $hospitalController->index()['hospitales'] ?? [];
 $plantas = $plantaController->index()['plantas'] ?? [];

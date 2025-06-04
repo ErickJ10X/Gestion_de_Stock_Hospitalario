@@ -2,10 +2,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require_once(__DIR__ . '/../../enum/RolEnum.php');
+require_once(__DIR__ . '/../../model/enum/RolEnum.php');
 require_once(__DIR__ . '/../../util/Session.php');
 
-use models\enum\RolEnum;
+use model\enum\RolEnum;
 use util\Session;
 
 // Usar la clase Session para manejar los datos del usuario de forma más segura

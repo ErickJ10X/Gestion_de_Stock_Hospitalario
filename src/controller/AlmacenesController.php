@@ -3,150 +3,241 @@
 namespace controller;
 
 use Exception;
-use model\service\AlmacenesService;
+use model\entity\Almacen;
+use model\service\AlmacenService;
+use model\repository\AlmacenRepository;
+use util\Session;
+use util\AuthGuard;
 
-require_once(__DIR__ . '/../model/service/AlmacenesService.php');
+require_once(__DIR__ . '/../model/service/AlmacenService.php');
+require_once(__DIR__ . '/../model/repository/AlmacenRepository.php');
+require_once(__DIR__ . '/../model/entity/Almacen.php');
+require_once(__DIR__ . '/../util/Session.php');
+require_once(__DIR__ . '/../util/AuthGuard.php');
 
 class AlmacenesController
 {
-    private AlmacenesService $almacenesService;
+    private AlmacenService $almacenService;
+    private Session $session;
+    private AuthGuard $authGuard;
 
     public function __construct()
     {
-        $this->almacenesService = new AlmacenesService();
+        $this->almacenService = new AlmacenService(new AlmacenRepository());
+        $this->session = new Session();
+        $this->authGuard = new AuthGuard();
     }
 
+    /**
+     * Método principal para obtener los almacenes
+     * @return array Lista de almacenes
+     */
     public function index(): array
     {
         try {
-            return $this->almacenesService->getAllAlmacenes();
+            return $this->almacenService->getAllAlmacenes();
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', 'Error al cargar los almacenes: ' . $e->getMessage());
+            return [];
         }
     }
 
-    public function getByPlanta($plantaId): array
+    /**
+     * Obtiene almacenes por planta
+     * @param int $plantaId ID de la planta
+     * @return array Lista de almacenes de una planta específica
+     */
+    public function getByPlanta(int $plantaId): array
     {
         try {
-            if (!is_numeric($plantaId) || $plantaId <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
-            }
-            
-            return $this->almacenesService->getAlmacenesByPlanta($plantaId);
+            return $this->almacenService->getAlmacenesByPlanta($plantaId);
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [];
         }
     }
 
-    public function show($id): array
+    /**
+     * Obtiene almacenes por hospital
+     * @param int $hospitalId ID del hospital
+     * @return array Lista de almacenes de un hospital específico
+     */
+    public function getByHospital(int $hospitalId): array
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de almacén inválido'];
-            }
-            
-            $almacen = $this->almacenesService->getAlmacenById($id);
-            if ($almacen) {
-                return ['error' => false, 'almacen' => $almacen];
-            } else {
-                return ['error' => true, 'mensaje' => 'Almacén no encontrado'];
-            }
+            return $this->almacenService->getAlmacenesByHospital($hospitalId);
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [];
         }
     }
-    
+
+    /**
+     * Obtiene un almacén por su ID
+     * @param int $id ID del almacén
+     * @return Almacen|null El almacén encontrado o null
+     */
+    public function getById(int $id): ?Almacen
+    {
+        try {
+            return $this->almacenService->getAlmacenById($id);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     /**
      * Crea un nuevo almacén
-     * @param string $tipo Tipo del almacén
-     * @param int $plantaId ID de la planta a la que pertenece
-     * @param int $hospitalId ID del hospital al que pertenece
-     * @return array Resultado de la operación
      */
-    public function store($tipo, $plantaId, $hospitalId): array
+    public function crear(): void
     {
+        $this->authGuard->requireHospitalGestor();
+        
         try {
-            if (empty(trim($tipo))) {
-                return ['error' => true, 'mensaje' => 'El tipo de almacén es obligatorio'];
-            }
-
-            if (!is_numeric($plantaId) || $plantaId <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            $tipo = $_POST['tipo'] ?? '';
+            $plantaId = isset($_POST['planta_id']) ? (int)$_POST['planta_id'] : null;
+            $hospitalId = isset($_POST['hospital_id']) ? (int)$_POST['hospital_id'] : 0;
+            
+            // Validaciones
+            if (empty($tipo)) {
+                throw new Exception('El tipo de almacén es obligatorio');
             }
             
-            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            if ($hospitalId <= 0) {
+                throw new Exception('El hospital es obligatorio');
             }
-
-            $resultado = $this->almacenesService->createAlmacen($tipo, $plantaId, $hospitalId);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén creado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo crear el almacén'];
-            }
+            
+            // Crear el almacén
+            $data = [
+                'tipo' => $tipo,
+                'id_planta' => $plantaId,
+                'id_hospital' => $hospitalId,
+                'activo' => true
+            ];
+            
+            $this->almacenService->createAlmacen($data);
+            
+            $this->session->setMessage('success', 'Almacén creado correctamente');
+            $this->redirectToIndex();
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', 'Error al crear almacén: ' . $e->getMessage());
+            $this->redirectToIndex();
         }
     }
-    
+
     /**
      * Actualiza un almacén existente
-     * @param int $id ID del almacén
-     * @param string $tipo Nuevo tipo del almacén
-     * @param int $plantaId Nuevo ID de la planta
-     * @param int $hospitalId Nuevo ID del hospital
-     * @return array Resultado de la operación
      */
-    public function update($id, $tipo, $plantaId, $hospitalId): array
+    public function editar(): void
     {
+        $this->authGuard->requireHospitalGestor();
+        
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de almacén inválido'];
-            }
-
-            if (empty(trim($tipo))) {
-                return ['error' => true, 'mensaje' => 'El tipo de almacén es obligatorio'];
-            }
-
-            if (!is_numeric($plantaId) || $plantaId <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de planta inválido'];
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            $tipo = $_POST['tipo'] ?? '';
+            $plantaId = isset($_POST['planta_id']) ? (int)$_POST['planta_id'] : null;
+            $hospitalId = isset($_POST['hospital_id']) ? (int)$_POST['hospital_id'] : 0;
+            
+            // Validaciones
+            if ($id <= 0) {
+                throw new Exception('ID de almacén inválido');
             }
             
-            if (!is_numeric($hospitalId) || $hospitalId <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            if (empty($tipo)) {
+                throw new Exception('El tipo de almacén es obligatorio');
             }
-
-            $resultado = $this->almacenesService->updateAlmacen($id, $tipo, $plantaId, $hospitalId);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén actualizado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo actualizar el almacén'];
+            
+            if ($hospitalId <= 0) {
+                throw new Exception('El hospital es obligatorio');
             }
+            
+            // Actualizar el almacén
+            $data = [
+                'tipo' => $tipo,
+                'id_planta' => $plantaId,
+                'id_hospital' => $hospitalId
+            ];
+            
+            $this->almacenService->updateAlmacen($id, $data);
+            
+            $this->session->setMessage('success', 'Almacén actualizado correctamente');
+            $this->redirectToIndex();
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', 'Error al actualizar almacén: ' . $e->getMessage());
+            $this->redirectToIndex();
+        }
+    }
+
+    /**
+     * Elimina un almacén
+     */
+    public function eliminar(): void
+    {
+        $this->authGuard->requireHospitalGestor();
+        
+        try {
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            
+            // Validaciones
+            if ($id <= 0) {
+                throw new Exception('ID de almacén inválido');
+            }
+            
+            // Eliminar el almacén
+            $eliminado = $this->almacenService->deleteAlmacen($id);
+            
+            if ($eliminado) {
+                $this->session->setMessage('success', 'Almacén eliminado correctamente');
+            } else {
+                throw new Exception('No se pudo eliminar el almacén');
+            }
+            
+            $this->redirectToIndex();
+        } catch (Exception $e) {
+            $this->session->setMessage('error', 'Error al eliminar almacén: ' . $e->getMessage());
+            $this->redirectToIndex();
         }
     }
     
     /**
-     * Elimina un almacén
-     * @param int $id ID del almacén a eliminar
-     * @return array Resultado de la operación
+     * Procesa las solicitudes POST
      */
-    public function destroy($id): array
+    public function processRequest(): void
     {
-        try {
-            if (!is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de almacén inválido'];
-            }
-
-            $resultado = $this->almacenesService->deleteAlmacen($id);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Almacén eliminado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo eliminar el almacén'];
-            }
-        } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+        // Si no es una petición POST, no hay nada que hacer
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
+        }
+        
+        $action = $_POST['action'] ?? '';
+        
+        switch ($action) {
+            case 'crear':
+                $this->crear();
+                break;
+            case 'editar':
+                $this->editar();
+                break;
+            case 'eliminar':
+                $this->eliminar();
+                break;
+            default:
+                $this->session->setMessage('error', 'Acción no reconocida');
+                $this->redirectToIndex();
+                break;
         }
     }
+    
+    /**
+     * Redirecciona a la página de índice de almacenes
+     */
+    private function redirectToIndex(): void
+    {
+        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/almacenes/index.php');
+        exit;
+    }
+}
+
+// Ejecutar el controlador si este archivo es llamado directamente
+if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
+    $controller = new AlmacenesController();
+    $controller->processRequest();
 }

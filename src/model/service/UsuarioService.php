@@ -2,6 +2,9 @@
 
 namespace model\service;
 
+require_once(__DIR__ . '/../repository/UsuarioRepository.php');
+require_once(__DIR__ . '/../repository/UsuarioUbicacionRepository.php');
+
 use model\entity\Usuario;
 use model\entity\UsuarioUbicacion;
 use model\repository\UsuarioRepository;
@@ -12,12 +15,9 @@ class UsuarioService {
     private UsuarioRepository $usuarioRepository;
     private ?UsuarioUbicacionRepository $ubicacionRepository;
 
-    public function __construct(
-        UsuarioRepository $usuarioRepository = null, 
-        UsuarioUbicacionRepository $ubicacionRepository = null
-    ) {
-        $this->usuarioRepository = $usuarioRepository ?? new UsuarioRepository();
-        $this->ubicacionRepository = $ubicacionRepository ?? new UsuarioUbicacionRepository();
+    public function __construct() {
+        $this->usuarioRepository = new UsuarioRepository();
+        $this->ubicacionRepository = new UsuarioUbicacionRepository();
     }
 
     public function getUsuarioById(int $id): ?Usuario {

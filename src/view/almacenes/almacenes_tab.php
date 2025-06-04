@@ -2,10 +2,21 @@
 if (!isset($almacenes) || !isset($session)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
+
+// Crear mapeos para mostrar nombres en lugar de IDs
+$plantasMap = [];
+foreach ($plantas as $planta) {
+    $plantasMap[$planta->getIdPlanta()] = $planta->getNombre();
+}
+
+$hospitalesMap = [];
+foreach ($hospitales as $hospital) {
+    $hospitalesMap[$hospital->getIdHospital()] = $hospital->getNombre();
+}
 ?>
 
 <div class="list-header__actions">
-    <button id="btn-add-almacen" class="list-button list-button--success">
+    <button id="btn-add-almacen" class="list-button list-button--success" onclick="document.querySelector('.tab-btn[data-tab=\'tab-agregar-editar\']').click()">
         <i class="bi bi-plus-circle"></i> Nuevo
     </button>
 </div>
@@ -31,14 +42,20 @@ if (!isset($almacenes) || !isset($session)) {
                     <tr class="list-table__body-row">
                         <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($almacen->getIdAlmacen()) ?></td>
                         <td class="list-table__body-cell" data-label="Tipo"><?= htmlspecialchars($almacen->getTipo()) ?></td>
-                        <td class="list-table__body-cell" data-label="Planta"><?= htmlspecialchars($almacen->getIdPlanta()) ?></td>
-                        <td class="list-table__body-cell" data-label="Hospital"><?= htmlspecialchars($almacen->getIdHospital()) ?></td>
+                        <td class="list-table__body-cell" data-label="Planta">
+                            <?= $almacen->getIdPlanta() ? htmlspecialchars($plantasMap[$almacen->getIdPlanta()] ?? 'Sin nombre') : 'N/A' ?>
+                        </td>
+                        <td class="list-table__body-cell" data-label="Hospital">
+                            <?= htmlspecialchars($hospitalesMap[$almacen->getIdHospital()] ?? 'Sin nombre') ?>
+                        </td>
                         <td class="list-table__body-cell" data-label="Acciones">
                             <div class="list-table__actions">
-                                <button class="list-table__button list-table__button--edit btn-edit-almacen" data-id="<?= $almacen->getIdAlmacen() ?>">
+                                <button class="list-table__button list-table__button--edit btn-edit-almacen" 
+                                        onclick="editarAlmacen(<?= $almacen->getIdAlmacen() ?>)">
                                     <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
                                 </button>
-                                <button class="list-table__button list-table__button--delete btn-delete-almacen" data-id="<?= $almacen->getIdAlmacen() ?>">
+                                <button class="list-table__button list-table__button--delete btn-delete-almacen"
+                                        onclick="eliminarAlmacen(<?= $almacen->getIdAlmacen() ?>)">
                                     <i class="bi bi-trash list-table__button-icon"></i> Eliminar
                                 </button>
                             </div>
@@ -50,92 +67,49 @@ if (!isset($almacenes) || !isset($session)) {
     </table>
 </div>
 
-<div id="almacen-card-create" class="hospital-card">
-    <div class="hospital-card__header hospital-card__header--create">
-        <h3 class="hospital-card__title">Nuevo Almacén</h3>
-        <button type="button" class="hospital-card__close">&times;</button>
-    </div>
-    <div class="hospital-card__body">
-        <?php if ($session->hasMessage('modal_error_almacen')): ?>
-            <div class="hospital-form__error">
-                <p><?= $session->getMessage('modal_error_almacen') ?></p>
+<!-- Modal para eliminar almacén -->
+<div class="modal fade" id="eliminarAlmacenModal" tabindex="-1" aria-labelledby="eliminarAlmacenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarAlmacenModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <?php $session->clearMessage('modal_error_almacen'); ?>
-        <?php endif; ?>
-        <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/almacen-actions.php" method="post" class="hospital-form" id="form-crear-almacen">
-            <input type="hidden" name="action" value="crear_almacen">
-            <div class="hospital-form__group">
-                <label for="tipo-almacen-create" class="hospital-form__label">Tipo:</label>
-                <input type="text" id="tipo-almacen-create" name="tipo" class="hospital-form__input" required>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar este almacén?
             </div>
-            <div class="hospital-form__group">
-                <label for="planta-id-create" class="hospital-form__label">ID de Planta:</label>
-                <input type="number" id="planta-id-create" name="planta_id" class="hospital-form__input" required>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/AlmacenesController.php" method="post">
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="id" id="eliminar_almacen_id">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
             </div>
-            <div class="hospital-form__group">
-                <label for="hospital-id-create" class="hospital-form__label">ID de Hospital:</label>
-                <input type="number" id="hospital-id-create" name="id_hospital" class="hospital-form__input" required>
-            </div>
-            <div class="hospital-card__footer">
-                <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-almacen">Cancelar</button>
-                <button type="submit" class="hospital-form__button hospital-form__button--primary" id="btn-submit-almacen">Registrar Almacén</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<?php foreach ($almacenes as $almacen): ?>
-    <div id="almacen-card-edit-<?= $almacen->getIdAlmacen() ?>" class="hospital-card">
-        <div class="hospital-card__header hospital-card__header--edit">
-            <h3 class="hospital-card__title">Editar Almacén</h3>
-            <button type="button" class="hospital-card__close">&times;</button>
-        </div>
-        <div class="hospital-card__body">
-            <?php if ($session->hasMessage('modal_error_almacen_' . $almacen->getIdAlmacen())): ?>
-                <div class="hospital-form__error">
-                    <p><?= $session->getMessage('modal_error_almacen_' . $almacen->getIdAlmacen()) ?></p>
-                </div>
-                <?php $session->clearMessage('modal_error_almacen_' . $almacen->getIdAlmacen()); ?>
-            <?php endif; ?>
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/almacen-actions.php" method="post" class="hospital-form" id="form-editar-almacen-<?= $almacen->getIdAlmacen() ?>">
-                <input type="hidden" name="action" value="editar_almacen">
-                <input type="hidden" name="id" value="<?= $almacen->getIdAlmacen() ?>">
-                <div class="hospital-form__group">
-                    <label for="tipo-almacen-edit-<?= $almacen->getIdAlmacen() ?>" class="hospital-form__label">Tipo:</label>
-                    <input type="text" id="tipo-almacen-edit-<?= $almacen->getIdAlmacen() ?>" name="tipo" value="<?= htmlspecialchars($almacen->getTipo()) ?>" class="hospital-form__input" required>
-                </div>
-                <div class="hospital-form__group">
-                    <label for="planta-id-edit-<?= $almacen->getIdAlmacen() ?>" class="hospital-form__label">ID de Planta:</label>
-                    <input type="number" id="planta-id-edit-<?= $almacen->getIdAlmacen() ?>" name="planta_id" value="<?= htmlspecialchars($almacen->getIdPlanta()) ?>" class="hospital-form__input" required>
-                </div>
-                <div class="hospital-form__group">
-                    <label for="hospital-id-edit-<?= $almacen->getIdAlmacen() ?>" class="hospital-form__label">ID de Hospital:</label>
-                    <input type="number" id="hospital-id-edit-<?= $almacen->getIdAlmacen() ?>" name="id_hospital" value="<?= htmlspecialchars($almacen->getIdHospital()) ?>" class="hospital-form__input" required>
-                </div>
-                <div class="hospital-card__footer">
-                    <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-edit-almacen-<?= $almacen->getIdAlmacen() ?>">Cancelar</button>
-                    <button type="submit" class="hospital-form__button hospital-form__button--primary" id="btn-submit-edit-almacen-<?= $almacen->getIdAlmacen() ?>">Actualizar Almacén</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<script>
+function editarAlmacen(id) {
+    // Cambiar a la pestaña de agregar/editar
+    document.querySelector('.tab-btn[data-tab="tab-agregar-editar"]').click();
     
-    <div id="almacen-card-delete-<?= $almacen->getIdAlmacen() ?>" class="hospital-card">
-        <div class="hospital-card__header hospital-card__header--delete">
-            <h3 class="hospital-card__title">Eliminar Almacén</h3>
-            <button type="button" class="hospital-card__close">&times;</button>
-        </div>
-        <div class="hospital-card__body">
-            <h4>¿Estás seguro de que deseas eliminar este almacén?</h4>
-            <p class="text-danger">Esta acción no se puede deshacer.</p>
-            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/almacen-actions.php" method="post" id="form-eliminar-almacen-<?= $almacen->getIdAlmacen() ?>">
-                <input type="hidden" name="action" value="eliminar_almacen">
-                <input type="hidden" name="id" value="<?= $almacen->getIdAlmacen() ?>">
-                <div class="hospital-card__footer">
-                    <button type="button" class="hospital-form__button hospital-form__button--secondary hospital-form__button--cancel" id="btn-cancel-delete-almacen-<?= $almacen->getIdAlmacen() ?>">Cancelar</button>
-                    <button type="submit" class="hospital-form__button hospital-form__button--danger" id="btn-submit-delete-almacen-<?= $almacen->getIdAlmacen() ?>">Confirmar Eliminación</button>
-                </div>
-            </form>
-        </div>
-    </div>
-<?php endforeach; ?>
+    // Seleccionar el almacén en el dropdown
+    const selectAlmacen = document.getElementById('select_almacen');
+    selectAlmacen.value = id;
+    
+    // Disparar el evento change para cargar los datos
+    const event = new Event('change');
+    selectAlmacen.dispatchEvent(event);
+}
+
+function eliminarAlmacen(id) {
+    // Configurar el modal
+    document.getElementById('eliminar_almacen_id').value = id;
+    
+    // Mostrar el modal usando Bootstrap
+    var myModal = new bootstrap.Modal(document.getElementById('eliminarAlmacenModal'));
+    myModal.show();
+}
+</script>

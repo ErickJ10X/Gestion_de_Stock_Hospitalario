@@ -12,7 +12,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
                 <i class="fas fa-first-aid me-2"></i> Crear Botiquín
             </div>
             <div class="card-body">
-                <form id="formCrearBotiquin" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/BotiquinHandler.php" method="POST" class="card-form">
+                <form id="formCrearBotiquin" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/BotiquinController.php" method="POST" class="card-form">
                     <input type="hidden" name="action" value="crear">
                     
                     <div class="mb-3">
@@ -85,7 +85,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
                                 $ubicacion = htmlspecialchars($plantaBotiquin->getNombre()) . ' - ' . htmlspecialchars($hospitalBotiquin->getNombre());
                             }
                         ?>
-                            <option value="<?= $botiquin->getIdBotiquines() ?>">
+                            <option value="<?= $botiquin->getIdBotiquin() ?>">
                                 <?= htmlspecialchars($botiquin->getNombre()) ?> (<?= $ubicacion ?>)
                             </option>
                         <?php endforeach; ?>
@@ -93,7 +93,7 @@ if (!isset($hospitales) || !isset($plantaController) || !isset($plantas) || !iss
                 </div>
                 
                 <div id="editar_botiquin_form_container" style="display: none;">
-                    <form id="formEditarBotiquin" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/BotiquinHandler.php" method="POST" class="card-form">
+                    <form id="formEditarBotiquin" action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/BotiquinController.php" method="POST" class="card-form">
                         <input type="hidden" name="action" value="editar">
                         <input type="hidden" id="editar_botiquin_id" name="id">
                         
@@ -176,8 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Crear un mapa para buscar rápidamente los datos del botiquín por ID
     echo "const botiquinesData = {};";
     foreach ($botiquines as $botiquin) {
-        echo "botiquinesData[" . $botiquin->getIdBotiquines() . "] = {";
-        echo "id: " . $botiquin->getIdBotiquines() . ",";
+        echo "botiquinesData[" . $botiquin->getIdBotiquin() . "] = {";
+        echo "id: " . $botiquin->getIdBotiquin() . ",";
         echo "nombre: '" . addslashes($botiquin->getNombre()) . "',";
         echo "planta_id: " . $botiquin->getIdPlanta();
         echo "};";
