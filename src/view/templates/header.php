@@ -26,6 +26,9 @@ if ($isLoggedIn) {
     $userName = htmlspecialchars($_SESSION['nombre'] ?? $session->getUserData('nombre') ?? 'Usuario');
     $userRole = $_SESSION['rol'] ?? $session->getUserData('rol') ?? '';
 }
+
+// Comprobar si se ha pasado una clase de página
+$pageClass = isset($pageClass) ? $pageClass : '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -35,20 +38,23 @@ if ($isLoggedIn) {
     <title>Gestor Hospitalario</title>
     <!-- Incorporar todos los archivos CSS disponibles -->
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/header.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/footer.css">
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/catalogo-productos.css">
     <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/usuarios.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/login.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-<body>
+<body class="<?= $pageClass ?>">
 <header class="header">
     <div class="container header__container">
         <?php if (!$isLoggedIn): ?>
-            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/index.php">Pegasus Medical</a>
+            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public">Pegasus Medical</a>
         <?php else: ?>
-            <div class="header__spacer"></div>
+            <a class="header__brand" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public">Pegasus</a>
         <?php endif; ?>
         <button class="header__toggle" id="navToggle">
             <i class="bi bi-list"></i>
@@ -58,7 +64,7 @@ if ($isLoggedIn) {
             <ul class="nav__list">
                 <?php if (!$isLoggedIn): ?>
                     <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/index.php">Inicio</a>
+                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public">Inicio</a>
                     </li>
                 <?php else: ?>
                     <?php if ($userRole === RolEnum::ADMINISTRADOR): ?>
@@ -121,9 +127,6 @@ if ($isLoggedIn) {
                 <?php else: ?>
                     <li class="nav__item">
                         <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav__item">
-                        <a class="nav__link" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php">Registrarse</a>
                     </li>
                 <?php endif; ?>
             </ul>

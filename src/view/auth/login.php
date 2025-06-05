@@ -19,51 +19,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si llegamos aquí, hubo un error (ya que login() redirige en caso exitoso)
 }
 
+// Agregar una clase al body para aplicar estilos específicos de login
+$pageClass = 'login-page';
 include('../templates/header.php');
 ?>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="text-center">Iniciar Sesión</h2>
-                    </div>
-                    <div class="card-body">
-                        <?php if (isset($_GET['error'])): ?>
-                            <div class="alert alert-danger">
-                                <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'; ?>
-                            </div>
-                        <?php endif; ?>
+<!-- Enlazar el archivo CSS específico para la página de login -->
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/login.css">
 
-                        <?php if (isset($_GET['success'])): ?>
-                            <div class="alert alert-success">
-                                <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Operación completada con éxito.'; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (isset($_GET['warning'])): ?>
-                            <div class="alert alert-warning">
-                                <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Atención: se requiere acción.'; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php" method="post" class="main__form">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="contrasena" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" name="contrasena" id="contrasena" placeholder="Contraseña" required>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                            </div>
-                        </form>
-                        <p class="text-center mt-3">¿No tienes cuenta? <a href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/register.php" class="main__form-link">Regístrate</a></p>
-                    </div>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Iniciar Sesión</h2>
+        </div>
+        <div class="login-body">
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger">
+                    <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'; ?>
                 </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['success'])): ?>
+                <div class="alert alert-success">
+                    <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Operación completada con éxito.'; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['warning'])): ?>
+                <div class="alert alert-warning">
+                    <?php echo isset($_GET['message']) ? htmlspecialchars(urldecode($_GET['message'])) : 'Atención: se requiere acción.'; ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="login-logo">
+                <!-- Puedes añadir un logo aquí -->
+                <!-- <img src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/img/logo.png" alt="Pegasus Medical Logo"> -->
             </div>
+            
+            <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/auth/login.php" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Introduce tu email" required>
+                </div>
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" class="form-control" name="contrasena" id="contrasena" placeholder="Introduce tu contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-login">Iniciar Sesión</button>
+            </form>
         </div>
     </div>
+</div>
+
 <?php include('../templates/footer.php'); ?>

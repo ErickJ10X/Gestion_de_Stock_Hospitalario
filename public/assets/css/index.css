@@ -1,0 +1,178 @@
+/* Estilos para la página de inicio */
+:root {
+    --primary-color: #4e73df;
+    --primary-dark: #2e59d9;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --danger-color: #e74a3b;
+    --light-bg: #f8f9fc;
+    --dark-text: #5a5c69;
+    --white: #fff;
+    --box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+/* Reset para asegurar que el fondo cubre toda la página */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.home-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-attachment: fixed;
+}
+
+/* Estilos para el contenedor principal en la página de inicio */
+.home-page .main {
+    padding: 20px 0;
+    margin: 0;
+    max-width: 100%;
+    background: transparent;
+}
+
+.home-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* El resto de los estilos se mantienen igual */
+.welcome-card {
+    background-color: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    width: 100%;
+    max-width: 800px;
+    transition: transform 0.3s ease;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.welcome-card:hover {
+    transform: translateY(-5px);
+}
+
+.welcome-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 25px 30px;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.welcome-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.welcome-body {
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.welcome-body p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: var(--dark-text);
+}
+
+.welcome-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.main__btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.main__btn i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.main__btn--login {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: 1px solid var(--primary-color);
+}
+
+.main__btn--login:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.main__btn--profile {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: 1px solid var(--primary-color);
+}
+
+.main__btn--profile:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.main__btn--logout {
+    background-color: transparent;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.main__btn--logout:hover {
+    background-color: var(--danger-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .welcome-header {
+        padding: 20px;
+    }
+    
+    .welcome-header h1 {
+        font-size: 26px;
+    }
+    
+    .welcome-body {
+        padding: 25px 20px;
+    }
+    
+    .welcome-body p {
+        font-size: 16px;
+    }
+    
+    .main__btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .welcome-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
