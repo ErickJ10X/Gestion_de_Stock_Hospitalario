@@ -2,99 +2,128 @@
 
 namespace model\entity;
 
-class Usuario
-{
-    private int $id_usuario;
+use InvalidArgumentException;
+use model\enum\RolEnum;
+
+class Usuario {
+    private ?int $id_usuario;
     private string $nombre;
     private string $email;
     private string $contrasena;
-    private int $id_rol;
+    private string $rol;
     private bool $activo;
+    
+    // Relaciones
+    private array $ubicaciones = [];
 
-    public function __construct($id_usuario = null, $nombre = null, $email = null, $contrasena = null, $id_rol = null, $activo = true)
-    {
-        $this->id_usuario = $id_usuario ?? 0;
-        $this->nombre = $nombre ?? '';
-        $this->email = $email ?? '';
-        $this->contrasena = $contrasena ?? '';
-        $this->id_rol = $id_rol ?? 5;
-        $this->activo = $activo ?? true;
-    }
-
-    public function getIdUsuario(): mixed
-    {
-        return $this->id_usuario;
-    }
-
-    public function setIdUsuario(mixed $id_usuario): void
-    {
+    public function __construct(int $id_usuario = null, string $nombre = '', string $email = '', 
+                               string $contrasena = '', string $rol = RolEnum::USUARIO_BOTIQUIN, bool $activo = true) {
         $this->id_usuario = $id_usuario;
-    }
-
-    public function getNombre(): mixed
-    {
-        return $this->nombre;
-    }
-
-    public function setNombre(mixed $nombre): void
-    {
         $this->nombre = $nombre;
-    }
-
-    public function getEmail(): mixed
-    {
-        return $this->email;
-    }
-
-    public function setEmail(mixed $email): void
-    {
         $this->email = $email;
-    }
-
-    public function getContrasena(): string
-    {
-        return $this->contrasena;
-    }
-
-    public function setContrasena(string $contrasena): void
-    {
         $this->contrasena = $contrasena;
-    }
-
-    public function getIdRol(): mixed
-    {
-        return $this->id_rol;
-    }
-
-    public function setIdRol(mixed $id_rol): void
-    {
-        $this->id_rol = $id_rol;
-    }
-
-    public function getActivo(): mixed
-    {
-        return $this->activo;
-    }
-
-    public function setActivo(mixed $activo): void
-    {
+        $this->setRol($rol);
         $this->activo = $activo;
     }
 
-    public function hashPassword(): void
-    {
-        if (!empty($this->contrasena) && !$this->esContrasenaHasheada()) {
-            $this->contrasena = password_hash($this->contrasena, PASSWORD_DEFAULT);
+    public function getIdUsuario(): ?int {
+        return $this->id_usuario;
+    }
+
+    public function setIdUsuario(?int $id_usuario): self {
+        $this->id_usuario = $id_usuario;
+        return $this;
+    }
+
+    public function getNombre(): string {
+        return $this->nombre;
+    }
+
+    public function setNombre(string $nombre): self {
+        $this->nombre = $nombre;
+        return $this;
+    }
+
+    public function getEmail(): string {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getContrasena(): string {
+        return $this->contrasena;
+    }
+
+    public function setContrasena(string $contrasena): self {
+        $this->contrasena = $contrasena;
+        return $this;
+    }
+
+    public function getRol(): string {
+        return $this->rol;
+    }
+
+    public function setRol(string $rol): self {
+        if (!RolEnum::isValid($rol)) {
+            throw new InvalidArgumentException('Rol de usuario inválido');
         }
+        $this->rol = $rol;
+        return $this;
     }
 
-    private function esContrasenaHasheada(): bool
-    {
-        return strlen($this->contrasena) === 60 && substr($this->contrasena, 0, 1) === '$';
+    public function isActivo(): bool {
+        return $this->activo;
     }
 
-    public function verificarContrasena($contrasena): bool
-    {
+    public function setActivo(bool $activo): self {
+        $this->activo = $activo;
+        return $this;
+    }
+    
+    public function getUbicaciones(): array {
+        return $this->ubicaciones;
+    }
+    
+    public function setUbicaciones(array $ubicaciones): self {
+        $this->ubicaciones = $ubicaciones;
+        return $this;
+    }
+    
+    public function addUbicacion(UsuarioUbicacion $ubicacion): self {
+        $this->ubicaciones[] = $ubicacion;
+        return $this;
+    }
+
+    public function toArray(): array {
+        return [
+            'id_usuario' => $this->id_usuario,
+            'nombre' => $this->nombre,
+            'email' => $this->email,
+            'contrasena' => $this->contrasena,
+            'rol' => $this->rol,
+            'activo' => $this->activo
+        ];
+    }
+    
+    public static function fromArray(array $data): self {
+        return new self(
+            $data['id_usuario'] ?? null,
+            $data['nombre'] ?? '',
+            $data['email'] ?? '',
+            $data['contrasena'] ?? '',
+            $data['rol'] ?? RolEnum::USUARIO_BOTIQUIN,
+            $data['activo'] ?? true
+        );
+    }
+    
+    public function verificarContrasena(string $contrasena): bool {
         return password_verify($contrasena, $this->contrasena);
+    }
+    
+    public static function hashContrasena(string $contrasena): string {
+        return password_hash($contrasena, PASSWORD_BCRYPT);
     }
 }

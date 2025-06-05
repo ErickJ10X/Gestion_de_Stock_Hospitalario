@@ -2,246 +2,389 @@
 
 namespace controller;
 
+require_once __DIR__ . '/../model/service/EtiquetaService.php';
+require_once __DIR__ . '/../model/entity/Etiqueta.php';
+
+use model\service\EtiquetaService;
+use model\entity\Etiqueta;
+use InvalidArgumentException;
 use Exception;
-use model\service\EtiquetasService;
 
-require_once(__DIR__ . '/../model/service/EtiquetasService.php');
+/**
+ * Controlador para la gestión de etiquetas
+ */
+class EtiquetasController {
+    private EtiquetaService $etiquetaService;
 
-class EtiquetasController
-{
-    private EtiquetasService $etiquetasService;
-
-    public function __construct()
-    {
-        $this->etiquetasService = new EtiquetasService();
+    public function __construct() {
+        $this->etiquetaService = new EtiquetaService();
     }
 
-    public function index(): array
-    {
+    /**
+     * Obtiene todas las etiquetas
+     * @return array Array con todas las etiquetas o mensaje de error
+     */
+    public function index(): array {
         try {
-            return ['error' => false, 'etiquetas' => $this->etiquetasService->getAllEtiquetas()];
+            $etiquetas = $this->etiquetaService->getAllEtiquetas();
+            return [
+                'error' => false,
+                'etiquetas' => $etiquetas
+            ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al obtener las etiquetas: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function show($id): array
-    {
+    /**
+     * Obtiene una etiqueta por su ID
+     * @param int $id ID de la etiqueta
+     * @return array Etiqueta encontrada o mensaje de error
+     */
+    public function show(int $id): array {
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de etiqueta inválido'];
-            }
+            $etiqueta = $this->etiquetaService->getEtiquetaById($id);
             
-            $etiqueta = $this->etiquetasService->getEtiquetaById($id);
-            if ($etiqueta) {
-                return ['error' => false, 'etiqueta' => $etiqueta];
-            } else {
-                return ['error' => true, 'mensaje' => 'Etiqueta no encontrada'];
-            }
-        } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
-        }
-    }
-
-    public function getByProducto($idProducto): array
-    {
-        try {
-            if (!is_numeric($idProducto) || $idProducto <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de producto inválido'];
+            if (!$etiqueta) {
+                return [
+                    'error' => true,
+                    'mensaje' => 'Etiqueta no encontrada'
+                ];
             }
             
             return [
-                'error' => false, 
-                'etiquetas' => $this->etiquetasService->getEtiquetasByProducto($idProducto)
+                'error' => false,
+                'etiqueta' => $etiqueta
             ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al obtener la etiqueta: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function getByReposicion($idReposicion): array
-    {
+    /**
+     * Crea una nueva etiqueta
+     * @param int $idProducto ID del producto
+     * @param int $idReposicion ID de la reposición
+     * @param string $tipo Tipo de etiqueta (Informativa o RFID)
+     * @param string $prioridad Prioridad de la etiqueta (Normal o Urgente)
+     * @param bool $impresa Estado de impresión de la etiqueta
+     * @return array Resultado de la operación
+     */
+    public function store(int $idProducto, int $idReposicion, string $tipo, string $prioridad, bool $impresa = false): array {
         try {
-            if (!is_numeric($idReposicion) || $idReposicion <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de reposición inválido'];
-            }
+            $data = [
+                'id_producto' => $idProducto,
+                'id_reposicion' => $idReposicion,
+                'tipo' => $tipo,
+                'prioridad' => $prioridad,
+                'impresa' => $impresa
+            ];
+            
+            $etiqueta = $this->etiquetaService->createEtiqueta($data);
             
             return [
-                'error' => false, 
-                'etiquetas' => $this->etiquetasService->getEtiquetasByReposicion($idReposicion)
+                'error' => false,
+                'etiqueta' => $etiqueta,
+                'mensaje' => 'Etiqueta generada correctamente'
+            ];
+        } catch (InvalidArgumentException $e) {
+            return [
+                'error' => true,
+                'mensaje' => 'Error en los datos de la etiqueta: ' . $e->getMessage()
             ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al crear la etiqueta: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function getByTipo($tipo): array
-    {
+    /**
+     * Actualiza una etiqueta existente
+     * @param int $id ID de la etiqueta
+     * @param array $data Datos a actualizar
+     * @return array Resultado de la operación
+     */
+    public function update(int $id, array $data): array {
         try {
-            if (empty(trim($tipo))) {
-                return ['error' => true, 'mensaje' => 'El tipo de etiqueta es requerido'];
-            }
+            $etiqueta = $this->etiquetaService->updateEtiqueta($id, $data);
             
             return [
-                'error' => false, 
-                'etiquetas' => $this->etiquetasService->getEtiquetasByTipo($tipo)
+                'error' => false,
+                'etiqueta' => $etiqueta,
+                'mensaje' => 'Etiqueta actualizada correctamente'
+            ];
+        } catch (InvalidArgumentException $e) {
+            return [
+                'error' => true,
+                'mensaje' => 'Error en los datos de la etiqueta: ' . $e->getMessage()
             ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al actualizar la etiqueta: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function getByPrioridad($prioridad): array
-    {
+    /**
+     * Elimina una etiqueta
+     * @param int $id ID de la etiqueta
+     * @return array Resultado de la operación
+     */
+    public function destroy(int $id): array {
         try {
-            if (empty(trim($prioridad))) {
-                return ['error' => true, 'mensaje' => 'La prioridad de la etiqueta es requerida'];
+            $result = $this->etiquetaService->deleteEtiqueta($id);
+            
+            if ($result) {
+                return [
+                    'error' => false,
+                    'mensaje' => 'Etiqueta eliminada correctamente'
+                ];
+            } else {
+                return [
+                    'error' => true,
+                    'mensaje' => 'No se pudo eliminar la etiqueta'
+                ];
             }
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => 'Error al eliminar la etiqueta: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Marca una etiqueta como impresa
+     * @param int $id ID de la etiqueta
+     * @return array Resultado de la operación
+     */
+    public function marcarComoImpresa(int $id): array {
+        try {
+            $result = $this->etiquetaService->marcarComoImpresa($id);
+            
+            if ($result) {
+                return [
+                    'error' => false,
+                    'mensaje' => 'Etiqueta marcada como impresa correctamente'
+                ];
+            } else {
+                return [
+                    'error' => true,
+                    'mensaje' => 'No se pudo marcar la etiqueta como impresa'
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => 'Error al marcar la etiqueta como impresa: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Obtiene las etiquetas asociadas a una reposición
+     * @param int $idReposicion ID de la reposición
+     * @return array Etiquetas encontradas o mensaje de error
+     */
+    public function getEtiquetasByReposicion(int $idReposicion): array {
+        try {
+            $etiquetas = $this->etiquetaService->getEtiquetasByReposicion($idReposicion);
             
             return [
-                'error' => false, 
-                'etiquetas' => $this->etiquetasService->getEtiquetasByPrioridad($prioridad)
+                'error' => false,
+                'etiquetas' => $etiquetas
             ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al obtener las etiquetas de la reposición: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function getByImpresa($impresa): array
-    {
+    /**
+     * Obtiene las etiquetas que no han sido impresas
+     * @return array Etiquetas no impresas o mensaje de error
+     */
+    public function getEtiquetasNoImpresas(): array {
         try {
-            $impresaValue = filter_var($impresa, FILTER_VALIDATE_BOOLEAN);
+            $etiquetas = $this->etiquetaService->getEtiquetasNoImpresas();
             
             return [
-                'error' => false, 
-                'etiquetas' => $this->etiquetasService->getEtiquetasByImpresa($impresaValue)
+                'error' => false,
+                'etiquetas' => $etiquetas
             ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al obtener las etiquetas no impresas: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function store($idProducto, $idReposicion, $tipo, $prioridad, $impresa = false): array
-    {
+    /**
+     * Genera etiquetas a partir de una reposición
+     * @param int $idReposicion ID de la reposición
+     * @param string $tipo Tipo de etiqueta (Informativa o RFID)
+     * @return array Resultado de la operación
+     */
+    public function generarEtiquetasDesdeReposicion(int $idReposicion, string $tipo = 'Informativa'): array {
         try {
-            if (!is_numeric($idProducto) || $idProducto <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de producto inválido'];
-            }
-
-            if (!is_numeric($idReposicion) || $idReposicion <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de reposición inválido'];
-            }
-
-            if (empty(trim($tipo))) {
-                return ['error' => true, 'mensaje' => 'El tipo de etiqueta es requerido'];
-            }
-
-            if (empty(trim($prioridad))) {
-                return ['error' => true, 'mensaje' => 'La prioridad de la etiqueta es requerida'];
-            }
-
-            $impresaValue = filter_var($impresa, FILTER_VALIDATE_BOOLEAN);
+            $etiquetas = $this->etiquetaService->generarEtiquetasDesdeReposicion($idReposicion, $tipo);
             
-            $resultado = $this->etiquetasService->createEtiqueta(
-                $idProducto,
-                $idReposicion,
-                $tipo,
-                $prioridad,
-                $impresaValue
-            );
-            
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Etiqueta creada correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo crear la etiqueta'];
-            }
+            return [
+                'error' => false,
+                'etiquetas' => $etiquetas,
+                'mensaje' => 'Etiquetas generadas correctamente'
+            ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al generar etiquetas desde la reposición: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function update($idEtiqueta, $idProducto, $idReposicion, $tipo, $prioridad, $impresa): array
-    {
+    /**
+     * Genera varias etiquetas para un producto y una reposición
+     * @param int $idProducto ID del producto
+     * @param int $idReposicion ID de la reposición
+     * @param string $tipo Tipo de etiqueta
+     * @param string $prioridad Prioridad de la etiqueta
+     * @param int $cantidad Cantidad de etiquetas a generar
+     * @return array Resultado de la operación
+     */
+    public function generarMultiplesEtiquetas(int $idProducto, int $idReposicion, string $tipo, string $prioridad, int $cantidad): array {
         try {
-            if (!is_numeric($idEtiqueta) || $idEtiqueta <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de etiqueta inválido'];
+            if ($cantidad <= 0) {
+                throw new InvalidArgumentException('La cantidad de etiquetas debe ser mayor que cero');
             }
-
-            if (!is_numeric($idProducto) || $idProducto <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de producto inválido'];
-            }
-
-            if (!is_numeric($idReposicion) || $idReposicion <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de reposición inválido'];
-            }
-
-            if (empty(trim($tipo))) {
-                return ['error' => true, 'mensaje' => 'El tipo de etiqueta es requerido'];
-            }
-
-            if (empty(trim($prioridad))) {
-                return ['error' => true, 'mensaje' => 'La prioridad de la etiqueta es requerida'];
-            }
-
-            $impresaValue = filter_var($impresa, FILTER_VALIDATE_BOOLEAN);
             
-            $resultado = $this->etiquetasService->updateEtiqueta(
-                $idEtiqueta,
-                $idProducto,
-                $idReposicion,
-                $tipo,
-                $prioridad,
-                $impresaValue
-            );
+            $etiquetas = [];
+            $errores = [];
             
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Etiqueta actualizada correctamente'];
+            for ($i = 0; $i < $cantidad; $i++) {
+                try {
+                    $resultado = $this->store($idProducto, $idReposicion, $tipo, $prioridad);
+                    if (!$resultado['error']) {
+                        $etiquetas[] = $resultado['etiqueta'];
+                    } else {
+                        $errores[] = 'Error en etiqueta #' . ($i + 1) . ': ' . $resultado['mensaje'];
+                    }
+                } catch (Exception $e) {
+                    $errores[] = 'Error en etiqueta #' . ($i + 1) . ': ' . $e->getMessage();
+                }
+            }
+            
+            if (empty($errores)) {
+                return [
+                    'error' => false,
+                    'etiquetas' => $etiquetas,
+                    'mensaje' => 'Se han generado ' . count($etiquetas) . ' etiquetas correctamente'
+                ];
             } else {
-                return ['error' => true, 'mensaje' => 'No se pudo actualizar la etiqueta'];
+                return [
+                    'error' => true,
+                    'etiquetas' => $etiquetas,
+                    'errores' => $errores,
+                    'mensaje' => 'Se han generado ' . count($etiquetas) . ' etiquetas, pero con ' . count($errores) . ' errores'
+                ];
             }
+            
+        } catch (InvalidArgumentException $e) {
+            return [
+                'error' => true,
+                'mensaje' => 'Error en los parámetros: ' . $e->getMessage()
+            ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al generar las etiquetas: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function marcarComoImpresa($idEtiqueta, $impresa = true): array
-    {
+    /**
+     * Procesa los datos del formulario para generar etiquetas
+     * @param array $formData Datos del formulario
+     * @return array Resultado de la operación
+     */
+    public function procesarFormularioGenerar(array $formData): array {
         try {
-            if (!is_numeric($idEtiqueta) || $idEtiqueta <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de etiqueta inválido'];
+            // Validar datos del formulario
+            if (!isset($formData['id_producto']) || empty($formData['id_producto'])) {
+                throw new InvalidArgumentException('Debe seleccionar un producto');
             }
-
-            $impresaValue = filter_var($impresa, FILTER_VALIDATE_BOOLEAN);
             
-            $resultado = $this->etiquetasService->marcarEtiquetaImpresa($idEtiqueta, $impresaValue);
+            if (!isset($formData['id_reposicion']) || empty($formData['id_reposicion'])) {
+                throw new InvalidArgumentException('Debe seleccionar una reposición');
+            }
             
-            if ($resultado) {
-                $estado = $impresaValue ? 'impresa' : 'no impresa';
-                return ['error' => false, 'mensaje' => "Etiqueta marcada como $estado correctamente"];
+            if (!isset($formData['tipo']) || !in_array($formData['tipo'], ['Informativa', 'RFID'])) {
+                throw new InvalidArgumentException('El tipo de etiqueta debe ser Informativa o RFID');
+            }
+            
+            if (!isset($formData['prioridad']) || !in_array($formData['prioridad'], ['Normal', 'Urgente'])) {
+                throw new InvalidArgumentException('La prioridad debe ser Normal o Urgente');
+            }
+            
+            $idProducto = intval($formData['id_producto']);
+            $idReposicion = intval($formData['id_reposicion']);
+            $tipo = $formData['tipo'];
+            $prioridad = $formData['prioridad'];
+            
+            // Cantidad de etiquetas a generar (opcional, por defecto 1)
+            $cantidad = isset($formData['cantidad']) && intval($formData['cantidad']) > 0 
+                      ? intval($formData['cantidad']) 
+                      : 1;
+            
+            if ($cantidad === 1) {
+                return $this->store($idProducto, $idReposicion, $tipo, $prioridad);
             } else {
-                return ['error' => true, 'mensaje' => 'No se pudo actualizar el estado de la etiqueta'];
+                return $this->generarMultiplesEtiquetas($idProducto, $idReposicion, $tipo, $prioridad, $cantidad);
             }
+            
+        } catch (InvalidArgumentException $e) {
+            return [
+                'error' => true,
+                'mensaje' => $e->getMessage()
+            ];
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al procesar el formulario: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function destroy($idEtiqueta): array
-    {
+    /**
+     * Procesa los datos del formulario para marcar etiquetas como impresas
+     * @param array $formData Datos del formulario
+     * @return array Resultado de la operación
+     */
+    public function procesarFormularioMarcarImpresas(array $formData): array {
         try {
-            if (!is_numeric($idEtiqueta) || $idEtiqueta <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de etiqueta inválido'];
+            if (!isset($formData['id_etiqueta'])) {
+                throw new InvalidArgumentException('Debe proporcionar el ID de la etiqueta');
             }
-
-            $resultado = $this->etiquetasService->deleteEtiqueta($idEtiqueta);
             
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Etiqueta eliminada correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo eliminar la etiqueta'];
-            }
+            $idEtiqueta = intval($formData['id_etiqueta']);
+            return $this->marcarComoImpresa($idEtiqueta);
+            
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            return [
+                'error' => true,
+                'mensaje' => 'Error al marcar la etiqueta como impresa: ' . $e->getMessage()
+            ];
         }
     }
 }

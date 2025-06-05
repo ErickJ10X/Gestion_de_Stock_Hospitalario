@@ -2,6 +2,8 @@
 
 namespace util;
 
+use model\entity\Usuario;
+
 class Session
 {
     public function __construct()
@@ -39,9 +41,9 @@ class Session
         return !empty($_SESSION['id']);
     }
 
-    public function setUserData($user)
+    public function setUserData(Usuario $user): void
     {
-        $_SESSION['id'] = $user->getId();
+        $_SESSION['id'] = $user->getIdUsuario();
         $_SESSION['nombre'] = $user->getNombre();
         $_SESSION['email'] = $user->getEmail();
         $_SESSION['rol'] = $user->getRol();
@@ -82,6 +84,26 @@ class Session
         }
 
         return null;
+    }
+
+    /**
+     * Elimina un mensaje flash específico
+     *
+     * @param string|null $type Tipo de mensaje a eliminar. Si es null, elimina todos los mensajes.
+     * @return void
+     */
+    public function clearMessage($type = null)
+    {
+        if ($type === null) {
+            unset($_SESSION['flash_message']);
+            unset($_SESSION['flash_message_type']);
+        } else if (
+            isset($_SESSION['flash_message_type']) &&
+            $_SESSION['flash_message_type'] === $type
+        ) {
+            unset($_SESSION['flash_message']);
+            unset($_SESSION['flash_message_type']);
+        }
     }
 
     public function getMessageType()

@@ -39,7 +39,7 @@ class ProductosRepository
     public function findAll(): array
     {
         $sql = "SELECT * FROM productos";
-        return $this->mapToProductoArray($this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
+        return $this->mapToProductoArray($this->pdo->query($sql)->fetchAll());
     }
 
     public function findById($id): ?Productos

@@ -1,89 +1,79 @@
 <?php
 
 namespace model\service;
-require_once(__DIR__ . '/../../../config/database.php');
-require_once(__DIR__ . '/../repository/HospitalesRepository.php');
-require_once(__DIR__ . '/../entity/Hospitales.php');
 
-use model\entity\Hospitales;
-use model\repository\HospitalesRepository;
-use PDOException;
-use Exception;
+require_once(__DIR__ . '/../../model/entity/Hospital.php');
+require_once(__DIR__ . '/../../model/repository/HospitalRepository.php');
 
-class HospitalService
-{
-    private HospitalesRepository $hospitalRepository;
+use model\entity\Hospital;
+use InvalidArgumentException;
+use model\repository\HospitalRepository;
 
-    public function __construct()
-    {
-        $this->hospitalRepository = new HospitalesRepository();
+class HospitalService {
+    private HospitalRepository $hospitalRepository;
+
+    public function __construct() {
+        $this->hospitalRepository = new HospitalRepository();
     }
 
-    public function getAllHospitales(): array
-    {
-        try {
-            return $this->hospitalRepository->findAll();
-        } catch (PDOException $e) {
-            throw new Exception("Error al cargar los hospitales: " . $e->getMessage());
+    public function getHospitalById(int $id): ?Hospital {
+        return $this->hospitalRepository->findById($id);
+    }
+
+    public function getAllHospitales(): array {
+        return $this->hospitalRepository->findAll();
+    }
+
+    public function getActiveHospitales(): array {
+        return $this->hospitalRepository->findActive();
+    }
+
+    public function createHospital(array $data): Hospital {
+        $this->validateHospitalData($data);
+        
+        $hospital = new Hospital(
+            null,
+            $data['nombre'],
+            $data['ubicacion'] ?? '',
+            $data['activo'] ?? true
+        );
+        
+        return $this->hospitalRepository->save($hospital);
+    }
+
+    public function updateHospital(int $id, array $data): Hospital {
+        $hospital = $this->hospitalRepository->findById($id);
+        if (!$hospital) {
+            throw new InvalidArgumentException('Hospital no encontrado');
         }
-    }
-
-    public function getHospitalById($id): ?Hospitales
-    {
-        try {
-            return $this->hospitalRepository->findById($id);
-        } catch (PDOException $e) {
-            throw new Exception("Error al obtener el hospital: " . $e->getMessage());
+        
+        if (isset($data['nombre'])) {
+            $hospital->setNombre($data['nombre']);
         }
-    }
-
-    public function createHospital($nombre, $ubicacion = ""): bool
-    {
-        try {
-            if (empty($nombre)) {
-                throw new Exception("El nombre del hospital es obligatorio");
-            }
-
-            $hospital = new Hospitales(0, $nombre, $ubicacion);
-            return $this->hospitalRepository->save($hospital);
-        } catch (PDOException $e) {
-            throw new Exception("Error al crear el hospital: " . $e->getMessage());
+        
+        if (isset($data['ubicacion'])) {
+            $hospital->setUbicacion($data['ubicacion']);
         }
-    }
-
-    public function updateHospital($id, $nombre, $ubicacion = null): bool
-    {
-        try {
-            if (empty($id) || empty($nombre)) {
-                throw new Exception("El ID y el nombre del hospital son obligatorios");
-            }
-
-            $hospital = $this->hospitalRepository->findById($id);
-            if (!$hospital) {
-                throw new Exception("Hospital no encontrado");
-            }
-
-            $hospital->setNombre($nombre);
-            if ($ubicacion !== null) {
-                $hospital->setUbicacion($ubicacion);
-            }
-
-            return $this->hospitalRepository->update($hospital);
-        } catch (PDOException $e) {
-            throw new Exception("Error al actualizar el hospital: " . $e->getMessage());
+        
+        if (isset($data['activo'])) {
+            $hospital->setActivo($data['activo']);
         }
+        
+        return $this->hospitalRepository->save($hospital);
     }
 
-    public function deleteHospital($id): bool
-    {
-        try {
-            if (empty($id)) {
-                throw new Exception("El ID del hospital es obligatorio");
-            }
+    public function deleteHospital(int $id): bool {
+        // En un sistema real, podría ser necesario comprobar si hay dependencias antes de eliminar
+        return $this->hospitalRepository->delete($id);
+    }
 
-            return $this->hospitalRepository->deleteById($id);
-        } catch (PDOException $e) {
-            throw new Exception("Error al eliminar el hospital: " . $e->getMessage());
+    public function desactivarHospital(int $id): bool {
+        return $this->hospitalRepository->softDelete($id);
+    }
+
+    private function validateHospitalData(array $data): void {
+        if (!isset($data['nombre']) || empty($data['nombre'])) {
+            throw new InvalidArgumentException('El nombre del hospital es obligatorio');
         }
     }
 }

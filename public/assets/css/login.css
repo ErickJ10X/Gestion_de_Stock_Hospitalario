@@ -1,0 +1,233 @@
+/* Estilos para la página de Login */
+:root {
+    --primary-color: #4e73df;
+    --primary-dark: #2e59d9;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --danger-color: #e74a3b;
+    --warning-color: #f6c23e;
+    --light-bg: #f8f9fc;
+    --dark-text: #5a5c69;
+    --white: #fff;
+    --box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+/* Reset para asegurar que el fondo cubre toda la página */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.login-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-attachment: fixed;
+}
+
+/* Mostrar el header y footer en la página de login pero mantener sus estilos originales */
+.login-page .header {
+    /* Eliminar estilo transparente para mostrar el header original */
+    position: relative;
+    z-index: 10;
+}
+
+.login-page .header__container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.login-page .main {
+    padding: 20px 0; /* Restaurar padding para mantener distancia entre header y login-container */
+    margin: 0;
+    max-width: 100%;
+    background: transparent; /* Asegurar que el fondo del main sea transparente */
+}
+
+.login-container {
+    min-height: 70vh; /* Reducido para dejar espacio al header y footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px; /* Reducido de 450px */
+    background-color: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+}
+
+.login-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 20px; /* Reducido de 25px 30px */
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.login-header h2 {
+    margin: 0;
+    font-size: 22px; /* Reducido de 24px */
+    font-weight: 600;
+}
+
+.login-body {
+    padding: 25px; /* Reducido de 30px */
+}
+
+.login-form .form-group {
+    margin-bottom: 20px; /* Reducido de 25px */
+    position: relative;
+}
+
+.login-form .form-control {
+    height: 50px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+.login-form label {
+    font-weight: 500;
+    color: var(--dark-text);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.login-form .btn-login {
+    width: 100%;
+    height: 50px;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+    font-weight: 600;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-form .btn-login:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.login-form .btn-login:active {
+    transform: translateY(0);
+}
+
+.login-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+}
+
+.login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background-color: rgba(28, 200, 138, 0.1);
+    border-left-color: var(--success-color);
+    color: #0f6848;
+}
+
+.alert-danger {
+    background-color: rgba(231, 74, 59, 0.1);
+    border-left-color: var(--danger-color);
+    color: #7e2319;
+}
+
+.alert-warning {
+    background-color: rgba(246, 194, 62, 0.1);
+    border-left-color: var(--warning-color);
+    color: #8e6f0d;
+}
+
+/* Logo o imagen decorativa */
+.login-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo img {
+    max-width: 150px;
+    height: auto;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-card {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .login-card {
+        max-width: 100%;
+    }
+    
+    .login-header {
+        padding: 20px;
+    }
+    
+    .login-body {
+        padding: 20px;
+    }
+    
+    .login-form .form-control {
+        height: 45px;
+    }
+    
+    .login-form .btn-login {
+        height: 45px;
+    }
+}
+
+/* Cambios en el header.php para integrar el login.css */
+.main__form {
+    margin-bottom: 0;
+}
+
+.main__form-link {
+    font-weight: 500;
+}
+
+/* Ajustar el footer en la página de login */
+.login-page footer {
+    /* El footer mantiene su estilo original */
+    position: relative;
+    z-index: 10;
+}

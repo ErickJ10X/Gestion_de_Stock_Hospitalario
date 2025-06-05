@@ -1,0 +1,53 @@
+/* Estilos para la sección de informes */
+
+.card-container {
+    margin-bottom: 30px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+/* Estilos para el formulario de filtros */
+.filtros-container {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para las tablas */
+.table-responsive {
+    margin-top: 10px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para los gráficos */
+canvas {
+    max-width: 100%;
+}
+
+/* Estilos para los badges */
+.badge {
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .col-md-3, .col-md-6 {
+        margin-bottom: 10px;
+    }
+}

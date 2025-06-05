@@ -2,79 +2,82 @@
 
 namespace model\service;
 
-require_once __DIR__ . '/../repository/PlantasRepository.php';
-require_once __DIR__ . '/../entity/Plantas.php';
+use model\entity\Planta;
+use model\repository\PlantaRepository;
+use InvalidArgumentException;
 
-use model\repository\PlantasRepository;
-use model\entity\Plantas;
-use Exception;
+class PlantaService {
+    private PlantaRepository $plantaRepository;
 
-class PlantaService
-{
-    private PlantasRepository $plantasRepository;
-
-    public function __construct()
-    {
-        $this->plantasRepository = new PlantasRepository();
+    public function __construct(PlantaRepository $plantaRepository = null) {
+        $this->plantaRepository = $plantaRepository ?? new PlantaRepository();
     }
 
-    public function getAllPlantas(): array
-    {
-        try {
-            return $this->plantasRepository->findAll();
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getAllPlantas: " . $e->getMessage());
-            throw new Exception("Error al obtener las plantas: " . $e->getMessage());
+    public function getPlantaById(int $id): ?Planta {
+        return $this->plantaRepository->findById($id);
+    }
+
+    public function getAllPlantas(): array {
+        return $this->plantaRepository->findAll();
+    }
+
+    public function getPlantasByHospital(int $idHospital): array {
+        return $this->plantaRepository->findByHospital($idHospital);
+    }
+
+    public function getActivePlantas(): array {
+        return $this->plantaRepository->findActive();
+    }
+
+    public function createPlanta(array $data): Planta {
+        $this->validatePlantaData($data);
+        
+        $planta = new Planta(
+            null,
+            $data['id_hospital'],
+            $data['nombre'],
+            $data['activo'] ?? true
+        );
+        
+        return $this->plantaRepository->save($planta);
+    }
+
+    public function updatePlanta(int $id, array $data): Planta {
+        $planta = $this->plantaRepository->findById($id);
+        if (!$planta) {
+            throw new InvalidArgumentException('Planta no encontrada');
         }
-    }
-
-    public function getPlantaById($id): ?Plantas
-    {
-        try {
-            return $this->plantasRepository->findById($id);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getPlantaById: " . $e->getMessage());
-            return null;
+        
+        if (isset($data['id_hospital'])) {
+            $planta->setIdHospital($data['id_hospital']);
         }
-    }
-
-    public function getPlantasByHospitalId($hospitalId): array
-    {
-        try {
-            return $this->plantasRepository->findByHospitalId($hospitalId);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::getPlantasByHospitalId: " . $e->getMessage());
-            return [];
+        
+        if (isset($data['nombre'])) {
+            $planta->setNombre($data['nombre']);
         }
-    }
-
-    public function savePlanta(Plantas $planta): bool
-    {
-        try {
-            return $this->plantasRepository->save($planta);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::savePlanta: " . $e->getMessage());
-            return false;
+        
+        if (isset($data['activo'])) {
+            $planta->setActivo($data['activo']);
         }
+        
+        return $this->plantaRepository->save($planta);
     }
 
-    public function updatePlanta(Plantas $planta): bool
-    {
-        try {
-            return $this->plantasRepository->update($planta);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::updatePlanta: " . $e->getMessage());
-            return false;
+    public function deletePlanta(int $id): bool {
+        return $this->plantaRepository->delete($id);
+    }
+
+    public function desactivarPlanta(int $id): bool {
+        return $this->plantaRepository->softDelete($id);
+    }
+
+    private function validatePlantaData(array $data): void {
+        if (!isset($data['id_hospital'])) {
+            throw new InvalidArgumentException('El hospital es obligatorio');
         }
-    }
-
-    public function deletePlanta($id): bool
-    {
-        try {
-            return $this->plantasRepository->delete($id);
-        } catch (Exception $e) {
-            error_log("Error en PlantaService::deletePlanta: " . $e->getMessage());
-            return false;
+        
+        if (!isset($data['nombre']) || empty($data['nombre'])) {
+            throw new InvalidArgumentException('El nombre de la planta es obligatorio');
         }
     }
 }

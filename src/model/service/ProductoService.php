@@ -2,86 +2,114 @@
 
 namespace model\service;
 
-require_once(__DIR__ . '/../entity/Productos.php');
-require_once(__DIR__ . '/../repository/ProductosRepository.php');
-require_once(__DIR__ . '/../../../config/database.php');
+use model\entity\Producto;
+use model\repository\ProductoRepository;
+use InvalidArgumentException;
 
-use model\entity\Productos;
-use model\repository\ProductosRepository;
-use PDOException;
-use Exception;
+class ProductoService {
+    private ProductoRepository $productoRepository;
 
-class ProductoService
-{
-    private ProductosRepository $productoRepository;
-
-    public function __construct()
-    {
-        $this->productoRepository = new ProductosRepository();
+    public function __construct(ProductoRepository $productoRepository = null) {
+        $this->productoRepository = $productoRepository ?? new ProductoRepository();
     }
 
-    public function getAllProductos(): array
-    {
-        try {
-            return $this->productoRepository->findAll();
-        } catch (PDOException $e) {
-            throw new Exception("Error al cargar los productos: " . $e->getMessage());
+    public function getProductoById(int $id): ?Producto {
+        return $this->productoRepository->findById($id);
+    }
+
+    public function getProductoByCodigo(string $codigo): ?Producto {
+        return $this->productoRepository->findByCodigo($codigo);
+    }
+
+    public function getAllProductos(): array {
+        return $this->productoRepository->findAll();
+    }
+
+    public function getActiveProductos(): array {
+        return $this->productoRepository->findActive();
+    }
+
+    public function getProductosByCatalogo(int $idPlanta): array {
+        return $this->productoRepository->findByCatalogo($idPlanta);
+    }
+
+    public function buscarProductos(string $termino): array {
+        return $this->productoRepository->buscarPorNombreOCodigo($termino);
+    }
+
+    public function createProducto(array $data): Producto {
+        $this->validateProductoData($data);
+        $this->checkCodigoUnique($data['codigo']);
+        
+        $producto = new Producto(
+            null,
+            $data['codigo'],
+            $data['nombre'],
+            $data['descripcion'] ?? '',
+            $data['unidad_medida'],
+            $data['activo'] ?? true
+        );
+        
+        return $this->productoRepository->save($producto);
+    }
+
+    public function updateProducto(int $id, array $data): Producto {
+        $producto = $this->productoRepository->findById($id);
+        if (!$producto) {
+            throw new InvalidArgumentException('Producto no encontrado');
+        }
+        
+        if (isset($data['codigo']) && $data['codigo'] !== $producto->getCodigo()) {
+            $this->checkCodigoUnique($data['codigo']);
+            $producto->setCodigo($data['codigo']);
+        }
+        
+        if (isset($data['nombre'])) {
+            $producto->setNombre($data['nombre']);
+        }
+        
+        if (isset($data['descripcion'])) {
+            $producto->setDescripcion($data['descripcion']);
+        }
+        
+        if (isset($data['unidad_medida'])) {
+            $producto->setUnidadMedida($data['unidad_medida']);
+        }
+        
+        if (isset($data['activo'])) {
+            $producto->setActivo($data['activo']);
+        }
+        
+        return $this->productoRepository->save($producto);
+    }
+
+    public function deleteProducto(int $id): bool {
+        // Aquí se podrían agregar validaciones adicionales antes de eliminar
+        return $this->productoRepository->delete($id);
+    }
+
+    public function desactivarProducto(int $id): bool {
+        return $this->productoRepository->softDelete($id);
+    }
+
+    private function validateProductoData(array $data): void {
+        if (!isset($data['codigo']) || empty($data['codigo'])) {
+            throw new InvalidArgumentException('El código es obligatorio');
+        }
+        
+        if (!isset($data['nombre']) || empty($data['nombre'])) {
+            throw new InvalidArgumentException('El nombre es obligatorio');
+        }
+        
+        if (!isset($data['unidad_medida']) || empty($data['unidad_medida'])) {
+            throw new InvalidArgumentException('La unidad de medida es obligatoria');
         }
     }
 
-    public function getProductoById($id): ?Productos
-    {
-        try {
-            $producto = $this->productoRepository->findById($id);
-            if (!$producto) {
-                return null;
-            }
-            return $producto;
-        } catch (PDOException $e) {
-            throw new Exception("Error al cargar el producto: " . $e->getMessage());
-        }
-    }
-
-    public function deleteProducto($id): bool
-    {
-        try {
-            return $this->productoRepository->delete($id);
-        } catch (PDOException $e) {
-            throw new Exception("Error al eliminar el producto: " . $e->getMessage());
-        }
-    }
-
-    public function updateProducto($id, $codigo, $nombre, $descripcion, $unidad_medida): bool
-    {
-        try {
-            $producto = new Productos(
-                $id,
-                $codigo,
-                $nombre,
-                $descripcion,
-                $unidad_medida
-            );
-
-            return $this->productoRepository->update($producto);
-        } catch (PDOException $e) {
-            throw new Exception("Error al actualizar el producto: " . $e->getMessage());
-        }
-    }
-
-    public function createProducto($codigo, $nombre, $descripcion, $unidad_medida): bool
-    {
-        try {
-            $producto = new Productos(
-                null,
-                $codigo,
-                $nombre,
-                $descripcion,
-                $unidad_medida
-            );
-
-            return $this->productoRepository->save($producto);
-        } catch (PDOException $e) {
-            throw new Exception("Error al crear el producto: " . $e->getMessage());
+    private function checkCodigoUnique(string $codigo, ?int $id = null): void {
+        $producto = $this->productoRepository->findByCodigo($codigo);
+        if ($producto && ($id === null || $producto->getIdProducto() !== $id)) {
+            throw new InvalidArgumentException('El código ya está en uso');
         }
     }
 }

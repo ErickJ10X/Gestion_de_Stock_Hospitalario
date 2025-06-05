@@ -2,102 +2,311 @@
 
 namespace controller;
 
-use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use model\service\HospitalService;
+use model\service\PlantaService;
+use model\entity\Hospital;
+use model\entity\Planta;
+use util\Redirect;
+use util\Session;
+use util\AuthGuard;
+use Exception;
 
 require_once(__DIR__ . '/../model/service/HospitalService.php');
+require_once(__DIR__ . '/../model/service/PlantaService.php');
+require_once(__DIR__ . '/../model/repository/HospitalRepository.php');
+require_once(__DIR__ . '/../model/repository/PlantaRepository.php');
+require_once(__DIR__ . '/../model/entity/Hospital.php');
+require_once(__DIR__ . '/../model/entity/Planta.php');
+require_once(__DIR__ . '/../util/Session.php');
+require_once(__DIR__ . '/../util/AuthGuard.php');
 
-class HospitalController
-{
+class HospitalController {
     private HospitalService $hospitalService;
+    private PlantaService $plantaService;
+    private Session $session;
+    private AuthGuard $authGuard;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->hospitalService = new HospitalService();
+        $this->plantaService = new PlantaService();
+        $this->session = new Session();
+        $this->authGuard = new AuthGuard();
     }
 
-    public function index(): array
-    {
+    /**
+     * Método principal para obtener los datos utilizados en la vista index
+     */
+    public function index(): array {
+        $this->authGuard->requireGestorHospital();
+        
+        $viewData = [
+            'hospitales' => [],
+            'plantas' => []
+        ];
+
         try {
-            return ['error' => false, 'hospitales' => $this->hospitalService->getAllHospitales()];
+            $viewData['hospitales'] = $this->hospitalService->getAllHospitales();
+            $viewData['plantas'] = $this->plantaService->getAllPlantas();
+            
+            // Procesar cualquier mensaje de sesión
+            $this->procesarMensajes();
+            
+            return $viewData;
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', "Error al cargar datos: " . $e->getMessage());
+            return $viewData;
         }
     }
 
-    public function show($id): array
-    {
+    /**
+     * Obtiene un hospital por su ID
+     */
+    public function getById(int $id): array {
         try {
-            if (empty($id) || !is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            $hospital = $this->hospitalService->getHospitalById($id);
+            
+            if ($hospital) {
+                return [
+                    'error' => false,
+                    'hospital' => $hospital->toArray()
+                ];
+            } else {
+                return [
+                    'error' => true,
+                    'mensaje' => 'Hospital no encontrado'
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Obtiene las plantas asociadas a un hospital
+     */
+    public function getByHospital(int $idHospital): array {
+        try {
+            $plantas = $this->plantaService->getPlantasByHospital($idHospital);
+            
+            return [
+                'error' => false,
+                'plantas' => $plantas
+            ];
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => $e->getMessage(),
+                'plantas' => []
+            ];
+        }
+    }
+
+    /**
+     * Crea un nuevo hospital
+     */
+    public function crear(): void {
+        $this->authGuard->requireGestorGeneral();
+        
+        try {
+            // Validar datos
+            $nombre = $_POST['nombre'] ?? '';
+            $ubicacion = $_POST['ubicacion'] ?? '';
+            
+            if (empty($nombre)) {
+                throw new Exception("El nombre del hospital es obligatorio");
             }
             
-            $hospital = $this->hospitalService->getHospitalById($id);
-            if ($hospital) {
-                return ['error' => false, 'hospital' => $hospital];
-            } else {
-                return ['error' => true, 'mensaje' => 'Hospital no encontrado'];
-            }
+            // Crear hospital
+            $hospital = $this->hospitalService->createHospital([
+                'nombre' => $nombre,
+                'ubicacion' => $ubicacion
+            ]);
+            
+            $this->session->setMessage('success', "Hospital creado correctamente");
+            Redirect::toHospitales();
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', $e->getMessage());
+            Redirect::toHospitales();
+            $this->redirect('index.php?tab=agregar-editar');
         }
     }
 
-    public function store($nombre, $ubicacion = ''): array
-    {
+    /**
+     * Actualiza un hospital existente
+     */
+    public function editar(): void {
+        $this->authGuard->requireGestorGeneral();
+        
         try {
-            if (empty(trim($nombre))) {
-                return ['error' => true, 'mensaje' => 'El nombre del hospital es obligatorio'];
+            // Validar datos
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            $nombre = $_POST['nombre'] ?? '';
+            $ubicacion = $_POST['ubicacion'] ?? '';
+            
+            if ($id <= 0) {
+                throw new Exception("ID de hospital no válido");
             }
-
-            $resultado = $this->hospitalService->createHospital($nombre, $ubicacion);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Hospital creado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo crear el hospital'];
+            
+            if (empty($nombre)) {
+                throw new Exception("El nombre del hospital es obligatorio");
             }
+            
+            // Actualizar hospital
+            $hospital = $this->hospitalService->updateHospital($id, [
+                'nombre' => $nombre,
+                'ubicacion' => $ubicacion
+            ]);
+            
+            $this->session->setMessage('success', "Hospital actualizado correctamente");
+            $this->redirect('index.php');
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', $e->getMessage());
+            $this->redirect('index.php?tab=agregar-editar');
         }
     }
 
-    public function update($id, $nombre, $ubicacion = null): array
-    {
+    /**
+     * Elimina un hospital
+     */
+    public function eliminar(): void {
+        $this->authGuard->requireGestorGeneral();
+        
         try {
-            if (empty($id) || !is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            
+            if ($id <= 0) {
+                throw new Exception("ID de hospital no válido");
             }
-
-            if (empty(trim($nombre))) {
-                return ['error' => true, 'mensaje' => 'El nombre del hospital es obligatorio'];
+            
+            // Primero verificar si hay plantas asociadas
+            $plantas = $this->plantaService->getPlantasByHospital($id);
+            if (!empty($plantas)) {
+                throw new Exception("No se puede eliminar el hospital porque tiene plantas asociadas");
             }
-
-            $resultado = $this->hospitalService->updateHospital($id, $nombre, $ubicacion);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Hospital actualizado correctamente'];
+            
+            // Eliminar hospital
+            $eliminado = $this->hospitalService->deleteHospital($id);
+            
+            if ($eliminado) {
+                $this->session->setMessage('success', "Hospital eliminado correctamente");
             } else {
-                return ['error' => true, 'mensaje' => 'No se pudo actualizar el hospital'];
+                $this->session->setMessage('error', "Error al eliminar el hospital");
             }
+            
+            $this->redirect('index.php');
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            $this->session->setMessage('error', $e->getMessage());
+            $this->redirect('index.php');
         }
     }
 
-    public function destroy($id): array
-    {
+    /**
+     * Procesa una solicitud desde la vista API
+     */
+    public function processApiRequest(): void {
+        header('Content-Type: application/json');
+        
         try {
-            if (empty($id) || !is_numeric($id) || $id <= 0) {
-                return ['error' => true, 'mensaje' => 'ID de hospital inválido'];
-            }
-
-            $resultado = $this->hospitalService->deleteHospital($id);
-            if ($resultado) {
-                return ['error' => false, 'mensaje' => 'Hospital eliminado correctamente'];
-            } else {
-                return ['error' => true, 'mensaje' => 'No se pudo eliminar el hospital'];
+            $this->authGuard->requireGestorHospital();
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $action = $_GET['action'] ?? '';
+                
+                switch ($action) {
+                    case 'getById':
+                        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+                        echo json_encode($this->getById($id));
+                        break;
+                    case 'getByHospital':
+                        $idHospital = isset($_GET['idHospital']) ? (int)$_GET['idHospital'] : 0;
+                        echo json_encode($this->getByHospital($idHospital));
+                        break;
+                    default:
+                        echo json_encode([
+                            'error' => true,
+                            'mensaje' => 'Acción no reconocida'
+                        ]);
+                        break;
+                }
+            } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $action = $_POST['action'] ?? '';
+                
+                switch ($action) {
+                    case 'crear':
+                        $this->crear();
+                        break;
+                    case 'editar':
+                        $this->editar();
+                        break;
+                    case 'eliminar':
+                        $this->eliminar();
+                        break;
+                    default:
+                        echo json_encode([
+                            'error' => true,
+                            'mensaje' => 'Acción no reconocida'
+                        ]);
+                        break;
+                }
             }
         } catch (Exception $e) {
-            return ['error' => true, 'mensaje' => $e->getMessage()];
+            echo json_encode([
+                'error' => true,
+                'mensaje' => $e->getMessage()
+            ]);
         }
     }
+
+    /**
+     * Procesa cualquier mensaje en la sesión
+     */
+    private function procesarMensajes(): void {
+        // Los mensajes se manejan automáticamente en la vista
+    }
+
+
+    /**
+     * Procesa la solicitud actual
+     */
+    public function processRequest(): void {
+        // Determinar si es una solicitud API
+        $isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+                        
+        if ($isApiRequest) {
+            $this->processApiRequest();
+            return;
+        }
+
+        // Procesar solicitudes normales
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $action = $_POST['action'] ?? '';
+            
+            switch ($action) {
+                case 'crear':
+                    $this->crear();
+                    break;
+                case 'editar':
+                    $this->editar();
+                    break;
+                case 'eliminar':
+                    $this->eliminar();
+                    break;
+                default:
+                    $this->session->setMessage('error', 'Acción no válida');
+                    $this->redirect('index.php');
+                    break;
+            }
+        }
+    }
+}
+
+// Ejecutar el controlador si este archivo es llamado directamente
+if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
+    $controller = new HospitalController();
+    $controller->processRequest();
 }
