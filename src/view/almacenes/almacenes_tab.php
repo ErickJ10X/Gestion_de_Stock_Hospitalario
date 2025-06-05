@@ -108,8 +108,5 @@ function eliminarAlmacen(id) {
     // Configurar el modal
     document.getElementById('eliminar_almacen_id').value = id;
     
-    // Mostrar el modal usando Bootstrap
-    var myModal = new bootstrap.Modal(document.getElementById('eliminarAlmacenModal'));
-    myModal.show();
 }
 </script>

@@ -18,20 +18,21 @@ $authGuard = new AuthGuard();
 $authGuard->requireAdministrador();
 
 // Obtener datos para la vista desde el controlador
-$viewData = $usuarioController->prepareDataForView();
+$viewData = $usuarioController->getAllUsers();
 $usuarios = $viewData['usuarios'] ?? [];
-$roles = $viewData['roles'] ?? [];
 
-// Comprobar si hay un usuario para editar
-$usuarioEditar = $viewData['usuario_editar'] ?? null;
+// Si no se obtienen usuarios, inicializar como array vacío
+if (!is_array($usuarios)) {
+    $usuarios = [];
+}
 
 $pageTitle = "Gestión de Usuarios";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
 <!-- Incluir estilos CSS con rutas absolutas y forzar recarga con parámetro de versión -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css?v=<?= time() ?>">
-<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css?v=<?= time() ?>">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css?v=<?= time() ?>">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/usuarios.css?v=<?= time() ?>">
 
@@ -40,7 +41,7 @@ include_once(__DIR__ . '/../templates/header.php');
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
 
-<div class="list-container">
+<div class="list-container usuarios-page">
     <?php if ($session->hasMessage('success')): ?>
         <div class="list-alert list-alert--success">
             <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
@@ -81,18 +82,22 @@ include_once(__DIR__ . '/../templates/header.php');
 </div>
 
 <script>
-    // Inicializar variables JavaScript con datos del servidor
-    const usuarioEditar = <?= $usuarioEditar ? json_encode($usuarioEditar->toArray()) : 'null' ?>;
+    // Inicializar variables JavaScript con datos del servidor - No hay usuarioEditar definido
+    const usuarioEditar = null;
     
-    // Si hay usuario para editar, activar la pestaña de crear/editar
-    if (usuarioEditar) {
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('[data-tab="tab-crear-editar"]').click();
+    // Cerrar alertas
+    document.querySelectorAll('.list-alert__close').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('.list-alert').remove();
         });
-    }
+    });
+    
+    // Verificar que se han cargado los usuarios
+    console.log('Usuarios cargados:', <?= count($usuarios) ?>);
+    console.log('Tipo de usuarios:', '<?= get_class($usuarios[0] ?? new stdClass()) ?>');
 </script>
 
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario-cards.js?v=<?= time() ?>"></script>
+<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuario.js?v=<?= time() ?>"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js?v=<?= time() ?>"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>

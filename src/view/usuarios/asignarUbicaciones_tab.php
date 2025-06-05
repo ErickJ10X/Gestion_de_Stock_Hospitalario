@@ -4,16 +4,14 @@ if (!isset($usuarios)) {
     die("Error: No se han proporcionado las variables requeridas.");
 }
 
-// Importar controladores y repositorios necesarios
+// Importar controladores necesarios
 require_once(__DIR__ . '/../../controller/AlmacenesController.php');
 require_once(__DIR__ . '/../../controller/PlantaController.php');
 require_once(__DIR__ . '/../../controller/BotiquinController.php');
-require_once(__DIR__ . '/../../model/entity/UsuarioUbicacion.php');
 
 use controller\AlmacenesController;
 use controller\PlantaController;
 use controller\BotiquinController;
-use model\entity\UsuarioUbicacion;
 
 // Instanciar controladores
 $almacenController = new AlmacenesController();
@@ -34,77 +32,142 @@ try {
 ?>
 
 <div class="ubicaciones-container">
-    <div class="card shadow mb-4">
-        <div class="section-title bg-primary text-white">
-            Asignación de ubicaciones
+    <div class="form-toggle-buttons mb-4">
+        <button type="button" class="btn form-toggle-btn active" data-target="asignarForm">
+            <i class="fas fa-map-marker-plus"></i> Asignar Ubicación
+        </button>
+        <button type="button" class="btn form-toggle-btn" data-target="verUbicacionesForm">
+            <i class="fas fa-map-marked-alt"></i> Ver Ubicaciones
+        </button>
+    </div>
+
+    <div class="row">
+        <!-- Formulario para asignar ubicación -->
+        <div class="col-md-12 form-section" id="asignarForm">
+            <div class="card shadow mb-4">
+                <div class="section-title bg-primary">
+                    Asignar Nueva Ubicación
+                </div>
+                <div class="card-body">
+                    <form id="formAsignarUbicacion" class="card-form" autocomplete="off">
+                        <!-- Información de usuario y ubicación -->
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <h5 class="form-section-title text-primary"><i class="fas fa-user-tag"></i> Selección de Usuario</h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label for="usuario_id" class="form-label">Usuario <span class="text-danger">*</span></label>
+                                    <select id="usuario_id" name="usuario_id" class="form-select" required>
+                                        <option value="">Seleccionar usuario</option>
+                                        <?php foreach ($usuarios as $usuario): ?>
+                                            <option value="<?= $usuario->getIdUsuario() ?>">
+                                                <?= htmlspecialchars($usuario->getNombre()) ?> (<?= htmlspecialchars($usuario->getEmail()) ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección de ubicación -->
+                        <div class="row mt-3 mb-2">
+                            <div class="col-12">
+                                <h5 class="form-section-title text-primary"><i class="fas fa-map-marker-alt"></i> Datos de Ubicación</h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="tipo_ubicacion" class="form-label">Tipo de ubicación <span class="text-danger">*</span></label>
+                                    <select id="tipo_ubicacion" name="tipo_ubicacion" class="form-select" required>
+                                        <option value="">Seleccionar tipo</option>
+                                        <option value="Hospital">Hospital/Almacén</option>
+                                        <option value="Planta">Planta</option>
+                                        <option value="Botiquin">Botiquín</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="id_ubicacion" class="form-label">Ubicación <span class="text-danger">*</span></label>
+                                    <select id="id_ubicacion" name="id_ubicacion" class="form-select" required disabled>
+                                        <option value="">Seleccione un tipo primero</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mt-4 text-center">
+                            <button type="submit" class="btn btn-primary" id="btnAsignar">
+                                <i class="fas fa-plus-circle"></i> Asignar Ubicación
+                            </button>
+                            <button type="reset" class="btn btn-secondary" id="btnLimpiarUbicacion">
+                                <i class="fas fa-broom"></i> Limpiar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <form id="formAsignarUbicacion" class="row g-3">
-                <div class="col-md-6">
-                    <label for="usuario_id" class="form-label">Usuario <span class="text-danger">*</span></label>
-                    <select id="usuario_id" name="usuario_id" class="form-select" required>
-                        <option value="">Seleccionar usuario</option>
-                        <?php foreach ($usuarios as $usuario): ?>
-                            <option value="<?= $usuario->getIdUsuario() ?>">
-                                <?= htmlspecialchars($usuario->getNombre()) ?> 
-                                (<?= htmlspecialchars($usuario->getEmail()) ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <div class="form-text">Seleccione el usuario al que desea asignar ubicaciones</div>
+
+        <!-- Sección para ver ubicaciones asignadas -->
+        <div class="col-md-12 form-section" id="verUbicacionesForm" style="display: none;">
+            <div class="card shadow mb-4">
+                <div class="section-title bg-info">
+                    Ubicaciones Asignadas
                 </div>
-
-                <div class="col-md-6">
-                    <label for="ubicacion_tipo" class="form-label">Tipo de ubicación <span class="text-danger">*</span></label>
-                    <select id="ubicacion_tipo" name="ubicacion_tipo" class="form-select" required>
-                        <option value="">Seleccionar tipo</option>
-                        <option value="<?= UsuarioUbicacion::TIPO_HOSPITAL ?>">Hospital/Almacén</option>
-                        <option value="<?= UsuarioUbicacion::TIPO_PLANTA ?>">Planta</option>
-                        <option value="<?= UsuarioUbicacion::TIPO_BOTIQUIN ?>">Botiquín</option>
-                    </select>
-                    <div class="form-text">Seleccione el tipo de ubicación que desea asignar</div>
-                </div>
-
-                <div class="col-md-12">
-                    <label for="ubicacion_id" class="form-label">Ubicación <span class="text-danger">*</span></label>
-                    <select id="ubicacion_id" name="ubicacion_id" class="form-select" required disabled>
-                        <option value="">Primero seleccione un tipo de ubicación</option>
-                    </select>
-                    <div class="form-text">Seleccione la ubicación específica</div>
-                </div>
-
-                <div class="col-12 mt-4">
-                    <button type="submit" class="btn btn-primary" id="btnAsignar">
-                        <i class="fas fa-plus-circle"></i> Asignar ubicación
-                    </button>
-                    <button type="reset" class="btn btn-secondary">
-                        <i class="fas fa-broom"></i> Limpiar
-                    </button>
-                </div>
-            </form>
-
-            <hr class="my-4">
-
-            <!-- Ubicaciones asignadas -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <h5><i class="fas fa-map-marker-alt"></i> Ubicaciones asignadas</h5>
-                    <div class="alert alert-info" id="sinUbicacionesMsg">
-                        <i class="fas fa-info-circle"></i> Seleccione un usuario para ver sus ubicaciones asignadas
+                <div class="card-body">
+                    <!-- Selector de usuario -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="verUsuarioUbicaciones" class="form-label">Seleccione un usuario</label>
+                                <select id="verUsuarioUbicaciones" class="form-select">
+                                    <option value="">Seleccionar usuario</option>
+                                    <?php foreach ($usuarios as $usuario): ?>
+                                        <option value="<?= $usuario->getIdUsuario() ?>">
+                                            <?= htmlspecialchars($usuario->getNombre()) ?> (<?= htmlspecialchars($usuario->getEmail()) ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="form-text">Seleccione un usuario para ver sus ubicaciones asignadas</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="table-responsive" id="tablaUbicacionesContainer" style="display: none;">
-                        <table class="table table-hover table-bordered" id="tablaUbicaciones">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Tipo</th>
-                                    <th>Nombre</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Las ubicaciones se cargarán dinámicamente -->
-                            </tbody>
-                        </table>
+
+                    <!-- Mensaje de selección inicial -->
+                    <div id="sinUbicacionesMsg" class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i> Seleccione un usuario para ver sus ubicaciones asignadas
+                    </div>
+
+                    <!-- Tabla de ubicaciones oculta inicialmente -->
+                    <div id="tablaUbicacionesContainer" style="display: none;">
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <h5 class="form-section-title text-info"><i class="fas fa-list"></i> Ubicaciones del Usuario</h5>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered" id="tablaUbicaciones">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Nombre</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Las ubicaciones se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,136 +175,127 @@ try {
     </div>
 </div>
 
-<!-- Modal de confirmación para eliminar ubicación -->
-<div class="modal fade" id="eliminarUbicacionModal" tabindex="-1" aria-labelledby="eliminarUbicacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="eliminarUbicacionModalLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro que desea eliminar esta ubicación del usuario?</p>
-                <p id="eliminarUbicacionNombre" class="fw-bold"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- Exportar datos para JavaScript -->
 <script>
+// Datos de ubicaciones para JS
+window.datosUbicaciones = {
+    almacenes: <?= json_encode(array_map(function($a) { return ['id' => $a->getId(), 'nombre' => $a->getTipo()]; }, $almacenes)) ?>,
+    plantas: <?= json_encode(array_map(function($p) { return ['id' => $p->getIdPlanta(), 'nombre' => $p->getNombre()]; }, $plantas)) ?>,
+    botiquines: <?= json_encode(array_map(function($b) { return ['id' => $b->getId(), 'nombre' => $b->getNombre()]; }, $botiquines)) ?>
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Variables para los elementos del DOM
     const formAsignarUbicacion = document.getElementById('formAsignarUbicacion');
     const usuarioSelect = document.getElementById('usuario_id');
-    const tipoUbicacionSelect = document.getElementById('ubicacion_tipo');
-    const ubicacionSelect = document.getElementById('ubicacion_id');
+    const tipoUbicacionSelect = document.getElementById('tipo_ubicacion');
+    const ubicacionSelect = document.getElementById('id_ubicacion');
     const sinUbicacionesMsg = document.getElementById('sinUbicacionesMsg');
     const tablaUbicacionesContainer = document.getElementById('tablaUbicacionesContainer');
     const tablaUbicaciones = document.getElementById('tablaUbicaciones');
-    
-    // Modal de confirmación
-    const eliminarUbicacionModal = new bootstrap.Modal(document.getElementById('eliminarUbicacionModal'));
-    const eliminarUbicacionNombre = document.getElementById('eliminarUbicacionNombre');
-    const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
-    
-    // Almacenes, plantas y botiquines disponibles
-    const almacenes = <?= json_encode(array_map(function($a) { return ['id' => $a->getId(), 'nombre' => $a->getTipo()]; }, $almacenes)) ?>;
-    const plantas = <?= json_encode(array_map(function($p) { return ['id' => $p->getIdPlanta(), 'nombre' => $p->getNombre()]; }, $plantas)) ?>;
-    const botiquines = <?= json_encode(array_map(function($b) { return ['id' => $b->getId(), 'nombre' => $b->getNombre()]; }, $botiquines)) ?>;
-    
-    // Constantes de tipos de ubicación
-    const TIPO_HOSPITAL = '<?= UsuarioUbicacion::TIPO_HOSPITAL ?>';
-    const TIPO_PLANTA = '<?= UsuarioUbicacion::TIPO_PLANTA ?>';
-    const TIPO_BOTIQUIN = '<?= UsuarioUbicacion::TIPO_BOTIQUIN ?>';
-    
-    // Datos temporales para eliminar ubicación
-    let tempDeleteData = null;
-    
-    // Manejar cambio en el tipo de ubicación
+    const btnLimpiarUbicacion = document.getElementById('btnLimpiarUbicacion');
+    const verUsuarioUbicaciones = document.getElementById('verUsuarioUbicaciones');
+
+    // Toggle entre formularios
+    document.querySelectorAll('.form-toggle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.form-toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            const target = this.getAttribute('data-target');
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(target).style.display = 'block';
+        });
+    });
+
+    // Limpiar select de ubicación al limpiar formulario
+    if (btnLimpiarUbicacion) {
+        btnLimpiarUbicacion.addEventListener('click', function() {
+            ubicacionSelect.innerHTML = '<option value="">Seleccione un tipo primero</option>';
+            ubicacionSelect.disabled = true;
+            tipoUbicacionSelect.value = '';
+        });
+    }
+
+    // Cambiar opciones de ubicación según tipo
     tipoUbicacionSelect.addEventListener('change', function() {
         const tipo = this.value;
         ubicacionSelect.innerHTML = '<option value="">Seleccione una ubicación</option>';
-        
-        if (tipo) {
+        ubicacionSelect.disabled = true;
+
+        let ubicaciones = [];
+        if (tipo === 'Hospital') {
+            ubicaciones = window.datosUbicaciones.almacenes;
+        } else if (tipo === 'Planta') {
+            ubicaciones = window.datosUbicaciones.plantas;
+        } else if (tipo === 'Botiquin') {
+            ubicaciones = window.datosUbicaciones.botiquines;
+        }
+
+        if (ubicaciones.length > 0) {
             ubicacionSelect.disabled = false;
-            let ubicaciones = [];
-            
-            // Determinar qué lista de ubicaciones usar según el tipo seleccionado
-            switch (tipo) {
-                case TIPO_HOSPITAL:
-                    ubicaciones = almacenes;
-                    break;
-                case TIPO_PLANTA:
-                    ubicaciones = plantas;
-                    break;
-                case TIPO_BOTIQUIN:
-                    ubicaciones = botiquines;
-                    break;
-            }
-            
-            // Añadir opciones al select de ubicaciones
             ubicaciones.forEach(ubicacion => {
                 const option = document.createElement('option');
                 option.value = ubicacion.id;
                 option.textContent = ubicacion.nombre;
                 ubicacionSelect.appendChild(option);
             });
-        } else {
-            ubicacionSelect.disabled = true;
         }
     });
-    
-    // Manejar cambio en el select de usuario
-    usuarioSelect.addEventListener('change', function() {
-        const usuarioId = this.value;
+
+    // Al cambiar usuario en el formulario de ver ubicaciones
+    verUsuarioUbicaciones.addEventListener('change', function() {
         limpiarTablaUbicaciones();
-        
+        const usuarioId = this.value;
         if (usuarioId) {
             cargarUbicacionesUsuario(usuarioId);
         } else {
-            sinUbicacionesMsg.textContent = "Seleccione un usuario para ver sus ubicaciones asignadas";
+            sinUbicacionesMsg.innerHTML = "<i class='fas fa-info-circle me-2'></i> Seleccione un usuario para ver sus ubicaciones asignadas";
             sinUbicacionesMsg.style.display = "block";
             tablaUbicacionesContainer.style.display = "none";
         }
     });
-    
-    // Manejar envío del formulario
+
+    // Enviar formulario de asignación
     formAsignarUbicacion.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const usuarioId = usuarioSelect.value;
         const tipoUbicacion = tipoUbicacionSelect.value;
         const ubicacionId = ubicacionSelect.value;
-        
+
         if (!usuarioId || !tipoUbicacion || !ubicacionId) {
             mostrarMensaje('error', 'Todos los campos son obligatorios');
             return;
         }
-        
-        // Llamar a la API para asignar ubicación (usando el controlador existente)
+
         const formData = new FormData();
         formData.append('action', 'asignar');
         formData.append('usuario_id', usuarioId);
         formData.append('tipo_ubicacion', tipoUbicacion);
         formData.append('ubicacion_id', ubicacionId);
-        
+
         fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php', {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: formData
         })
         .then(response => response.json())
         .then(resultado => {
             if (resultado && resultado.success) {
                 mostrarMensaje('success', 'Ubicación asignada correctamente');
-                cargarUbicacionesUsuario(usuarioId);
                 formAsignarUbicacion.reset();
+                ubicacionSelect.innerHTML = '<option value="">Seleccione un tipo primero</option>';
                 ubicacionSelect.disabled = true;
+                
+                // Si está seleccionado el mismo usuario en la vista de ubicaciones, actualizar
+                if (verUsuarioUbicaciones.value === usuarioId) {
+                    cargarUbicacionesUsuario(usuarioId);
+                }
             } else {
                 mostrarMensaje('error', 'Error: ' + (resultado ? resultado.message : 'No se pudo asignar la ubicación'));
             }
@@ -250,76 +304,70 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('error', 'Error en la solicitud: ' + error);
         });
     });
-    
+
     // Cargar ubicaciones de un usuario
     function cargarUbicacionesUsuario(usuarioId) {
         fetch(`/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php?action=getByUsuario&id=${usuarioId}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(response => response.json())
         .then(resultado => {
             if (resultado && resultado.success) {
                 const ubicaciones = resultado.data;
-                
-                if (ubicaciones.length === 0) {
-                    sinUbicacionesMsg.textContent = "Este usuario no tiene ubicaciones asignadas";
+
+                if (!ubicaciones || ubicaciones.length === 0) {
+                    sinUbicacionesMsg.innerHTML = "<i class='fas fa-info-circle me-2'></i> Este usuario no tiene ubicaciones asignadas";
                     sinUbicacionesMsg.style.display = "block";
                     tablaUbicacionesContainer.style.display = "none";
                 } else {
                     sinUbicacionesMsg.style.display = "none";
                     tablaUbicacionesContainer.style.display = "block";
-                    
+
                     const tbody = tablaUbicaciones.querySelector('tbody');
                     tbody.innerHTML = '';
-                    
+
                     ubicaciones.forEach(ubicacion => {
                         const tr = document.createElement('tr');
-                        
+
                         // Tipo de ubicación con badge
                         const tdTipo = document.createElement('td');
                         let badgeClass = 'bg-secondary';
                         let tipoTexto = ubicacion.tipo_ubicacion;
-                        
+
                         switch (ubicacion.tipo_ubicacion) {
-                            case TIPO_HOSPITAL:
+                            case 'Hospital':
                                 badgeClass = 'bg-primary';
                                 tipoTexto = 'HOSPITAL/ALMACÉN';
                                 break;
-                            case TIPO_PLANTA:
+                            case 'Planta':
                                 badgeClass = 'bg-success';
                                 tipoTexto = 'PLANTA';
                                 break;
-                            case TIPO_BOTIQUIN:
+                            case 'Botiquin':
                                 badgeClass = 'bg-info';
                                 tipoTexto = 'BOTIQUÍN';
                                 break;
                         }
-                        
+
                         tdTipo.innerHTML = `<span class="badge ${badgeClass}">${tipoTexto}</span>`;
-                        
-                        // Nombre de ubicación (buscamos el nombre según el tipo e ID)
+
+                        // Nombre de ubicación
                         const tdNombre = document.createElement('td');
                         let nombreUbicacion = `ID: ${ubicacion.id_ubicacion}`;
                         
-                        switch (ubicacion.tipo_ubicacion) {
-                            case TIPO_HOSPITAL:
-                                const almacen = almacenes.find(a => a.id == ubicacion.id_ubicacion);
-                                if (almacen) nombreUbicacion = almacen.nombre;
-                                break;
-                            case TIPO_PLANTA:
-                                const planta = plantas.find(p => p.id == ubicacion.id_ubicacion);
-                                if (planta) nombreUbicacion = planta.nombre;
-                                break;
-                            case TIPO_BOTIQUIN:
-                                const botiquin = botiquines.find(b => b.id == ubicacion.id_ubicacion);
-                                if (botiquin) nombreUbicacion = botiquin.nombre;
-                                break;
+                        if (ubicacion.tipo_ubicacion === 'Hospital') {
+                            const almacen = window.datosUbicaciones.almacenes.find(a => a.id == ubicacion.id_ubicacion);
+                            if (almacen) nombreUbicacion = almacen.nombre;
+                        } else if (ubicacion.tipo_ubicacion === 'Planta') {
+                            const planta = window.datosUbicaciones.plantas.find(p => p.id == ubicacion.id_ubicacion);
+                            if (planta) nombreUbicacion = planta.nombre;
+                        } else if (ubicacion.tipo_ubicacion === 'Botiquin') {
+                            const botiquin = window.datosUbicaciones.botiquines.find(b => b.id == ubicacion.id_ubicacion);
+                            if (botiquin) nombreUbicacion = botiquin.nombre;
                         }
                         
                         tdNombre.textContent = nombreUbicacion;
-                        
+
                         // Acciones
                         const tdAcciones = document.createElement('td');
                         tdAcciones.innerHTML = `
@@ -327,22 +375,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 data-usuario-id="${usuarioId}"
                                 data-tipo="${ubicacion.tipo_ubicacion}"
                                 data-id="${ubicacion.id_ubicacion}"
-                                data-nombre="${tdNombre.textContent}">
+                                data-nombre="${nombreUbicacion}">
                                 <i class="fas fa-trash-alt"></i> Eliminar
                             </button>
                         `;
-                        
+
                         tr.appendChild(tdTipo);
                         tr.appendChild(tdNombre);
                         tr.appendChild(tdAcciones);
                         tbody.appendChild(tr);
                     });
-                    
-                    // Agregar eventos a los botones de eliminar
+
                     configurarBotonesEliminar();
                 }
             } else {
-                mostrarMensaje('error', 'Error al cargar ubicaciones: ' + 
+                mostrarMensaje('error', 'Error al cargar ubicaciones: ' +
                     (resultado ? resultado.message : 'Respuesta vacía'));
             }
         })
@@ -350,62 +397,54 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('error', 'Error en la solicitud: ' + error);
         });
     }
-    
+
     // Configurar los botones de eliminar ubicación
     function configurarBotonesEliminar() {
         const botones = document.querySelectorAll('.btn-eliminar-ubicacion');
-        
         botones.forEach(boton => {
             boton.addEventListener('click', function() {
                 const usuarioId = this.dataset.usuarioId;
                 const tipo = this.dataset.tipo;
                 const id = this.dataset.id;
                 const nombre = this.dataset.nombre;
-                
-                // Guardar datos temporalmente
+
                 tempDeleteData = { usuarioId, tipo, id };
-                
-                // Mostrar modal de confirmación
+
                 eliminarUbicacionNombre.textContent = `${getTipoTexto(tipo)}: ${nombre}`;
                 eliminarUbicacionModal.show();
             });
         });
     }
-    
-    // Convertir tipo de ubicación a texto legible
+
     function getTipoTexto(tipo) {
         switch (tipo) {
-            case TIPO_HOSPITAL: return 'HOSPITAL/ALMACÉN';
-            case TIPO_PLANTA: return 'PLANTA';
-            case TIPO_BOTIQUIN: return 'BOTIQUÍN';
+            case 'Hospital': return 'HOSPITAL/ALMACÉN';
+            case 'Planta': return 'PLANTA';
+            case 'Botiquin': return 'BOTIQUÍN';
             default: return tipo;
         }
     }
-    
-    // Configurar el botón de confirmar eliminación
+
     btnConfirmarEliminar.addEventListener('click', function() {
         if (!tempDeleteData) return;
-        
+
         const { usuarioId, tipo, id } = tempDeleteData;
-        
-        // Llamar a la API para desasignar
+
         const formData = new FormData();
         formData.append('action', 'desasignar');
         formData.append('usuario_id', usuarioId);
         formData.append('tipo_ubicacion', tipo);
         formData.append('ubicacion_id', id);
-        
+
         fetch('/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/UsuarioController.php', {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: formData
         })
         .then(response => response.json())
         .then(resultado => {
             eliminarUbicacionModal.hide();
-            
+
             if (resultado && resultado.success) {
                 mostrarMensaje('success', 'Ubicación eliminada correctamente');
                 cargarUbicacionesUsuario(usuarioId);
@@ -418,14 +457,12 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('error', 'Error en la solicitud: ' + error);
         });
     });
-    
-    // Limpiar tabla de ubicaciones
+
     function limpiarTablaUbicaciones() {
         const tbody = tablaUbicaciones.querySelector('tbody');
         tbody.innerHTML = '';
     }
-    
-    // Mostrar mensajes de alerta
+
     function mostrarMensaje(tipo, mensaje) {
         const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
         const alertDiv = document.createElement('div');
@@ -434,15 +471,17 @@ document.addEventListener('DOMContentLoaded', function() {
             ${mensaje}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
-        
+
         const container = document.querySelector('.ubicaciones-container');
         container.insertBefore(alertDiv, container.firstChild);
-        
-        // Auto-eliminar después de 5 segundos
+
         setTimeout(() => {
             alertDiv.classList.remove('show');
             setTimeout(() => alertDiv.remove(), 300);
         }, 5000);
     }
+
+    // Variable temporal para eliminación
+    let tempDeleteData = null;
 });
 </script>

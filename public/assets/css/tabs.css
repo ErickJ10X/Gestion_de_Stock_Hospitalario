@@ -31,18 +31,23 @@
   padding: 0;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  width: 100%; /* Asegurar que ocupe todo el ancho */
+  justify-content: stretch; /* Distribuir elementos uniformemente */
 }
 
 .tab-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.8);
-  padding: 1rem 2rem;
+  padding: 1rem 0.5rem; /* Reducir padding horizontal */
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   position: relative;
   transition: var(--transition);
+  flex: 1; /* Hacer que cada pestaña ocupe la misma proporción de espacio */
+  text-align: center; /* Centrar el texto */
+  white-space: nowrap; /* Evitar saltos de línea */
 }
 
 .tab-btn:hover {
@@ -101,5 +106,6 @@
   .tab-btn {
     width: 100%;
     text-align: center;
+    flex: none; /* Deshabilitar flex en vista móvil */
   }
 }
