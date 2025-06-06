@@ -28,6 +28,7 @@ include_once(__DIR__ . '/../templates/header.php');
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/paginacion.css">
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/pactos.css?v=<?= time() ?>">
 
 <?php if ($session->hasMessage('success')): ?>
     <div class="alert alert-success alert-dismissible fade show">
@@ -66,6 +67,6 @@ include_once(__DIR__ . '/../templates/header.php');
 <div class="hospital-overlay"></div>
 
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js"></script>
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/pactos.js"></script>
+<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/pactos.js?v=<?= time() ?>"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>
