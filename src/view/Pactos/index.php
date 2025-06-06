@@ -27,28 +27,20 @@ include_once(__DIR__ . '/../templates/header.php');
 
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
 <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
-
-<!-- jQuery y DataTables primero para evitar problemas de carga -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- Bootstrap JS para modales -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/paginacion.css">
 
 <?php if ($session->hasMessage('success')): ?>
-    <div class="list-alert list-alert--success">
-        <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
-        <button type="button" class="list-alert__close">&times;</button>
+    <div class="alert alert-success alert-dismissible fade show">
+        <?= $session->getMessage('success') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <?php $session->clearMessage('success'); ?>
 <?php endif; ?>
 
 <?php if ($session->hasMessage('error')): ?>
-    <div class="list-alert list-alert--error">
-        <p class="list-alert__message"><?= $session->getMessage('error') ?></p>
-        <button type="button" class="list-alert__close">&times;</button>
+    <div class="alert alert-danger alert-dismissible fade show">
+        <?= $session->getMessage('error') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <?php $session->clearMessage('error'); ?>
 <?php endif; ?>
@@ -70,10 +62,10 @@ include_once(__DIR__ . '/../templates/header.php');
     </div>
 </div>
 
-
+<!-- Overlay para modales -->
 <div class="hospital-overlay"></div>
 
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/pactos.js"></script>
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js"></script>
+<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/pactos.js"></script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>
