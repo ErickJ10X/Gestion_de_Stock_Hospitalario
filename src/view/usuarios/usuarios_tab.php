@@ -24,23 +24,23 @@ $porcentajeActivos = $totalUsuarios > 0 ? round(($usuariosActivos / $totalUsuari
             <i class="fas fa-plus-circle me-1"></i> Nuevo Usuario
         </button>
 
-<div class="search-group">
-        <div class="input-group input-group-sm">
-            <select id="registrosPorPagina" class="form-select form-select-sm">
-                <option value="5">5 registros</option>
-                <option value="10" selected>10 registros</option>
-                <option value="25">25 registros</option>
-                <option value="50">50 registros</option>
-                <option value="100">100 registros</option>
-            </select>
+        <div class="search-group">
+            <div class="input-group input-group-sm">
+                <select id="registrosPorPagina" class="form-select form-select-sm">
+                    <option value="5">5 registros</option>
+                    <option value="10" selected>10 registros</option>
+                    <option value="25">25 registros</option>
+                    <option value="50">50 registros</option>
+                    <option value="100">100 registros</option>
+                </select>
+            </div>
+            <div class="input-group input-group-sm">
+                <input type="text" id="buscarUsuario" class="form-control" placeholder="Buscar...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
         </div>
-        <div class="input-group input-group-sm">
-            <input type="text" id="buscarUsuario" class="form-control" placeholder="Buscar...">
-            <button class="btn btn-outline-secondary" type="button">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-</div>
 
     </div>
     <div class="card-body p-0">
@@ -197,9 +197,6 @@ $porcentajeActivos = $totalUsuarios > 0 ? round(($usuariosActivos / $totalUsuari
     // Total de registros para paginación
     window.totalRegistros = <?= $totalUsuarios ?>;
 </script>
-
-<!-- Incluir el archivo de paginación -->
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/paginacion.js"></script>
 
 <!-- Incluir el JS centralizado de usuarios -->
 <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/usuarios.js"></script>

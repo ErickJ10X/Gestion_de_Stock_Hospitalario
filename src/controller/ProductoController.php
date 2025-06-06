@@ -110,7 +110,7 @@ class ProductoController
      */
     public function crear(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $codigo = $_POST['codigo'] ?? '';

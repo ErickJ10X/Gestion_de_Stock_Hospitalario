@@ -67,28 +67,6 @@ foreach ($hospitales as $hospital) {
     </table>
 </div>
 
-<!-- Modal para eliminar almacén -->
-<div class="modal fade" id="eliminarAlmacenModal" tabindex="-1" aria-labelledby="eliminarAlmacenModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eliminarAlmacenModalLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                ¿Está seguro de que desea eliminar este almacén?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/AlmacenesController.php" method="post">
-                    <input type="hidden" name="action" value="eliminar">
-                    <input type="hidden" name="id" id="eliminar_almacen_id">
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 function editarAlmacen(id) {
