@@ -1,0 +1,228 @@
+/**
+ * Estilos para la paginación de tablas
+ */
+
+/* Contenedor de paginación */
+.card-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.75rem 1.25rem;
+}
+
+/* Estructura de alineación en card-footer */
+.card-footer .row {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+.card-footer .col-md-5,
+.card-footer .col-md-7 {
+    padding: 0;
+}
+
+/* Mejoras al card-header */
+.card-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f8f9fc !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Contenedor para elementos de búsqueda y selector */
+.search-group {
+    display: flex;
+    align-items: center;
+}
+
+.search-group .input-group {
+    width: auto;
+    display: flex;
+    align-items: center;
+    height: 31px; /* Altura uniforme para ambos elementos */
+}
+
+.card-header .btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+    transition: all 0.2s;
+}
+
+.card-header .btn-success:hover {
+    background-color: #17a673;
+    border-color: #169b6b;
+}
+
+/* Información de paginación */
+.paginacion-info {
+    color: #6c757d;
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    white-space: nowrap;
+}
+
+.paginacion-info span {
+    font-weight: 600;
+    color: #4e73df;
+}
+
+/* Controles de paginación */
+.pagination {
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Eliminar marcadores de lista en paginación */
+.pagination .page-item {
+    list-style-type: none;
+}
+
+.pagination .page-item .page-link {
+    position: relative;
+    display: block;
+    color: #4e73df;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    min-width: 38px;
+    text-align: center;
+}
+
+/* Estilo para la página activa */
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+/* Estilo para página deshabilitada */
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+/* Efecto hover en enlaces de paginación */
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    z-index: 2;
+    color: #224abe;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+/* Estilos para los botones de primera y última página */
+.pagination .page-item:first-child .page-link {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.pagination .page-item:last-child .page-link {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+/* Selector de registros por página */
+#registrosPorPagina {
+    border-radius: 0.25rem;
+    border: 1px solid #d1d3e2;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    color: #6e707e;
+    height: 31px;
+    width: 130px;
+}
+
+#registrosPorPagina:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    outline: 0;
+}
+
+/* Buscador de la tabla */
+#buscarUsuario {
+    border-radius: 0.25rem;
+    border: 1px solid #d1d3e2;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    color: #6e707e;
+    height: 31px;
+}
+
+#buscarUsuario:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    outline: 0;
+}
+
+/* Efecto de transición para cambios de página */
+tbody {
+    transition: opacity 0.3s ease;
+}
+
+tbody.loading {
+    opacity: 0.6;
+}
+
+/* Estilo para cuando no hay resultados */
+.no-results-row td {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #858796;
+}
+
+.no-results-row i {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    color: #e74a3b;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 767.98px) {
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .card-header .d-flex.align-items-center {
+        justify-content: space-between;
+    }
+    
+    .card-footer .row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .card-footer .col-md-5,
+    .card-footer .col-md-7 {
+        width: 100%;
+    }
+    
+    .pagination {
+        justify-content: center !important;
+        margin-top: 0.5rem;
+    }
+    
+    .paginacion-info {
+        text-align: center;
+    }
+}
+
+/* Mejoras para pantallas más pequeñas */
+@media (max-width: 480px) {
+    .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        min-width: 32px;
+    }
+}

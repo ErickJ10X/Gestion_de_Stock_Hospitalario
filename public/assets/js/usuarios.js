@@ -1,308 +1,140 @@
-/**
- * Archivo JavaScript para manejar la funcionalidad de los formularios de usuarios
- */
+// Cambia la pestaña activa y muestra el panel correspondiente
+function activarPestania(tabId) {
+    // Quitar clase active de todos los botones y paneles
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicialización de tooltips y popovers de Bootstrap si están presentes
-    if (typeof bootstrap !== 'undefined') {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
+    // Activar el botón y el panel correspondiente
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    const pane = document.getElementById(tabId);
+    if (btn) btn.classList.add('active');
+    if (pane) pane.classList.add('active');
+}
 
-    // Funcionalidad para alternar la visibilidad de la contraseña
-    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
-    if (togglePasswordButtons) {
-        togglePasswordButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.closest('.input-group').querySelector('input');
-                const currentType = input.getAttribute('type');
-                
-                if (currentType === 'password') {
-                    input.setAttribute('type', 'text');
-                    this.innerHTML = '<i class="fas fa-eye-slash"></i>';
-                } else {
-                    input.setAttribute('type', 'password');
-                    this.innerHTML = '<i class="fas fa-eye"></i>';
-                }
-            });
-        });
-    }
-    
-    // Validación personalizada para contraseñas
-    function validarContrasena(contrasena) {
-        // Al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-        return passwordRegex.test(contrasena);
-    }
-    
-    // Función para mostrar mensajes de alerta en el DOM
-    function mostrarMensaje(tipo, texto, contenedor = '.usuarios-container') {
-        const containerEl = document.querySelector(contenedor);
-        if (!containerEl) return;
-        
-        const alertaEl = document.createElement('div');
-        alertaEl.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
-        alertaEl.innerHTML = `
-            ${texto}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        
-        containerEl.insertBefore(alertaEl, containerEl.firstChild);
-        
-        // Eliminar automáticamente después de 5 segundos
-        setTimeout(() => {
-            alertaEl.classList.remove('show');
-            setTimeout(() => alertaEl.remove(), 300);
-        }, 5000);
-    }
+// Mostrar formulario de edición y seleccionar usuario
+function showEditUserTab(userId) {
+    activarPestania('tab-crear-editar');
+    setTimeout(() => {
+        // Activar botón "Editar Usuario" y desactivar "Crear Usuario"
+        const btnEditar = document.querySelector('.form-toggle-btn[data-target="editarForm"]');
+        const btnCrear = document.querySelector('.form-toggle-btn[data-target="crearForm"]');
+        if (btnEditar) btnEditar.classList.add('active');
+        if (btnCrear) btnCrear.classList.remove('active');
+        // Mostrar sección editar y ocultar crear
+        const editarForm = document.getElementById('editarForm');
+        const crearForm = document.getElementById('crearForm');
+        if (editarForm) editarForm.style.display = '';
+        if (crearForm) crearForm.style.display = 'none';
 
-    // Configuración de la alternancia entre formularios
-    const formToggleButtons = document.querySelectorAll('.form-toggle-btn');
-    if (formToggleButtons.length) {
-        formToggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Desactivar todos los botones
-                formToggleButtons.forEach(btn => btn.classList.remove('active'));
-                // Activar este botón
-                this.classList.add('active');
-                
-                // Ocultar todos los formularios
-                document.querySelectorAll('.form-section').forEach(form => {
-                    form.style.display = 'none';
-                });
-                
-                // Mostrar el formulario correspondiente
-                const targetForm = document.getElementById(this.getAttribute('data-target'));
-                if (targetForm) {
-                    targetForm.style.display = 'block';
-                }
-            });
-        });
-    }
+        // Seleccionar usuario en el selector
+        const select = document.getElementById('seleccionarUsuario');
+        if (select) {
+            select.value = userId;
+            select.dispatchEvent(new Event('change'));
+        }
+        // Ocultar mensaje y mostrar formulario de edición
+        const mensaje = document.getElementById('mensajeSeleccion');
+        if (mensaje) mensaje.style.display = 'none';
+        const formEditar = document.getElementById('formEditarContainer');
+        if (formEditar) formEditar.style.display = '';
+    }, 100);
+}
 
-    // Manejo del formulario de creación de usuario
-    const formCrearUsuario = document.getElementById('formCrearUsuario');
-    if (formCrearUsuario) {
-        formCrearUsuario.addEventListener('submit', function(e) {
+// Cambiar a la pestaña de ubicaciones y seleccionar usuario
+function showUserLocationsTab(userId) {
+    activarPestania('tab-ubicaciones');
+    setTimeout(() => {
+        const select = document.getElementById('verUsuarioUbicaciones');
+        if (select) {
+            select.value = userId;
+            select.dispatchEvent(new Event('change'));
+        }
+        // Mostrar la sección de ver ubicaciones si existe
+        const verUbicacionesForm = document.getElementById('verUbicacionesForm');
+        if (verUbicacionesForm) {
+            // Activar el botón de ver ubicaciones si existe
+            const btns = document.querySelectorAll('#tab-ubicaciones .form-toggle-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            const btnVer = document.querySelector('#tab-ubicaciones .form-toggle-btn[data-target="verUbicacionesForm"]');
+            if (btnVer) btnVer.classList.add('active');
+            // Mostrar solo el panel de ver ubicaciones
+            document.querySelectorAll('#tab-ubicaciones .form-section').forEach(sec => sec.style.display = 'none');
+            verUbicacionesForm.style.display = '';
+        }
+    }, 100);
+}
+
+// Mostrar formulario de creación de usuario
+function showCreateUserForm() {
+    activarPestania('tab-crear-editar');
+    setTimeout(() => {
+        // Activar botón "Crear Usuario" y desactivar "Editar Usuario"
+        const btnCrear = document.querySelector('.form-toggle-btn[data-target="crearForm"]');
+        const btnEditar = document.querySelector('.form-toggle-btn[data-target="editarForm"]');
+        if (btnCrear) btnCrear.classList.add('active');
+        if (btnEditar) btnEditar.classList.remove('active');
+        // Mostrar sección crear y ocultar editar
+        const crearForm = document.getElementById('crearForm');
+        const editarForm = document.getElementById('editarForm');
+        if (crearForm) crearForm.style.display = '';
+        if (editarForm) editarForm.style.display = 'none';
+        // Limpiar selección de usuario
+        const select = document.getElementById('seleccionarUsuario');
+        if (select) select.value = '';
+        const mensaje = document.getElementById('mensajeSeleccion');
+        if (mensaje) mensaje.style.display = '';
+        const formEditar = document.getElementById('formEditarContainer');
+        if (formEditar) formEditar.style.display = 'none';
+    }, 100);
+}
+
+// Delegar eventos en botones de la tabla de usuarios
+document.addEventListener('DOMContentLoaded', function () {
+    // Botón editar
+    document.querySelectorAll('.list-table__button--edit').forEach(btn => {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            // Obtener valores de los campos
-            const nombre = document.getElementById('nombre').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const rol = document.getElementById('rol').value;
-            const contrasena = document.getElementById('contrasena').value;
-            const confirmarContrasena = document.getElementById('confirmar_contrasena').value;
-            
-            // Validaciones básicas
-            if (!nombre || !email || !rol || !contrasena || !confirmarContrasena) {
-                mostrarMensaje('error', 'Todos los campos son obligatorios');
-                return;
-            }
-            
-            // Validar que las contraseñas coincidan
-            if (contrasena !== confirmarContrasena) {
-                mostrarMensaje('error', 'Las contraseñas no coinciden');
-                return;
-            }
-            
-            // Validar el formato de la contraseña
-            if (!validarContrasena(contrasena)) {
-                mostrarMensaje('error', 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial');
-                return;
-            }
-            
-            // Enviar los datos mediante fetch
-            const formData = new FormData(formCrearUsuario);
-            
-            fetch(formCrearUsuario.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                // Verificar si la respuesta es un JSON válido
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                }
-                throw new Error('Respuesta no válida del servidor');
-            })
-            .then(data => {
-                if (data.success) {
-                    mostrarMensaje('success', data.message || 'Usuario creado correctamente');
-                    formCrearUsuario.reset();
-                    
-                    // Recargar la página después de un tiempo
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    mostrarMensaje('error', data.message || 'Error al crear el usuario');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                mostrarMensaje('error', 'Error al procesar la solicitud');
-            });
+            const userId = this.closest('tr').querySelector('td').textContent.trim();
+            showEditUserTab(userId);
         });
-    }
+    });
 
-    // Manejo del selector de usuario para edición
-    const seleccionarUsuario = document.getElementById('seleccionarUsuario');
-    const formEditarContainer = document.getElementById('formEditarContainer');
-    const mensajeSeleccion = document.getElementById('mensajeSeleccion');
-    
-    if (seleccionarUsuario && formEditarContainer && mensajeSeleccion) {
-        seleccionarUsuario.addEventListener('change', function() {
-            const userId = this.value;
-            
-            if (!userId) {
-                mensajeSeleccion.style.display = 'block';
-                formEditarContainer.style.display = 'none';
-                return;
-            }
-            
-            // Obtener datos del usuario seleccionado
-            const userData = window.usuariosData?.[userId];
-            
-            if (userData) {
-                // Asignar datos a los campos del formulario
-                document.getElementById('editId').value = userData.id_usuario;
-                document.getElementById('editNombre').value = userData.nombre;
-                document.getElementById('editEmail').value = userData.email;
-                document.getElementById('editRol').value = userData.rol;
-                
-                const checkboxActivo = document.getElementById('editActivo');
-                if (checkboxActivo) {
-                    checkboxActivo.checked = userData.activo === '1';
-                    const estadoLabel = document.getElementById('estadoLabel');
-                    if (estadoLabel) {
-                        estadoLabel.textContent = userData.activo === '1' ? 'Activo' : 'Inactivo';
-                    }
-                }
-                
-                // Limpiar contraseñas
-                document.getElementById('editContrasena').value = '';
-                document.getElementById('editConfirmarContrasena').value = '';
-                
-                // Mostrar formulario y ocultar mensaje
-                mensajeSeleccion.style.display = 'none';
-                formEditarContainer.style.display = 'block';
-            }
-        });
-    }
-
-    // Manejo del botón para cancelar edición
-    const cancelarEdicion = document.getElementById('cancelar_edicion_usuario');
-    if (cancelarEdicion) {
-        cancelarEdicion.addEventListener('click', function() {
-            if (seleccionarUsuario) {
-                seleccionarUsuario.value = '';
-            }
-            
-            if (formEditarContainer) {
-                formEditarContainer.style.display = 'none';
-            }
-            
-            if (mensajeSeleccion) {
-                mensajeSeleccion.style.display = 'block';
-            }
-        });
-    }
-
-    // Manejo del formulario de edición
-    const formEditarUsuario = document.getElementById('formEditarUsuario');
-    if (formEditarUsuario) {
-        formEditarUsuario.addEventListener('submit', function(e) {
+    // Botón ubicaciones
+    document.querySelectorAll('.list-table__button--locations').forEach(btn => {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            // Validaciones básicas para edición
-            const id = document.getElementById('editId').value;
-            const nombre = document.getElementById('editNombre').value.trim();
-            const email = document.getElementById('editEmail').value.trim();
-            const rol = document.getElementById('editRol').value;
-            
-            if (!id || !nombre || !email || !rol) {
-                mostrarMensaje('error', 'El nombre, email y rol son obligatorios');
-                return;
-            }
-            
-            // Si hay contraseña, validarla
-            const contrasena = document.getElementById('editContrasena').value;
-            const confirmarContrasena = document.getElementById('editConfirmarContrasena').value;
-            
-            if (contrasena || confirmarContrasena) {
-                if (contrasena !== confirmarContrasena) {
-                    mostrarMensaje('error', 'Las contraseñas no coinciden');
-                    return;
-                }
-                
-                if (contrasena && !validarContrasena(contrasena)) {
-                    mostrarMensaje('error', 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial');
-                    return;
-                }
-            }
-            
-            // Enviar formulario
-            const formData = new FormData(formEditarUsuario);
-            
-            // Asegurar que se envíe el estado correcto
-            const checkboxActivo = document.getElementById('editActivo');
-            if (checkboxActivo && !checkboxActivo.checked) {
-                formData.set('activo', '0');
-            }
-            
-            fetch(formEditarUsuario.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                }
-                throw new Error('Respuesta no válida del servidor');
-            })
-            .then(data => {
-                if (data.success) {
-                    mostrarMensaje('success', data.message || 'Usuario actualizado correctamente');
-                    
-                    // Actualizar datos en memoria
-                    if (window.usuariosData && window.usuariosData[id]) {
-                        window.usuariosData[id].nombre = nombre;
-                        window.usuariosData[id].email = email;
-                        window.usuariosData[id].rol = rol;
-                        window.usuariosData[id].activo = checkboxActivo && checkboxActivo.checked ? '1' : '0';
-                    }
-                    
-                    // Recargar después de un tiempo
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    mostrarMensaje('error', data.message || 'Error al actualizar el usuario');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                mostrarMensaje('error', 'Error al procesar la solicitud');
-            });
+            const userId = this.closest('tr').querySelector('td').textContent.trim();
+            showUserLocationsTab(userId);
+        });
+    });
+
+    // Botón nuevo usuario
+    const btnNuevo = document.getElementById('btnNuevoUsuario');
+    if (btnNuevo) {
+        btnNuevo.addEventListener('click', function (e) {
+            e.preventDefault();
+            showCreateUserForm();
         });
     }
 
-    // Actualizar etiqueta de estado al cambiar checkbox
-    const editActivo = document.getElementById('editActivo');
-    if (editActivo) {
-        editActivo.addEventListener('change', function() {
-            const estadoLabel = document.getElementById('estadoLabel');
-            if (estadoLabel) {
-                estadoLabel.textContent = this.checked ? 'Activo' : 'Inactivo';
-            }
+    // Alternar entre formularios de crear y editar usuario en la pestaña Agregar/Editar
+    const formToggleBtns = document.querySelectorAll('.form-toggle-btn');
+    const formSections = document.querySelectorAll('.form-section');
+    formToggleBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            // Quitar clase active de todos los botones
+            formToggleBtns.forEach(b => b.classList.remove('active'));
+            // Agregar clase active al botón clickeado
+            this.classList.add('active');
+            // Mostrar la sección correspondiente y ocultar las demás
+            const target = this.getAttribute('data-target');
+            formSections.forEach(section => {
+                if (section.id === target) {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
         });
-    }
+    });
 });

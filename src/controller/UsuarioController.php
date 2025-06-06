@@ -9,6 +9,7 @@ use model\service\UsuarioUbicacionService;
 use model\enum\RolEnum;
 use util\Session;
 use util\AuthGuard;
+use util\Redirect;
 use Exception;
 
 require_once(__DIR__ . '/../model/service/UsuarioService.php');
@@ -33,60 +34,9 @@ class UsuarioController {
     }
 
     /**
-     * Procesa solicitudes HTTP y ejecuta la acción correspondiente
+     * Méto do principal para obtener los datos utilizados en la vista index
      */
-    public function processRequest(): void {
-        $this->authGuard->requireAdministrador();
-        
-        // Determinar si es una solicitud API o normal
-        $isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
-        if ($isApiRequest) {
-            $this->handleApiRequest();
-            return;
-        }
-
-        // Solicitudes normales
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $action = $_POST['action'] ?? '';
-            
-            switch ($action) {
-                case 'crear':
-                    $this->createUser();
-                    break;
-                case 'editar':
-                    $this->updateUser();
-                    break;
-                case 'eliminar':
-                    $this->deleteUser();
-                    break;
-                default:
-                    $this->session->setMessage('error', 'Acción no válida');
-                    $this->redirect('index.php');
-                    break;
-            }
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
-            $action = $_GET['action'];
-            
-            switch ($action) {
-                case 'edit':
-                    $this->showEditForm();
-                    break;
-                case 'delete':
-                    $this->deleteUserConfirm();
-                    break;
-                default:
-                    $this->redirect('index.php');
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Prepara los datos necesarios para mostrar en las vistas
-     */
-    public function prepareDataForView(): array {
+    public function index(): array {
         $this->authGuard->requireAdministrador();
         
         $viewData = [
@@ -97,10 +47,10 @@ class UsuarioController {
         try {
             $viewData['usuarios'] = $this->usuarioService->getAllUsuarios();
             
-            // Cargar usuario a editar si existe en la URL
+            // Si hay un usuario para editar en la URL
             if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                 $id = (int)$_GET['edit'];
-                $usuario = $this->usuarioService->getUsuarioById($id);
+                $usuario = $this->getUserWithUbicaciones($id);
                 if ($usuario) {
                     $viewData['usuario_editar'] = $usuario;
                 }
@@ -114,9 +64,91 @@ class UsuarioController {
     }
 
     /**
+     * Obtiene un usuario por su ID incluyendo sus ubicaciones
+     */
+    public function getUserWithUbicaciones(int $id): ?Usuario {
+        try {
+            $usuario = $this->usuarioService->getUsuarioById($id);
+            if ($usuario) {
+                $ubicaciones = $this->ubicacionService->getUbicacionesByUsuario($id);
+                $usuario->setUbicaciones($ubicaciones);
+            }
+            return $usuario;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Obtiene un usuario por su ID
+     */
+    public function getById(int $id): array {
+        try {
+            $usuario = $this->getUserWithUbicaciones($id);
+            
+            if ($usuario) {
+                $userData = $usuario->toArray();
+                $ubicaciones = [];
+                
+                foreach ($usuario->getUbicaciones() as $ubicacion) {
+                    $ubicaciones[] = $ubicacion->toArray();
+                }
+                
+                $userData['ubicaciones'] = $ubicaciones;
+                
+                return [
+                    'error' => false,
+                    'usuario' => $userData
+                ];
+            } else {
+                return [
+                    'error' => true,
+                    'mensaje' => 'Usuario no encontrado'
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Obtiene las ubicaciones de un usuario
+     */
+    public function getUbicaciones(int $idUsuario): array {
+        try {
+            $ubicaciones = $this->ubicacionService->getUbicacionesByUsuario($idUsuario);
+            $result = [];
+            
+            foreach ($ubicaciones as $ubicacion) {
+                $result[] = [
+                    'id_usuario' => $ubicacion->getIdUsuario(),
+                    'tipo_ubicacion' => $ubicacion->getTipoUbicacion(),
+                    'id_ubicacion' => $ubicacion->getIdUbicacion()
+                ];
+            }
+            
+            return [
+                'error' => false,
+                'ubicaciones' => $result
+            ];
+        } catch (Exception $e) {
+            return [
+                'error' => true,
+                'mensaje' => $e->getMessage(),
+                'ubicaciones' => []
+            ];
+        }
+    }
+
+    /**
      * Crea un nuevo usuario
      */
-    private function createUser(): void {
+    public function crear(): void {
+        $this->authGuard->requireAdministrador();
+        
         try {
             // Validar datos
             $nombre = $_POST['nombre'] ?? '';
@@ -155,7 +187,9 @@ class UsuarioController {
     /**
      * Actualiza un usuario existente
      */
-    private function updateUser(): void {
+    public function editar(): void {
+        $this->authGuard->requireAdministrador();
+        
         try {
             // Validar datos
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -171,8 +205,10 @@ class UsuarioController {
             }
             
             // Si hay contraseña nueva, validar
-            if (!empty($contrasena) && $contrasena !== $confirmarContrasena) {
-                throw new Exception("Las contraseñas no coinciden");
+            if (!empty($contrasena)) {
+                if ($contrasena !== $confirmarContrasena) {
+                    throw new Exception("Las contraseñas no coinciden");
+                }
             }
             
             // Preparar datos para actualizar
@@ -199,9 +235,11 @@ class UsuarioController {
     }
 
     /**
-     * Elimina un usuario 
+     * Elimina un usuario
      */
-    private function deleteUser(): void {
+    public function eliminar(): void {
+        $this->authGuard->requireAdministrador();
+        
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
             
@@ -227,222 +265,16 @@ class UsuarioController {
     }
 
     /**
-     * Obtiene un usuario por su ID incluyendo sus ubicaciones
+     * Asigna una ubicación a un usuario
      */
-    public function getUserById(int $id): ?Usuario {
-        try {
-            $usuario = $this->usuarioService->getUsuarioById($id);
-            if ($usuario) {
-                $ubicaciones = $this->ubicacionService->getUbicacionesByUsuario($id);
-                $usuario->setUbicaciones($ubicaciones);
-            }
-            return $usuario;
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Maneja la confirmación de eliminación de usuario
-     */
-    private function deleteUserConfirm(): void {
-        try {
-            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-            
-            if ($id <= 0) {
-                throw new Exception("ID de usuario no válido");
-            }
-            
-            if ($id == $this->session->getUserData('id')) {
-                throw new Exception("No puedes eliminar tu propio usuario");
-            }
-            
-            // Eliminar ubicaciones y luego el usuario
-            $this->ubicacionService->eliminarUbicacionesPorUsuario($id);
-            $this->usuarioService->deleteUsuario($id);
-            
-            $this->session->setMessage('success', "Usuario eliminado correctamente");
-            $this->redirect('index.php');
-            
-        } catch (Exception $e) {
-            $this->session->setMessage('error', $e->getMessage());
-            $this->redirect('index.php');
-        }
-    }
-
-    /**
-     * Muestra el formulario de edición con los datos del usuario
-     */
-    private function showEditForm(): void {
-        try {
-            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-            
-            if ($id <= 0) {
-                throw new Exception("ID de usuario no válido");
-            }
-            
-            $usuario = $this->getUserById($id);
-            if (!$usuario) {
-                throw new Exception("Usuario no encontrado");
-            }
-            
-            $this->redirect('index.php?tab=crear-editar&edit=' . $id);
-            
-        } catch (Exception $e) {
-            $this->session->setMessage('error', $e->getMessage());
-            $this->redirect('index.php');
-        }
-    }
-
-    /**
-     * Maneja solicitudes de la API
-     */
-    private function handleApiRequest(): void {
-        header('Content-Type: application/json; charset=utf-8');
+    public function asignarUbicacion(): void {
+        $this->authGuard->requireAdministrador();
         
         try {
-            $this->authGuard->requireAdministrador();
+            $usuarioId = isset($_POST['usuario_id']) ? (int)$_POST['usuario_id'] : 0;
+            $tipoUbicacion = $_POST['tipo_ubicacion'] ?? '';
+            $ubicacionId = isset($_POST['ubicacion_id']) ? (int)$_POST['ubicacion_id'] : 0;
             
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->handleApiGet();
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $this->handleApiPost();
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Método HTTP no soportado']);
-            }
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-        
-        exit(); // Terminar la ejecución después de manejar la solicitud API
-    }
-
-    /**
-     * Maneja solicitudes GET de la API
-     */
-    private function handleApiGet(): void {
-        $action = $_GET['action'] ?? '';
-        
-        switch ($action) {
-            case 'getById':
-                $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-                $this->apiGetUserById($id);
-                break;
-                
-            case 'getByUsuario':
-                $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-                $this->apiGetUbicacionesByUsuario($id);
-                break;
-                
-            case 'getAll':
-                $this->apiGetAllUsers();
-                break;
-                
-            default:
-                echo json_encode(['success' => false, 'message' => 'Acción no reconocida']);
-                break;
-        }
-    }
-
-    /**
-     * Maneja solicitudes POST de la API
-     */
-    private function handleApiPost(): void {
-        $action = $_POST['action'] ?? '';
-        
-        switch ($action) {
-            case 'asignar':
-                $usuarioId = isset($_POST['usuario_id']) ? (int)$_POST['usuario_id'] : 0;
-                $tipoUbicacion = $_POST['tipo_ubicacion'] ?? '';
-                $ubicacionId = isset($_POST['ubicacion_id']) ? (int)$_POST['ubicacion_id'] : 0;
-                
-                $this->apiAsignarUbicacion($usuarioId, $tipoUbicacion, $ubicacionId);
-                break;
-                
-            case 'desasignar':
-                $usuarioId = isset($_POST['usuario_id']) ? (int)$_POST['usuario_id'] : 0;
-                $tipoUbicacion = $_POST['tipo_ubicacion'] ?? '';
-                $ubicacionId = isset($_POST['ubicacion_id']) ? (int)$_POST['ubicacion_id'] : 0;
-                
-                $this->apiDesasignarUbicacion($usuarioId, $tipoUbicacion, $ubicacionId);
-                break;
-                
-            default:
-                echo json_encode(['success' => false, 'message' => 'Acción no reconocida']);
-                break;
-        }
-    }
-
-    /**
-     * API: Obtiene un usuario por ID
-     */
-    private function apiGetUserById(int $id): void {
-        try {
-            if ($id <= 0) {
-                throw new Exception("ID de usuario no válido");
-            }
-            
-            $usuario = $this->getUserById($id);
-            
-            if (!$usuario) {
-                throw new Exception("Usuario no encontrado");
-            }
-            
-            echo json_encode(['success' => true, 'data' => $usuario->toArray()]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-    }
-
-    /**
-     * API: Obtiene todos los usuarios
-     */
-    private function apiGetAllUsers(): void {
-        try {
-            $usuarios = $this->usuarioService->getAllUsuarios();
-            $result = [];
-            
-            foreach ($usuarios as $usuario) {
-                $result[] = $usuario->toArray();
-            }
-            
-            echo json_encode(['success' => true, 'data' => $result]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-    }
-
-    /**
-     * API: Obtiene las ubicaciones de un usuario
-     */
-    private function apiGetUbicacionesByUsuario(int $id): void {
-        try {
-            if ($id <= 0) {
-                throw new Exception("ID de usuario no válido");
-            }
-            
-            $ubicaciones = $this->ubicacionService->getUbicacionesByUsuario($id);
-            $result = [];
-            
-            foreach ($ubicaciones as $ubicacion) {
-                $result[] = [
-                    'id_usuario' => $ubicacion->getIdUsuario(),
-                    'tipo_ubicacion' => $ubicacion->getTipoUbicacion(),
-                    'id_ubicacion' => $ubicacion->getIdUbicacion()
-                ];
-            }
-            
-            echo json_encode(['success' => true, 'data' => $result]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-    }
-
-    /**
-     * API: Asigna una ubicación a un usuario
-     */
-    private function apiAsignarUbicacion(int $usuarioId, string $tipoUbicacion, int $ubicacionId): void {
-        try {
             if ($usuarioId <= 0) {
                 throw new Exception("ID de usuario no válido");
             }
@@ -455,26 +287,48 @@ class UsuarioController {
                 throw new Exception("ID de ubicación no válido");
             }
             
-            // Convertir tipos para compatibilidad con UsuarioUbicacion::TIPOS_VALIDOS
-            $normalizedTipo = $this->normalizarTipoUbicacion($tipoUbicacion);
+            // Normalizar el tipo de ubicación
+            $tipoNormalizado = $this->normalizarTipoUbicacion($tipoUbicacion);
             
             // Asignar ubicación
-            $resultado = $this->ubicacionService->asignarUbicacion($usuarioId, $normalizedTipo, $ubicacionId);
+            $this->ubicacionService->asignarUbicacion($usuarioId, $tipoNormalizado, $ubicacionId);
             
-            echo json_encode([
-                'success' => $resultado,
-                'message' => $resultado ? 'Ubicación asignada correctamente' : 'Error al asignar la ubicación'
-            ]);
+            if ($this->isApiRequest()) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Ubicación asignada correctamente'
+                ]);
+                exit;
+            } else {
+                $this->session->setMessage('success', "Ubicación asignada correctamente");
+                $this->redirect('index.php?tab=asignar-ubicaciones');
+            }
+            
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            if ($this->isApiRequest()) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]);
+                exit;
+            } else {
+                $this->session->setMessage('error', $e->getMessage());
+                $this->redirect('index.php?tab=asignar-ubicaciones');
+            }
         }
     }
 
     /**
-     * API: Elimina una ubicación de un usuario
+     * Elimina una ubicación de un usuario
      */
-    private function apiDesasignarUbicacion(int $usuarioId, string $tipoUbicacion, int $ubicacionId): void {
+    public function eliminarUbicacion(): void {
+        $this->authGuard->requireAdministrador();
+        
         try {
+            $usuarioId = isset($_POST['usuario_id']) ? (int)$_POST['usuario_id'] : 0;
+            $tipoUbicacion = $_POST['tipo_ubicacion'] ?? '';
+            $ubicacionId = isset($_POST['ubicacion_id']) ? (int)$_POST['ubicacion_id'] : 0;
+            
             if ($usuarioId <= 0) {
                 throw new Exception("ID de usuario no válido");
             }
@@ -487,21 +341,37 @@ class UsuarioController {
                 throw new Exception("ID de ubicación no válido");
             }
             
-            // Convertir tipos para compatibilidad con UsuarioUbicacion::TIPOS_VALIDOS
-            $normalizedTipo = $this->normalizarTipoUbicacion($tipoUbicacion);
+            // Normalizar el tipo de ubicación
+            $tipoNormalizado = $this->normalizarTipoUbicacion($tipoUbicacion);
             
-            // Desasignar ubicación
-            $resultado = $this->ubicacionService->eliminarUbicacion($usuarioId, $normalizedTipo, $ubicacionId);
+            // Eliminar ubicación
+            $this->ubicacionService->eliminarUbicacion($usuarioId, $tipoNormalizado, $ubicacionId);
             
-            echo json_encode([
-                'success' => $resultado,
-                'message' => $resultado ? 'Ubicación eliminada correctamente' : 'Error al eliminar la ubicación'
-            ]);
+            if ($this->isApiRequest()) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Ubicación eliminada correctamente'
+                ]);
+                exit;
+            } else {
+                $this->session->setMessage('success', "Ubicación eliminada correctamente");
+                $this->redirect('index.php?tab=asignar-ubicaciones');
+            }
+            
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            if ($this->isApiRequest()) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]);
+                exit;
+            } else {
+                $this->session->setMessage('error', $e->getMessage());
+                $this->redirect('index.php?tab=asignar-ubicaciones');
+            }
         }
     }
-
+    
     /**
      * Normaliza los tipos de ubicación para que coincidan con UsuarioUbicacion::TIPOS_VALIDOS
      */
@@ -523,10 +393,131 @@ class UsuarioController {
     }
 
     /**
+     * Procesa una solicitud desde la vista API
+     */
+    public function processApiRequest(): void {
+        header('Content-Type: application/json');
+        
+        try {
+            $this->authGuard->requireAdministrador();
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $action = $_GET['action'] ?? '';
+                
+                switch ($action) {
+                    case 'getById':
+                        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+                        echo json_encode($this->getById($id));
+                        break;
+                    case 'getUbicaciones':
+                        $idUsuario = isset($_GET['idUsuario']) ? (int)$_GET['idUsuario'] : 0;
+                        echo json_encode($this->getUbicaciones($idUsuario));
+                        break;
+                    case 'getAll':
+                        echo json_encode([
+                            'error' => false,
+                            'usuarios' => $this->usuarioService->getAllUsuarios()
+                        ]);
+                        break;
+                    default:
+                        echo json_encode([
+                            'error' => true,
+                            'mensaje' => 'Acción no reconocida'
+                        ]);
+                        break;
+                }
+            } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $action = $_POST['action'] ?? '';
+                
+                switch ($action) {
+                    case 'crear':
+                        $this->crear();
+                        break;
+                    case 'editar':
+                        $this->editar();
+                        break;
+                    case 'eliminar':
+                        $this->eliminar();
+                        break;
+                    case 'asignarUbicacion':
+                        $this->asignarUbicacion();
+                        break;
+                    case 'eliminarUbicacion':
+                        $this->eliminarUbicacion();
+                        break;
+                    default:
+                        echo json_encode([
+                            'error' => true,
+                            'mensaje' => 'Acción no reconocida'
+                        ]);
+                        break;
+                }
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'error' => true,
+                'mensaje' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Procesa la solicitud actual
+     */
+    public function processRequest(): void {
+        // Determinar si es una solicitud API
+        if ($this->isApiRequest()) {
+            $this->processApiRequest();
+            return;
+        }
+
+        // Procesar solicitudes normales
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $action = $_POST['action'] ?? '';
+            
+            switch ($action) {
+                case 'crear':
+                    $this->crear();
+                    break;
+                case 'editar':
+                    $this->editar();
+                    break;
+                case 'eliminar':
+                    $this->eliminar();
+                    break;
+                case 'asignarUbicacion':
+                    $this->asignarUbicacion();
+                    break;
+                case 'eliminarUbicacion':
+                    $this->eliminarUbicacion();
+                    break;
+                default:
+                    $this->session->setMessage('error', 'Acción no válida');
+                    $this->redirect('index.php');
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * Verifica si la solicitud actual es una solicitud AJAX
+     */
+    private function isApiRequest(): bool {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    /**
      * Redirige a una URL relativa a la sección de usuarios
      */
     private function redirect(string $path): void {
         header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/' . $path);
         exit();
     }
+}
+
+// Ejecutar el controlador si este archivo es llamado directamente
+if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
+    $controller = new UsuarioController();
+    $controller->processRequest();
 }
