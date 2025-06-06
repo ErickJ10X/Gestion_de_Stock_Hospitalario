@@ -32,27 +32,28 @@ $pageTitle = "Gestión de Botiquines";
 include_once(__DIR__ . '/../templates/header.php');
 ?>
 
-<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
-<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/card-form.css">
-<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/list.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/tabs.css">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/botiquines.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/paginacion.css">
 
-<div class="list-container">
 
-    <?php if ($session->hasMessage('success')): ?>
-        <div class="list-alert list-alert--success">
-            <p class="list-alert__message"><?= $session->getMessage('success') ?></p>
-            <button type="button" class="list-alert__close">&times;</button>
-        </div>
-        <?php $session->clearMessage('success'); ?>
-    <?php endif; ?>
+<?php if ($session->hasMessage('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show">
+        <?= $session->getMessage('success') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php $session->clearMessage('success'); ?>
+<?php endif; ?>
 
-    <?php if ($session->hasMessage('error')): ?>
-        <div class="list-alert list-alert--error">
-            <p class="list-alert__message"><?= $session->getMessage('error') ?></p>
-            <button type="button" class="list-alert__close">&times;</button>
-        </div>
-        <?php $session->clearMessage('error'); ?>
-    <?php endif; ?>
+<?php if ($session->hasMessage('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show">
+        <?= $session->getMessage('error') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php $session->clearMessage('error'); ?>
+<?php endif; ?>
 
     <div class="tabs-container">
         <div class="tabs-nav">
@@ -64,17 +65,26 @@ include_once(__DIR__ . '/../templates/header.php');
             <div id="tab-botiquines" class="tab-pane active">
                 <?php include_once(__DIR__ . '/botiquines_tab.php'); ?>
             </div>
-            
+
             <div id="tab-agregar-editar" class="tab-pane">
                 <?php include_once(__DIR__ . '/agregarEditar_tab.php'); ?>
             </div>
         </div>
     </div>
-</div>
 
-<div class="hospital-overlay"></div>
 
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/hospital-cards.js"></script>
-<script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js"></script>
+    <div class="hospital-overlay"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/tabs.js"></script>
+    <script src="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/js/botiquines.js?v=<?= time() ?>"></script>
+
+    <script>
+        // Función global para navegación entre pestañas
+        function cambiarAPestana(idPestana) {
+            const tabBtn = document.querySelector(`.tab-btn[data-tab="${idPestana}"]`);
+            if (tabBtn) tabBtn.click();
+        }
+    </script>
 
 <?php include_once(__DIR__ . '/../templates/footer.php'); ?>

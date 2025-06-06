@@ -1,499 +1,508 @@
-// Cambia la pestaña activa y muestra el panel correspondiente
-function activarPestania(tabId) {
-    // Quitar clase active de todos los botones y paneles
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+/**
+ * Archivo JavaScript para manejar la funcionalidad de los formularios de usuarios
+ * Versión sin AJAX - Formularios tradicionales
+ */
 
-    // Activar el botón y el panel correspondiente
-    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    const pane = document.getElementById(tabId);
-    if (btn) btn.classList.add('active');
-    if (pane) pane.classList.add('active');
-}
-
-// Mostrar formulario de edición y seleccionar usuario
-function showEditUserTab(userId) {
-    activarPestania('tab-crear-editar');
-    setTimeout(() => {
-        // Activar botón "Editar Usuario" y desactivar "Crear Usuario"
-        const btnEditar = document.querySelector('.form-toggle-btn[data-target="editarForm"]');
-        const btnCrear = document.querySelector('.form-toggle-btn[data-target="crearForm"]');
-        if (btnEditar) btnEditar.classList.add('active');
-        if (btnCrear) btnCrear.classList.remove('active');
-        // Mostrar sección editar y ocultar crear
-        const editarForm = document.getElementById('editarForm');
-        const crearForm = document.getElementById('crearForm');
-        if (editarForm) editarForm.style.display = '';
-        if (crearForm) crearForm.style.display = 'none';
-
-        // Seleccionar usuario en el selector
-        const select = document.getElementById('seleccionarUsuario');
-        if (select) {
-            select.value = userId;
-            select.dispatchEvent(new Event('change'));
-        }
-        // Ocultar mensaje y mostrar formulario de edición
-        const mensaje = document.getElementById('mensajeSeleccion');
-        if (mensaje) mensaje.style.display = 'none';
-        const formEditar = document.getElementById('formEditarContainer');
-        if (formEditar) formEditar.style.display = '';
-    }, 100);
-}
-
-// Cambiar a la pestaña de ubicaciones y seleccionar usuario
-function showUserLocationsTab(userId) {
-    activarPestania('tab-ubicaciones');
-    setTimeout(() => {
-        const select = document.getElementById('verUsuarioUbicaciones');
-        if (select) {
-            select.value = userId;
-            select.dispatchEvent(new Event('change'));
-        }
-        // Mostrar la sección de ver ubicaciones si existe
-        const verUbicacionesForm = document.getElementById('verUbicacionesForm');
-        if (verUbicacionesForm) {
-            // Activar el botón de ver ubicaciones si existe
-            const btns = document.querySelectorAll('#tab-ubicaciones .form-toggle-btn');
-            btns.forEach(btn => btn.classList.remove('active'));
-            const btnVer = document.querySelector('#tab-ubicaciones .form-toggle-btn[data-target="verUbicacionesForm"]');
-            if (btnVer) btnVer.classList.add('active');
-            // Mostrar solo el panel de ver ubicaciones
-            document.querySelectorAll('#tab-ubicaciones .form-section').forEach(sec => sec.style.display = 'none');
-            verUbicacionesForm.style.display = '';
-        }
-    }, 100);
-}
-
-// Mostrar formulario de creación de usuario
-function showCreateUserForm() {
-    activarPestania('tab-crear-editar');
-    setTimeout(() => {
-        // Activar botón "Crear Usuario" y desactivar "Editar Usuario"
-        const btnCrear = document.querySelector('.form-toggle-btn[data-target="crearForm"]');
-        const btnEditar = document.querySelector('.form-toggle-btn[data-target="editarForm"]');
-        if (btnCrear) btnCrear.classList.add('active');
-        if (btnEditar) btnEditar.classList.remove('active');
-        // Mostrar sección crear y ocultar editar
-        const crearForm = document.getElementById('crearForm');
-        const editarForm = document.getElementById('editarForm');
-        if (crearForm) crearForm.style.display = '';
-        if (editarForm) editarForm.style.display = 'none';
-        // Limpiar selección de usuario
-        const select = document.getElementById('seleccionarUsuario');
-        if (select) select.value = '';
-        const mensaje = document.getElementById('mensajeSeleccion');
-        if (mensaje) mensaje.style.display = '';
-        const formEditar = document.getElementById('formEditarContainer');
-        if (formEditar) formEditar.style.display = 'none';
-    }, 100);
-}
-
-// Delegar eventos en botones de la tabla de usuarios
-document.addEventListener('DOMContentLoaded', function () {
-    // Botón editar
-    document.querySelectorAll('.list-table__button--edit').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const userId = this.closest('tr').querySelector('td').textContent.trim();
-            showEditUserTab(userId);
-        });
-    });
-
-    // Botón ubicaciones
-    document.querySelectorAll('.list-table__button--locations').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const userId = this.closest('tr').querySelector('td').textContent.trim();
-            showUserLocationsTab(userId);
-        });
-    });
-
-    // Botón nuevo usuario
-    const btnNuevo = document.getElementById('btnNuevoUsuario');
-    if (btnNuevo) {
-        btnNuevo.addEventListener('click', function (e) {
-            e.preventDefault();
-            showCreateUserForm();
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicialización de tooltips y popovers de Bootstrap si están presentes
+    if (typeof bootstrap !== 'undefined') {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     }
 
-    // Alternar entre formularios de crear y editar usuario en la pestaña Agregar/Editar
-    const formToggleBtns = document.querySelectorAll('.form-toggle-btn');
-    const formSections = document.querySelectorAll('.form-section');
-    formToggleBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            // Quitar clase active de todos los botones
-            formToggleBtns.forEach(b => b.classList.remove('active'));
-            // Agregar clase active al botón clickeado
-            this.classList.add('active');
-            // Mostrar la sección correspondiente y ocultar las demás
-            const target = this.getAttribute('data-target');
-            formSections.forEach(section => {
-                if (section.id === target) {
-                    section.style.display = '';
+    // Funcionalidad para alternar la visibilidad de la contraseña
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+    if (togglePasswordButtons) {
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.closest('.input-group').querySelector('input');
+                const currentType = input.getAttribute('type');
+                
+                if (currentType === 'password') {
+                    input.setAttribute('type', 'text');
+                    this.innerHTML = '<i class="fas fa-eye-slash"></i>';
                 } else {
-                    section.style.display = 'none';
+                    input.setAttribute('type', 'password');
+                    this.innerHTML = '<i class="fas fa-eye"></i>';
                 }
             });
         });
-    });
-});
-
-/**
- * Sistema de paginación para tablas con datos cargados en el cliente
- */
-document.addEventListener('DOMContentLoaded', function() {
-    // Configuración inicial
-    let paginaActual = 1;
-    let registrosPorPagina = 10;
-    let filtroTexto = '';
-
-    // Elementos DOM
-    const tabla = document.getElementById('usuariosDataTable');
-    const tbody = tabla ? tabla.querySelector('tbody') : null;
-    const paginacionContainer = document.getElementById('paginacion-usuarios');
-    const selectRegistrosPorPagina = document.getElementById('registrosPorPagina');
-    const inputBuscar = document.getElementById('buscarUsuario');
-    const spanInicio = document.getElementById('inicio-registros');
-    const spanFin = document.getElementById('fin-registros');
-    const spanTotal = document.getElementById('total-registros');
-
-    // Verificar que tenemos todos los elementos necesarios
-    if (!tabla || !tbody || !paginacionContainer || !window.datosUsuarios) {
-        console.error('No se encontraron los elementos necesarios para la paginación');
-        return;
+    }
+    
+    // Validación personalizada para contraseñas
+    function validarContrasena(contrasena) {
+        // Al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+        return passwordRegex.test(contrasena);
     }
 
-    /**
-     * Función para generar una fila de usuario
-     */
-    function generarFilaUsuario(usuario) {
-        const badgeClass = usuario.activo ? 'bg-success' : 'bg-danger';
-        const badgeText = usuario.activo ? 'Activo' : 'Inactivo';
-        const iconClass = usuario.activo ? 'check-circle' : 'times-circle';
-
-        let rolBadgeClass = 'primary';
-        switch (usuario.rol) {
-            case 'ADMINISTRADOR':
-                rolBadgeClass = 'danger';
-                break;
-            case 'GESTOR_GENERAL':
-                rolBadgeClass = 'primary';
-                break;
-            case 'GESTOR_HOSPITAL':
-                rolBadgeClass = 'warning';
-                break;
-            case 'GESTOR_PLANTA':
-                rolBadgeClass = 'info';
-                break;
-            case 'USUARIO_BOTIQUIN':
-                rolBadgeClass = 'secondary';
-                break;
-        }
-
-        return `
-            <tr>
-                <td>${usuario.id}</td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <span class="ms-2">${escapeHtml(usuario.nombre)}</span>
-                    </div>
-                </td>
-                <td>
-                    <a href="mailto:${escapeHtml(usuario.email)}" class="text-decoration-none">
-                        <i class="far fa-envelope me-1"></i>
-                        ${escapeHtml(usuario.email)}
-                    </a>
-                </td>
-                <td>
-                    <span class="badge bg-${rolBadgeClass}">${escapeHtml(usuario.rol)}</span>
-                </td>
-                <td>
-                    <span class="badge ${badgeClass} status-badge">
-                        <i class="fas fa-${iconClass} me-1"></i>
-                        ${badgeText}
-                    </span>
-                </td>
-                <td>
-                    <div class="d-flex gap-1">
-                        <a href="#" 
-                            class="list-table__button list-table__button--edit btn btn-sm"
-                            title="Editar usuario">
-                            <i class="fas fa-edit list-table__button-icon"></i> Editar
-                        </a>
-                        
-                        <button type="button"
-                                class="list-table__button list-table__button--locations btn btn-sm"
-                                title="Gestionar ubicaciones">
-                            <i class="fas fa-map-marker-alt list-table__button-icon"></i> Ubicaciones
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    /**
-     * Escapa caracteres HTML por seguridad
-     */
-    function escapeHtml(texto) {
-        if (!texto) return '';
-        return texto
-            .toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    /**
-     * Filtra los datos según el texto de búsqueda
-     */
-    function filtrarDatos() {
-        if (!filtroTexto) {
-            return window.datosUsuarios;
-        }
-
-        const termino = filtroTexto.toLowerCase();
-        return window.datosUsuarios.filter(usuario => {
-            return usuario.nombre.toLowerCase().includes(termino) ||
-                usuario.email.toLowerCase().includes(termino) ||
-                usuario.rol.toLowerCase().includes(termino);
+    // Configuración de la alternancia entre formularios
+    const formToggleButtons = document.querySelectorAll('.form-toggle-btn');
+    if (formToggleButtons.length) {
+        formToggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Desactivar todos los botones
+                formToggleButtons.forEach(btn => btn.classList.remove('active'));
+                // Activar este botón
+                this.classList.add('active');
+                
+                // Ocultar todos los formularios
+                document.querySelectorAll('.form-section').forEach(form => {
+                    form.style.display = 'none';
+                });
+                
+                // Mostrar el formulario correspondiente
+                const targetForm = document.getElementById(this.getAttribute('data-target'));
+                if (targetForm) {
+                    targetForm.style.display = 'block';
+                }
+            });
         });
     }
 
-    /**
-     * Actualiza la tabla con los datos de la página actual
-     */
-    function actualizarTabla() {
-        // Agregar clase loading para transición
-        tbody.classList.add('loading');
-
-        // Pequeño retraso para permitir que la transición sea visible
-        setTimeout(() => {
-            const datosFiltrados = filtrarDatos();
-            const totalRegistros = datosFiltrados.length;
-
-            // Calcular indices
-            const inicio = (paginaActual - 1) * registrosPorPagina;
-            let fin = inicio + registrosPorPagina;
-            if (fin > totalRegistros) fin = totalRegistros;
-
-            // Obtener los registros de la página actual
-            const registros = datosFiltrados.slice(inicio, fin);
-
-            // Actualizar HTML de la tabla
-            if (registros.length === 0) {
-                tbody.innerHTML = `
-                    <tr class="no-results-row">
-                        <td colspan="6" class="text-center py-4">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No se encontraron usuarios registrados
-                        </td>
-                    </tr>
-                `;
-            } else {
-                tbody.innerHTML = registros.map(generarFilaUsuario).join('');
+    // Manejo del formulario de creación de usuario - Validación Cliente
+    const formCrearUsuario = document.getElementById('formCrearUsuario');
+    if (formCrearUsuario) {
+        formCrearUsuario.addEventListener('submit', function(e) {
+            // Obtener valores de los campos
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const rol = document.getElementById('rol').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const confirmarContrasena = document.getElementById('confirmar_contrasena').value;
+            
+            // Validaciones básicas
+            if (!nombre || !email || !rol || !contrasena || !confirmarContrasena) {
+                e.preventDefault();
+                alert('Todos los campos son obligatorios');
+                return false;
             }
-
-            // Actualizar contadores
-            if (spanInicio) spanInicio.textContent = totalRegistros > 0 ? inicio + 1 : 0;
-            if (spanFin) spanFin.textContent = fin;
-            if (spanTotal) spanTotal.textContent = totalRegistros;
-
-            // Actualizar paginación
-            actualizarPaginacion(totalRegistros);
-
-            // Reactivar eventos en los botones de la tabla
-            activarEventosBotones();
-
-            // Quitar clase loading
-            tbody.classList.remove('loading');
-        }, 150);
+            
+            // Validar que las contraseñas coincidan
+            if (contrasena !== confirmarContrasena) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+            
+            // Validar el formato de la contraseña
+            if (!validarContrasena(contrasena)) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial');
+                return false;
+            }
+            
+            // Si todo está bien, el formulario se enviará normalmente
+            return true;
+        });
     }
 
-    /**
-     * Genera los botones de paginación
-     */
-    function actualizarPaginacion(totalRegistros) {
-        const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+    // Manejo del selector de usuario para edición
+    const seleccionarUsuario = document.getElementById('seleccionarUsuario');
+    const formEditarContainer = document.getElementById('formEditarContainer');
+    const mensajeSeleccion = document.getElementById('mensajeSeleccion');
+    
+    if (seleccionarUsuario && formEditarContainer && mensajeSeleccion) {
+        seleccionarUsuario.addEventListener('change', function() {
+            const userId = this.value;
+            
+            if (!userId) {
+                mensajeSeleccion.style.display = 'block';
+                formEditarContainer.style.display = 'none';
+                return;
+            }
+            
+            // Obtener datos del usuario seleccionado
+            const userData = window.usuariosData?.[userId];
+            
+            if (userData) {
+                // Asignar datos a los campos del formulario
+                document.getElementById('editId').value = userData.id_usuario;
+                document.getElementById('editNombre').value = userData.nombre;
+                document.getElementById('editEmail').value = userData.email;
+                document.getElementById('editRol').value = userData.rol;
+                
+                const checkboxActivo = document.getElementById('editActivo');
+                if (checkboxActivo) {
+                    checkboxActivo.checked = userData.activo === '1';
+                    const estadoLabel = document.getElementById('estadoLabel');
+                    if (estadoLabel) {
+                        estadoLabel.textContent = userData.activo === '1' ? 'Activo' : 'Inactivo';
+                    }
+                }
+                
+                // Limpiar contraseñas
+                document.getElementById('editContrasena').value = '';
+                document.getElementById('editConfirmarContrasena').value = '';
+                
+                // Mostrar formulario y ocultar mensaje
+                mensajeSeleccion.style.display = 'none';
+                formEditarContainer.style.display = 'block';
+            }
+        });
+    }
 
-        // Si no hay registros o solo hay una página
-        if (totalRegistros === 0 || totalPaginas === 1) {
-            paginacionContainer.querySelectorAll('.page-item').forEach(item => {
-                item.classList.add('disabled');
+    // Manejo del botón para cancelar edición
+    const cancelarEdicion = document.getElementById('cancelar_edicion_usuario');
+    if (cancelarEdicion) {
+        cancelarEdicion.addEventListener('click', function() {
+            if (seleccionarUsuario) {
+                seleccionarUsuario.value = '';
+            }
+            
+            if (formEditarContainer) {
+                formEditarContainer.style.display = 'none';
+            }
+            
+            if (mensajeSeleccion) {
+                mensajeSeleccion.style.display = 'block';
+            }
+        });
+    }
+
+    // Manejo del formulario de edición - Validación Cliente
+    const formEditarUsuario = document.getElementById('formEditarUsuario');
+    if (formEditarUsuario) {
+        formEditarUsuario.addEventListener('submit', function(e) {
+            // Validaciones básicas para edición
+            const id = document.getElementById('editId').value;
+            const nombre = document.getElementById('editNombre').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const rol = document.getElementById('editRol').value;
+            
+            if (!id || !nombre || !email || !rol) {
+                e.preventDefault();
+                alert('El nombre, email y rol son obligatorios');
+                return false;
+            }
+            
+            // Si hay contraseña, validarla
+            const contrasena = document.getElementById('editContrasena').value;
+            const confirmarContrasena = document.getElementById('editConfirmarContrasena').value;
+            
+            if (contrasena || confirmarContrasena) {
+                if (contrasena !== confirmarContrasena) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden');
+                    return false;
+                }
+                
+                if (contrasena && !validarContrasena(contrasena)) {
+                    e.preventDefault();
+                    alert('La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial');
+                    return false;
+                }
+            }
+            
+            // Si todo está bien, el formulario se enviará normalmente
+            return true;
+        });
+    }
+
+    // Actualizar etiqueta de estado al cambiar checkbox
+    const editActivo = document.getElementById('editActivo');
+    if (editActivo) {
+        editActivo.addEventListener('change', function() {
+            const estadoLabel = document.getElementById('estadoLabel');
+            if (estadoLabel) {
+                estadoLabel.textContent = this.checked ? 'Activo' : 'Inactivo';
+            }
+        });
+    }
+
+    // SISTEMA DE PAGINACIÓN PARA USUARIOS
+    // Variables para la paginación
+    let paginaActual = 1;
+    let registrosPorPagina = 10;
+    let totalPaginas = Math.ceil(window.totalRegistros / registrosPorPagina);
+    let datosFiltrados = window.datosUsuarios ? [...window.datosUsuarios] : [];
+
+    // Referencias a elementos DOM para paginación
+    const tablaUsuarios = document.querySelector('#usuariosDataTable tbody');
+    const paginacionUsuarios = document.getElementById('paginacion-usuarios');
+    const inicioRegistros = document.getElementById('inicio-registros');
+    const finRegistros = document.getElementById('fin-registros');
+    const totalRegistrosElement = document.getElementById('total-registros');
+    const buscarUsuario = document.getElementById('buscarUsuario');
+    const registrosPorPaginaSelect = document.getElementById('registrosPorPagina');
+
+    // Función para actualizar la tabla según la página actual
+    function actualizarTablaUsuarios() {
+        if (!tablaUsuarios || !datosFiltrados) return;
+
+        const inicio = (paginaActual - 1) * registrosPorPagina;
+        const fin = inicio + registrosPorPagina;
+        const usuariosPagina = datosFiltrados.slice(inicio, fin);
+
+        // Limpiar la tabla
+        tablaUsuarios.innerHTML = '';
+
+        // Si no hay datos después del filtrado
+        if (usuariosPagina.length === 0) {
+            const tr = document.createElement('tr');
+            tr.className = 'no-results-row';
+            tr.innerHTML = `
+                <td colspan="6" class="text-center py-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No se encontraron usuarios con los criterios de búsqueda
+                </td>
+            `;
+            tablaUsuarios.appendChild(tr);
+        } else {
+            // Añadir filas correspondientes a la página actual
+            usuariosPagina.forEach(usuario => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${usuario.id}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="ms-2">${usuario.nombre}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="mailto:${usuario.email}" class="text-decoration-none">
+                            <i class="far fa-envelope me-1"></i>
+                            ${usuario.email}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge ${getBadgeClassForRol(usuario.rol)}">${usuario.rol}</span>
+                    </td>
+                    <td>
+                        <span class="badge ${usuario.activo ? 'bg-success' : 'bg-danger'} status-badge">
+                            <i class="fas fa-${usuario.activo ? 'check-circle' : 'times-circle'} me-1"></i>
+                            ${usuario.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="#" onclick="editarUsuarioDesdeTabla(${usuario.id}); return false;"
+                               class="list-table__button list-table__button--edit btn btn-sm"
+                               title="Editar usuario">
+                                <i class="fas fa-edit list-table__button-icon"></i> Editar
+                            </a>
+                            <a href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/usuarios/index.php?tab=asignar-ubicaciones&id=${usuario.id}"
+                               class="list-table__button list-table__button--locations btn btn-sm"
+                               title="Gestionar ubicaciones">
+                                <i class="fas fa-map-marker-alt list-table__button-icon"></i> Ubicaciones
+                            </a>
+                        </div>
+                    </td>
+                `;
+                tablaUsuarios.appendChild(tr);
             });
-            return;
         }
 
-        // Actualizar estado de los botones primera/anterior
-        const btnPrimera = paginacionContainer.querySelector('[data-pagina="primera"]').parentNode;
-        const btnAnterior = paginacionContainer.querySelector('[data-pagina="anterior"]').parentNode;
-
-        if (paginaActual === 1) {
-            btnPrimera.classList.add('disabled');
-            btnAnterior.classList.add('disabled');
-        } else {
-            btnPrimera.classList.remove('disabled');
-            btnAnterior.classList.remove('disabled');
+        // Actualizar información de registros mostrados
+        if (inicioRegistros && finRegistros && totalRegistrosElement) {
+            inicioRegistros.textContent = datosFiltrados.length > 0 ? inicio + 1 : 0;
+            finRegistros.textContent = Math.min(fin, datosFiltrados.length);
+            totalRegistrosElement.textContent = datosFiltrados.length;
         }
 
-        // Actualizar estado de los botones siguiente/última
-        const btnSiguiente = paginacionContainer.querySelector('[data-pagina="siguiente"]').parentNode;
-        const btnUltima = paginacionContainer.querySelector('[data-pagina="ultima"]').parentNode;
+        // Actualizar el paginador
+        actualizarPaginador();
+    }
 
-        if (paginaActual === totalPaginas) {
-            btnSiguiente.classList.add('disabled');
-            btnUltima.classList.add('disabled');
-        } else {
-            btnSiguiente.classList.remove('disabled');
-            btnUltima.classList.remove('disabled');
+    // Función para obtener la clase de badge según el rol
+    function getBadgeClassForRol(rol) {
+        switch (rol) {
+            case 'ADMINISTRADOR':
+                return 'bg-danger';
+            case 'GESTOR_GENERAL':
+                return 'bg-primary';
+            case 'GESTOR_HOSPITAL':
+                return 'bg-warning';
+            case 'GESTOR_PLANTA':
+                return 'bg-info';
+            case 'USUARIO_BOTIQUIN':
+                return 'bg-secondary';
+            default:
+                return 'bg-primary';
+        }
+    }
+
+    // Función para actualizar el paginador
+    function actualizarPaginador() {
+        if (!paginacionUsuarios) return;
+
+        totalPaginas = Math.ceil(datosFiltrados.length / registrosPorPagina);
+        
+        // Si no hay registros, establecer al menos una página
+        if (totalPaginas === 0) totalPaginas = 1;
+
+        // Ajustar página actual si está fuera de rango
+        if (paginaActual > totalPaginas) {
+            paginaActual = totalPaginas;
+        }
+
+        // Construir los enlaces de paginación
+        let paginadorHTML = `
+            <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-pagina="primera" aria-label="Primera página">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                    <span class="sr-only">Primera</span>
+                </a>
+            </li>
+            <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-pagina="anterior" aria-label="Página anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        `;
+
+        // Límites para los números de página (mostrar un máximo de 5 páginas)
+        let inicio = Math.max(1, paginaActual - 2);
+        let fin = Math.min(totalPaginas, inicio + 4);
+        
+        // Ajustar inicio si estamos cerca del final
+        if (fin === totalPaginas) {
+            inicio = Math.max(1, fin - 4);
         }
 
         // Generar números de página
-        // Eliminar números existentes (excepto primera/anterior/siguiente/última)
-        const botonesAEliminar = Array.from(paginacionContainer.querySelectorAll('.page-item')).filter(item => {
-            const link = item.querySelector('a');
-            return link && link.dataset.pagina && !isNaN(parseInt(link.dataset.pagina));
-        });
-
-        botonesAEliminar.forEach(btn => btn.remove());
-
-        // Agregar nuevos números
-        const btnSiguienteElement = paginacionContainer.querySelector('[data-pagina="siguiente"]').parentNode;
-
-        // Determinar qué números mostrar (mostraremos 5 números máximo alrededor de la página actual)
-        let inicio = Math.max(1, paginaActual - 2);
-        let fin = Math.min(totalPaginas, inicio + 4);
-
-        // Si estamos cerca del final, ajustar el inicio
-        if (fin === totalPaginas) {
-            inicio = Math.max(1, totalPaginas - 4);
-        }
-
         for (let i = inicio; i <= fin; i++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${i === paginaActual ? 'active' : ''}`;
-
-            const a = document.createElement('a');
-            a.className = 'page-link';
-            a.href = '#';
-            a.textContent = i;
-            a.dataset.pagina = i;
-
-            li.appendChild(a);
-            paginacionContainer.insertBefore(li, btnSiguienteElement);
-        }
-    }
-
-    /**
-     * Activar eventos en los botones de edición y ubicaciones
-     */
-    function activarEventosBotones() {
-        document.querySelectorAll('.list-table__button--edit').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                const userId = this.closest('tr').querySelector('td').textContent.trim();
-                if (typeof showEditUserTab === 'function') {
-                    showEditUserTab(userId);
-                }
-            });
-        });
-
-        document.querySelectorAll('.list-table__button--locations').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                const userId = this.closest('tr').querySelector('td').textContent.trim();
-                if (typeof showUserLocationsTab === 'function') {
-                    showUserLocationsTab(userId);
-                }
-            });
-        });
-    }
-
-    /**
-     * Manejar clics en la paginación
-     */
-    paginacionContainer.addEventListener('click', function(event) {
-        const target = event.target.closest('a');
-        if (!target || target.parentNode.classList.contains('disabled')) return;
-
-        event.preventDefault();
-
-        const accion = target.dataset.pagina;
-        const datosFiltrados = filtrarDatos();
-        const totalPaginas = Math.ceil(datosFiltrados.length / registrosPorPagina);
-
-        let paginaAnterior = paginaActual;
-
-        // Determinar la nueva página según la acción
-        switch(accion) {
-            case 'primera':
-                paginaActual = 1;
-                break;
-            case 'anterior':
-                if (paginaActual > 1) paginaActual--;
-                break;
-            case 'siguiente':
-                if (paginaActual < totalPaginas) paginaActual++;
-                break;
-            case 'ultima':
-                paginaActual = totalPaginas;
-                break;
-            default:
-                // Si es un número de página
-                if (!isNaN(parseInt(accion))) {
-                    paginaActual = parseInt(accion);
-                }
-                break;
+            paginadorHTML += `
+                <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                    <a class="page-link" href="#" data-pagina="${i}">${i}</a>
+                </li>
+            `;
         }
 
-        // Solo actualizar si realmente cambiamos de página
-        if (paginaAnterior !== paginaActual) {
-            // Hacer scroll a la parte superior de la tabla si es necesario
-            if (window.innerWidth < 768) {
-                tabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        paginadorHTML += `
+            <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-pagina="siguiente" aria-label="Página siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Siguiente</span>
+                </a>
+            </li>
+            <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-pagina="ultima" aria-label="Última página">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                    <span class="sr-only">Última</span>
+                </a>
+            </li>
+        `;
+
+        paginacionUsuarios.innerHTML = paginadorHTML;
+
+        // Agregar eventos a los enlaces de paginación
+        document.querySelectorAll('#paginacion-usuarios .page-link').forEach(enlace => {
+            enlace.addEventListener('click', function(e) {
+                e.preventDefault();
+                const accion = this.getAttribute('data-pagina');
+
+                switch (accion) {
+                    case 'primera':
+                        paginaActual = 1;
+                        break;
+                    case 'anterior':
+                        paginaActual = Math.max(1, paginaActual - 1);
+                        break;
+                    case 'siguiente':
+                        paginaActual = Math.min(totalPaginas, paginaActual + 1);
+                        break;
+                    case 'ultima':
+                        paginaActual = totalPaginas;
+                        break;
+                    default:
+                        paginaActual = parseInt(accion);
+                }
+
+                actualizarTablaUsuarios();
+            });
+        });
+    }
+
+    // Buscador de usuarios
+    if (buscarUsuario) {
+        buscarUsuario.addEventListener('input', function() {
+            const termino = this.value.toLowerCase().trim();
+            
+            if (window.datosUsuarios) {
+                if (termino === '') {
+                    // Si no hay término de búsqueda, mostrar todos
+                    datosFiltrados = [...window.datosUsuarios];
+                } else {
+                    // Filtrar según el término de búsqueda
+                    datosFiltrados = window.datosUsuarios.filter(usuario => {
+                        return usuario.nombre.toLowerCase().includes(termino) || 
+                               usuario.email.toLowerCase().includes(termino) || 
+                               usuario.rol.toLowerCase().includes(termino);
+                    });
+                }
+                
+                paginaActual = 1; // Volver a la primera página con cada búsqueda
+                actualizarTablaUsuarios();
             }
-            actualizarTabla();
-        }
-    });
+        });
+    }
 
-    /**
-     * Manejar cambio en registros por página
-     */
-    if (selectRegistrosPorPagina) {
-        selectRegistrosPorPagina.addEventListener('change', function() {
+    // Manejador para cambiar registros por página
+    if (registrosPorPaginaSelect) {
+        registrosPorPaginaSelect.addEventListener('change', function() {
             registrosPorPagina = parseInt(this.value);
             paginaActual = 1; // Volver a la primera página
-            actualizarTabla();
+            actualizarTablaUsuarios();
         });
     }
 
-    /**
-     * Manejar búsqueda
-     */
-    if (inputBuscar) {
-        // Usamos keyup para que se dispare después de que el usuario haya terminado de escribir
-        inputBuscar.addEventListener('input', debounce(function() {
-            filtroTexto = this.value;
-            paginaActual = 1; // Volver a la primera página
-            actualizarTabla();
-        }, 300));
+    // Botón para nuevo usuario
+    const btnNuevoUsuario = document.getElementById('btnNuevoUsuario');
+    if (btnNuevoUsuario) {
+        btnNuevoUsuario.addEventListener('click', function() {
+            // Cambiar a la pestaña de agregar/editar
+            const tabBtn = document.querySelector('.tab-btn[data-tab="tab-crear-editar"]');
+            if (tabBtn) {
+                tabBtn.click();
+                
+                // Pequeña espera para asegurar que la pestaña se haya cargado
+                setTimeout(() => {
+                    // Activar el formulario "Crear Usuario" (primero por defecto) 
+                    const crearBtn = document.querySelector('.form-toggle-btn[data-target="crearForm"]');
+                    if (crearBtn && !crearBtn.classList.contains('active')) {
+                        crearBtn.click();
+                    }
+                }, 100);
+            }
+        });
     }
 
-    /**
-     * Función para retrasar la ejecución de una función (debounce)
-     */
-    function debounce(func, wait) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-        };
+    // Inicializar la tabla y paginador al cargar la página
+    if (window.datosUsuarios && tablaUsuarios) {
+        datosFiltrados = [...window.datosUsuarios];
+        actualizarTablaUsuarios();
     }
-
-    // Inicializar la tabla
-    actualizarTabla();
 });
+
+// Función para editar usuario desde la tabla
+function editarUsuarioDesdeTabla(idUsuario) {
+    // Cambiar a la pestaña de editar
+    const tabBtn = document.querySelector('.tab-btn[data-tab="tab-crear-editar"]');
+    if (tabBtn) {
+        tabBtn.click();
+        
+        // Pequeña espera para asegurar que la pestaña se haya cargado
+        setTimeout(() => {
+            // Activar el formulario "Editar Usuario"
+            const editarBtn = document.querySelector('.form-toggle-btn[data-target="editarForm"]');
+            if (editarBtn) {
+                editarBtn.click();
+                
+                // Otra pequeña espera para asegurar que el formulario se active
+                setTimeout(() => {
+                    // Seleccionar el usuario en el dropdown
+                    const selectUsuario = document.getElementById('seleccionarUsuario');
+                    if (selectUsuario) {
+                        selectUsuario.value = idUsuario;
+                        
+                        // Disparar el evento change para cargar los datos del usuario
+                        const changeEvent = new Event('change');
+                        selectUsuario.dispatchEvent(changeEvent);
+                    }
+                }, 100);
+            }
+        }, 100);
+    }
+}

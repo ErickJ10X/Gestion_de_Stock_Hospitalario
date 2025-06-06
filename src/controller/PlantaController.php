@@ -270,8 +270,11 @@ class PlantaController {
      * Redirige a una URL relativa
      */
     private function redirect(string $path): void {
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/' . $path);
-        exit();
+        if (headers_sent()) {
+            echo "<script>window.location.href='$path';</script>";
+        } else {
+            header('Location:  /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/hospitales/' . $path);
+        }
     }
 
     /**

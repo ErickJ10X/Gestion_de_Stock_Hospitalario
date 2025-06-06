@@ -106,30 +106,6 @@ function getDestinoNombre($idDestino, $tipoUbicacion, $plantas, $botiquines) {
     </table>
 </div>
 
-<!-- Modal de confirmación de eliminación -->
-<div class="modal fade" id="eliminarPactoModal" tabindex="-1" aria-labelledby="eliminarPactoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="eliminarPactoModalLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro que desea eliminar este pacto?</p>
-                <p class="text-danger">Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form action="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/controller/PactosController.php" method="POST">
-                    <input type="hidden" name="action" value="eliminar">
-                    <input type="hidden" id="id_pacto_eliminar" name="id">
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar DataTable si está disponible
