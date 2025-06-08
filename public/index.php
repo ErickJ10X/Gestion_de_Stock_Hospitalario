@@ -8,6 +8,7 @@ require_once('../src/model/enum/RolEnum.php');
 use model\enum\RolEnum;
 
 ?>
+<link rel="stylesheet" href="/Pegasus-Medical-Gestion_de_Stock_Hospitalario/public/assets/css/index.css">
 
 <div class="home-container">
     <div class="welcome-card">

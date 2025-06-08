@@ -4,105 +4,109 @@ if (!isset($productos) || !isset($session)) {
 }
 ?>
 
-<div class="list-header__actions">
-    <button id="btn-add-producto" class="list-button list-button--success" onclick="document.querySelector('.tab-btn[data-tab=\'tab-agregar-editar\']').click()">
-        <i class="bi bi-plus-circle"></i> Nuevo
-    </button>
-</div>
+<!-- Tarjeta principal de la tabla -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
 
-<div class="table-responsive">
-    <table class="list-table" id="tablaProductos">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Unidad de Medida</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($productos)): ?>
+        <button id="btnNuevoProducto" class="btn btn-sm btn-success">
+            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+        </button>
+
+        <div class="search-group">
+            <div class="input-group input-group-sm">
+                <select id="registrosPorPaginaProductos" class="form-select form-select-sm">
+                    <option value="5">5 registros</option>
+                    <option value="10" selected>10 registros</option>
+                    <option value="25">25 registros</option>
+                    <option value="50">50 registros</option>
+                </select>
+            </div>
+            <div class="input-group input-group-sm">
+                <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="list-table table table-striped table-hover" id="productosDataTable">
+                <thead>
                 <tr>
-                    <td colspan="6" class="list-table__empty">No hay productos registrados</td>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Unidad de Medida</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($productos as $producto): ?>
-                    <tr class="list-table__body-row">
-                        <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($producto->getIdProducto()) ?></td>
-                        <td class="list-table__body-cell" data-label="Código"><?= htmlspecialchars($producto->getCodigo()) ?></td>
-                        <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($producto->getNombre()) ?></td>
-                        <td class="list-table__body-cell" data-label="Descripción"><?= htmlspecialchars($producto->getDescripcion()) ?></td>
-                        <td class="list-table__body-cell" data-label="Unidad de Medida"><?= htmlspecialchars($producto->getUnidadMedida()) ?></td>
-                        <td class="list-table__body-cell" data-label="Acciones">
-                            <div class="list-table__actions">
-                                <button class="list-table__button list-table__button--edit" 
-                                        onclick="seleccionarProducto(<?= $producto->getIdProducto() ?>)"
-                                        title="Editar producto">
-                                    <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
-                                </button>
-                                <button class="list-table__button list-table__button--delete"
-                                        onclick="confirmarEliminarProducto(<?= $producto->getIdProducto() ?>, '<?= htmlspecialchars(addslashes($producto->getNombre())) ?>')"
-                                        title="Eliminar producto">
-                                    <i class="bi bi-trash list-table__button-icon"></i> Eliminar
-                                </button>
-                            </div>
-                        </td>
+                </thead>
+                <tbody>
+                <?php if (empty($productos)): ?>
+                    <tr>
+                        <td colspan="6" class="list-table__empty">No hay productos registrados</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($productos as $producto): ?>
+                        <tr class="list-table__body-row">
+                            <td class="list-table__body-cell" data-label="ID"><?= htmlspecialchars($producto->getIdProducto()) ?></td>
+                            <td class="list-table__body-cell" data-label="Código"><?= htmlspecialchars($producto->getCodigo()) ?></td>
+                            <td class="list-table__body-cell" data-label="Nombre"><?= htmlspecialchars($producto->getNombre()) ?></td>
+                            <td class="list-table__body-cell" data-label="Descripción"><?= htmlspecialchars($producto->getDescripcion()) ?></td>
+                            <td class="list-table__body-cell" data-label="Unidad de Medida"><?= htmlspecialchars($producto->getUnidadMedida()) ?></td>
+                            <td class="list-table__body-cell" data-label="Acciones">
+                                <div class="list-table__actions">
+                                    <button class="list-table__button list-table__button--edit"
+                                            onclick="seleccionarProducto(<?= $producto->getIdProducto() ?>)"
+                                            title="Editar producto">
+                                        <i class="bi bi-pencil-square list-table__button-icon"></i> Editar
+                                    </button>
+                                    <button class="list-table__button list-table__button--delete"
+                                            onclick="confirmarEliminarProducto(<?= $producto->getIdProducto() ?>, '<?= htmlspecialchars(addslashes($producto->getNombre())) ?>')"
+                                            title="Eliminar producto">
+                                        <i class="bi bi-trash list-table__button-icon"></i> Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación con JS -->
+        <div class="card-footer bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <div class="paginacion-info">
+                        Mostrando <span id="inicio-registros-productos">1</span> a <span id="fin-registros-productos">10</span>
+                        de <span id="total-registros-productos"><?= count($productos) ?></span> registros
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <nav aria-label="Paginación de productos">
+                        <ul class="pagination justify-content-end mb-0" id="paginacion-productos">
+                            <!-- La paginación se generará dinámicamente con JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar DataTable si está disponible
-    if (typeof $.fn.DataTable !== 'undefined') {
-        try {
-            $('#tablaProductos').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json'
-                },
-                responsive: true,
-                order: [[0, 'asc']]
-            });
-        } catch (error) {
-            console.error('Error al inicializar DataTable:', error);
-        }
-    }
-});
-
-// Función para seleccionar un producto para editar
-function seleccionarProducto(id) {
-    // Cambiar a la pestaña de edición
-    document.querySelector('.tab-btn[data-tab="tab-agregar-editar"]').click();
-    
-    // Esperar un momento para que la pestaña se muestre
-    setTimeout(() => {
-        // Seleccionar el producto en el dropdown
-        const selectProducto = document.getElementById('select_producto');
-        selectProducto.value = id;
-        
-        // Disparar el evento change para cargar los datos
-        const event = new Event('change');
-        selectProducto.dispatchEvent(event);
-        
-        // Hacer scroll al formulario de edición
-        document.getElementById('editar_producto_form_container').scrollIntoView({
-            behavior: 'smooth'
-        });
-    }, 100);
-}
-
-// Función para confirmar eliminación de un producto
-function confirmarEliminarProducto(id, nombre) {
-    document.getElementById('id_producto_eliminar').value = id;
-    document.getElementById('nombreProductoEliminar').textContent = nombre;
-    
-    // Mostrar el modal
-    const modalEliminar = new bootstrap.Modal(document.getElementById('eliminarProductoModal'));
-    modalEliminar.show();
-}
+    // Inicializar datos de productos para paginación
+    window.datosProductos = <?= json_encode(array_map(function ($p) {
+        return [
+            'id' => $p->getIdProducto(),
+            'codigo' => $p->getCodigo(),
+            'nombre' => $p->getNombre(),
+            'descripcion' => $p->getDescripcion(),
+            'unidad_medida' => $p->getUnidadMedida()
+        ];
+    }, $productos)) ?>;
 </script>

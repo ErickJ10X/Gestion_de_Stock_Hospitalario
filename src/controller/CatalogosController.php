@@ -97,7 +97,7 @@ class CatalogosController
      */
     public function crear(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $idProducto = isset($_POST['id_producto']) ? (int)$_POST['id_producto'] : 0;
@@ -127,10 +127,10 @@ class CatalogosController
             $this->catalogoService->createCatalogo($data);
             
             $this->session->setMessage('success', 'Producto añadido al catálogo correctamente');
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         } catch (Exception $e) {
             $this->session->setMessage('error', 'Error al añadir producto al catálogo: ' . $e->getMessage());
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         }
     }
 
@@ -139,7 +139,7 @@ class CatalogosController
      */
     public function editar(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -170,10 +170,10 @@ class CatalogosController
             $this->catalogoService->updateCatalogo($id, $data);
             
             $this->session->setMessage('success', 'Catálogo actualizado correctamente');
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         } catch (Exception $e) {
             $this->session->setMessage('error', 'Error al actualizar catálogo: ' . $e->getMessage());
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         }
     }
 
@@ -182,7 +182,7 @@ class CatalogosController
      */
     public function eliminar(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -201,10 +201,10 @@ class CatalogosController
                 throw new Exception('No se pudo eliminar el producto del catálogo');
             }
             
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         } catch (Exception $e) {
             $this->session->setMessage('error', 'Error al eliminar producto del catálogo: ' . $e->getMessage());
-            $this->redirectToIndex();
+            $this->redirect('index.php');
         }
     }
 
@@ -298,7 +298,7 @@ class CatalogosController
                 break;
             default:
                 $this->session->setMessage('error', 'Acción no reconocida');
-                $this->redirectToIndex();
+                $this->redirect('index.php');
                 break;
         }
     }
@@ -306,10 +306,13 @@ class CatalogosController
     /**
      * Redirecciona a la página de índice de catálogos
      */
-    private function redirectToIndex(): void
+    private function redirect(string $string): void
     {
-        header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/catalogos/index.php');
-        exit;
+        if (headers_sent()) {
+            echo "<script>window.location.href='$string';</script>";
+        } else {
+            header('Location:  /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/catalogos/' . $string);
+        }
     }
 }
 

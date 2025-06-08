@@ -184,7 +184,7 @@ class PactosController
      */
     public function editar(): void
     {
-        $this->authGuard->requireHospitalGestor();
+        $this->authGuard->requireGestorHospital();
         
         try {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
