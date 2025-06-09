@@ -2,6 +2,9 @@
 
 namespace model\service;
 
+require_once(__DIR__ . '/../../model/entity/Producto.php');
+require_once(__DIR__ . '/../../model/repository/ProductoRepository.php');
+
 use model\entity\Producto;
 use model\repository\ProductoRepository;
 use InvalidArgumentException;

@@ -4,6 +4,8 @@ namespace model\service;
 
 require_once(__DIR__ . '/../../model/entity/Etiqueta.php');
 require_once(__DIR__ . '/../../model/repository/EtiquetaRepository.php');
+require_once(__DIR__ . '/../../model/repository/ReposicionRepository.php');
+
 
 use model\entity\Etiqueta;
 use model\repository\EtiquetaRepository;

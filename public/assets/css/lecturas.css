@@ -1,0 +1,413 @@
+/* Estilos para las pestañas de lecturas de stock - Adaptado al estilo de hospitales */
+
+/* Variables globales para mantener consistencia */
+:root {
+  --primary-color: #004b87; /* Azul de Pegasus */
+  --secondary-color: #65b741; /* Verde para crear */
+  --warning-color: #ff9a3c; /* Naranja para editar */
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+  --dark-text: #343a40;
+  --light-text: #6c757d;
+  --white: #ffffff;
+  --light-bg: #f8f9fc;
+  --border-color: #e3e6f0;
+  --box-shadow: 0 0.15rem 1.75rem 0 rgba(34,39,55,.1);
+  --input-shadow: 0 1px 3px rgba(50,50,93,.15), 0 1px 0 rgba(0,0,0,.02);
+  --transition: all 0.3s ease;
+  --header-bg: #222831;
+}
+
+/* Fondo de página tipo login - Igual que hospitales-container */
+.lecturas-container {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.lecturas-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Tamaños de contenedores principales - Ajustados para usar más espacio */
+.card-lectura {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: var(--white);
+  background-clip: border-box;
+  border: none;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 100%; /* Asegurar que use todo el ancho disponible */
+}
+
+.card-lectura:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 2rem 0 rgba(34,39,55,.15);
+}
+
+/* Colores para la barra de título de los cards */
+.card-header-lectura {
+  padding: 1rem 1.25rem;
+  margin-bottom: 0;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Mejorar tamaño de la tabla */
+.tabla-lecturas {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  background-color: var(--white);
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+}
+
+/* Contenedor principal centrado - Ajustado para más espacio */
+.lecturas-container .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  padding: 1.5rem;
+}
+
+.lecturas-container .row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%; /* Usar todo el ancho disponible */
+}
+
+/* Formularios más anchos */
+.form-section {
+  max-width: 900px; /* Ajustado para coherencia */
+  margin: 0 auto 30px auto;
+  width: 100%;
+  display: block;
+  animation: fadeIn 0.8s ease forwards; /* Animación como en login */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Formularios Mejorados */
+.form-lectura {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Estilizar el grupo de búsqueda igual que en hospitales */
+.search-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 900px; /* Ajustado para coherencia */
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.search-group .input-group {
+  flex: 1;
+  min-width: 180px;
+}
+
+.form-lectura form,
+.form-lectura .form-group,
+.form-lectura .row {
+  width: 100%;
+}
+
+/* Estilo para estados de lectura */
+.estado-lectura {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.estado-lectura--atrasada {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: var(--danger-color);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.estado-lectura--urgente {
+  background-color: rgba(255, 154, 60, 0.2);
+  color: #fd7e14;
+  border: 1px solid rgba(255, 154, 60, 0.3);
+}
+
+.estado-lectura--proxima {
+  background-color: rgba(23, 162, 184, 0.2);
+  color: var(--info-color);
+  border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.estado-lectura--programada {
+  background-color: rgba(101, 183, 65, 0.2);
+  color: var(--secondary-color);
+  border: 1px solid rgba(101, 183, 65, 0.3);
+}
+
+/* Estilo para la fecha próxima */
+.fecha-proxima {
+  font-weight: 500;
+}
+
+.fecha-proxima--atrasada {
+  color: var(--danger-color);
+}
+
+.fecha-proxima--urgente {
+  color: #fd7e14;
+}
+
+/* Mejoras visuales en la tabla de histórico */
+.tabla-historico-lecturas tbody tr:hover {
+  background-color: rgba(0, 75, 135, 0.03);
+}
+
+/* Estilos para el modal de detalle de lectura */
+.detalle-lectura-tabla {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.detalle-lectura-tabla th {
+  width: 40%;
+  background-color: #f1f5f9;
+  font-weight: 600;
+}
+
+/* Indicadores de carga */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.spinner-icon {
+  animation: spinnerRotate 1s linear infinite;
+}
+
+@keyframes spinnerRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para mensajes de feedback */
+.lectura-mensaje {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.lectura-mensaje--success {
+  border-left-color: var(--secondary-color);
+  background-color: rgba(101, 183, 65, 0.1);
+}
+
+.lectura-mensaje--error {
+  border-left-color: var(--danger-color);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.lectura-mensaje--warning {
+  border-left-color: var(--warning-color);
+  background-color: rgba(255, 154, 60, 0.1);
+}
+
+.lectura-mensaje--info {
+  border-left-color: var(--info-color);
+  background-color: rgba(23, 162, 184, 0.1);
+}
+
+/* Paginación info */
+.paginacion-info {
+  color: var(--light-text);
+  font-size: 0.9rem;
+}
+
+/* Botón de registrar específico */
+.btn-registrar-lectura {
+  color: var(--white);
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transition: var(--transition);
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+.btn-registrar-lectura:hover {
+  background-color: #539635;
+  border-color: #539635;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: var(--white);
+}
+
+/* Mejora del espacio y alineación de los formularios - Igual que en hospitales.css */
+.form-group {
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 0.95rem;
+}
+
+.form-control,
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--dark-text);
+  background-color: var(--white);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--input-shadow);
+}
+
+.form-control:focus,
+.form-select:focus {
+  color: var(--dark-text);
+  background-color: var(--white);
+  border-color: #bac8f3;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Centrar los botones de acción del formulario */
+.form-lectura .form-group.mt-4 {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 2rem !important;
+}
+
+/* Centrar los botones de acción */
+.form-group.text-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+/* Estilos específicos para las tablas de lecturas */
+.list-table th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Media queries para responsive */
+@media (max-width: 768px) {
+  .search-group {
+    flex-direction: column;
+  }
+
+  .search-group .input-group {
+    width: 100%;
+  }
+
+  .form-group.mt-4.text-center,
+  .form-group.text-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-lectura .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .tabla-lecturas {
+    min-width: 800px;
+  }
+
+  .paginacion-info {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .search-group button {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .estado-lectura {
+    width: 100%;
+    display: block;
+    margin-top: 5px;
+  }
+
+  .list-table__button {
+    width: 100%;
+    margin-bottom: 5px;
+    justify-content: center;
+  }
+
+  .list-table__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+}

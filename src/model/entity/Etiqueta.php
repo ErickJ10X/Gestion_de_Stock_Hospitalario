@@ -26,6 +26,10 @@ class Etiqueta {
         $this->impresa = $impresa;
     }
 
+    public function getIdEtiqueta(): ?int {
+        return $this->id_etiqueta;
+    }
+
     public function getId(): ?int {
         return $this->id_etiqueta;
     }
@@ -78,6 +82,10 @@ class Etiqueta {
     }
 
     public function isImpresa(): bool {
+        return $this->impresa;
+    }
+
+    public function getImpresa(): bool {
         return $this->impresa;
     }
 

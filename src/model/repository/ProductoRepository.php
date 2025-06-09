@@ -3,6 +3,7 @@
 namespace model\repository;
 
 require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../model/entity/Producto.php';
 
 use model\entity\Producto;
 use PDO;

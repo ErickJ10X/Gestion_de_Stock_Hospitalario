@@ -288,7 +288,7 @@ class LecturasStockController
             }
             
             if (!$registradoPor) {
-                $registradoPor = $_SESSION['user_id'] ?? 0;
+                $registradoPor = $_SESSION['id'] ?? 0;
             }
             
             if (!$registradoPor) {
@@ -475,6 +475,35 @@ class LecturasStockController
     {
         header('Location: /Pegasus-Medical-Gestion_de_Stock_Hospitalario/src/view/lecturaStock/index.php');
         exit;
+    }
+
+    public function prepararDatosDetalleLectura(mixed $lectura)
+    {
+        // Preparar los datos de detalle de la lectura para la vista
+        $detalle = [
+            'id_lectura' => $lectura->getIdLectura(),
+            'id_producto' => $lectura->getIdProducto(),
+            'id_botiquin' => $lectura->getIdBotiquin(),
+            'cantidad_disponible' => $lectura->getCantidadDisponible(),
+            'fecha_lectura' => $lectura->getFechaLectura()->format('Y-m-d H:i:s'),
+            'registrado_por' => $lectura->getRegistradoPor()
+        ];
+
+        // Agregar información adicional si está disponible
+        if ($producto = $lectura->getProducto()) {
+            $detalle['producto_nombre'] = $producto->getNombre();
+            $detalle['producto_codigo'] = $producto->getCodigo();
+        }
+
+        if ($botiquin = $lectura->getBotiquin()) {
+            $detalle['botiquin_nombre'] = $botiquin->getNombre();
+        }
+
+        if ($usuario = $lectura->getUsuario()) {
+            $detalle['usuario_nombre'] = $usuario->getNombre();
+        }
+
+        return $detalle;
     }
 }
 
